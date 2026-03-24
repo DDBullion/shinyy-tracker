@@ -196,6 +196,8 @@
       <div class="tab" onclick="setFilter('panda')">🐼 Pandas</div>
       <div class="tab" onclick="setFilter('zombucks')">🧟 Zombucks</div>
       <div class="tab" onclick="setFilter('geiger')">🇩🇪 Geiger</div>
+      <div class="tab" onclick="setFilter('engelhard')">⚗️ Engelhard</div>
+      <div class="tab" onclick="setFilter('prospector')">⛏️ Prospector</div>
     </div>
 
     <div class="search-wrap" id="silverSearchWrap">
@@ -293,7 +295,7 @@ const SILVER_DEALERS = [
   {size:'1oz',  name:'1oz Silver Rounds (Random Design)',    dealer:'SD Bullion',       prem:4.28,  oz:1,      ship:'Free @ $499', url:'https://sdbullion.com/1-oz-generic-silver-rounds', verified:true},
   {size:'100oz',name:'100oz Silver Bar (Secondary Mkt)',     dealer:'Monument Metals',  prem:1.28,  oz:100,    ship:'Free @ $199', url:'https://monumentmetals.com/silver/silver-bars/100-oz-silver-bars.html', verified:true},
   {size:'100oz',name:'100oz Dillon Gage Silver Bar',         dealer:'Monument Metals',  prem:2.33,  oz:100,    ship:'Free @ $199', url:'https://monumentmetals.com/silver/silver-bars/100-oz-silver-bars.html', verified:true},
-  {size:'100oz',name:'100oz Engelhard Silver Bar',           dealer:'Monument Metals',  prem:2.83,  oz:100,    ship:'Free @ $199', url:'https://monumentmetals.com/silver/silver-bars/100-oz-silver-bars.html', verified:true},
+  {size:'100oz',name:'100oz Engelhard Silver Bar',           dealer:'Monument Metals',  prem:2.83,  oz:100,    ship:'Free @ $199', url:'https://monumentmetals.com/silver/silver-bars/100-oz-silver-bars.html', tag:'engelhard', verified:true},
   {size:'10oz', name:'10oz SilverTowne Buffalo Bar',         dealer:'JM Bullion',       prem:3.75,  oz:10,     ship:'Free @ $499', url:'https://www.jmbullion.com/10-oz-silvertowne-buffalo-silver-bar/', verified:true},
   // ── Estimated ──
   {size:'5oz',  name:'America The Beautiful 5oz Coin (BU)', dealer:'Bullion Exchanges',prem:1.88,  oz:5,      ship:'Free @ $199', url:'https://bullionexchanges.com/5-oz-silver-america-the-beautiful-atb-coin-bu-random-design'},
@@ -301,7 +303,7 @@ const SILVER_DEALERS = [
   {size:'kilo', name:'1 Kilo Silver Bars (Browse All)',     dealer:'Bullion Exchanges',prem:2.15,  oz:32.15,  ship:'Free @ $199', url:'https://bullionexchanges.com/buy-silver/bars/1-kilo-silver-bars'},
   {size:'100oz',name:'100oz Nadir Refinery Silver Bar',     dealer:'Bullion Exchanges',prem:2.29,  oz:100,    ship:'Free @ $199', url:'https://bullionexchanges.com/100-oz-nadir-refinery-silver-bar-w-assay'},
   {size:'1oz',  name:"Gov't Minted Silver Coins (Random)",  dealer:'Bullion Exchanges',prem:2.31,  oz:1,      ship:'Free @ $199', url:'https://bullionexchanges.com/buy-silver/coins/1-oz-silver-coins'},
-  {size:'100oz',name:'Engelhard 100oz Silver Bar (Poured)', dealer:'Safe Haven Metal', prem:2.47,  oz:100,    ship:'Free @ $199', url:'https://safehavenmetal.com/product/100-oz-silver-bar-engelhard-poured-extruded/'},
+  {size:'100oz',name:'Engelhard 100oz Silver Bar (Poured)', dealer:'Safe Haven Metal', prem:2.47,  oz:100,    ship:'Free @ $199', url:'https://safehavenmetal.com/product/100-oz-silver-bar-engelhard-poured-extruded/', tag:'engelhard'},
   {size:'5oz',  name:'5oz Silver Bar (Secondary Market)',   dealer:'Monument Metals',  prem:2.99,  oz:5,      ship:'Free @ $199', url:'https://monumentmetals.com/secondary-market-5-oz-silver-bar-999-fine.html'},
   {size:'1oz',  name:'Canada 1oz Silver Maple Leaf',        dealer:'Pacific Precious', prem:3.65,  oz:1,      ship:'Varies',      url:'https://www.pacificpreciousmetals.com/product/1295-any-year-1oz-canadian-silver-maple-leaf'},
   {size:'1oz',  name:'American Silver Eagle (Cull)',        dealer:'Monument Metals',  prem:3.91,  oz:1,      ship:'Free @ $199', url:'https://monumentmetals.com/cull-silver-eagles-random-date.html'},
@@ -413,6 +415,19 @@ const SILVER_DEALERS = [
   {size:'1oz', name:'1oz Australian Silver Kangaroo (BU)', dealer:'SD Bullion',       prem:3.49,  oz:1, ship:'Free @ $499', url:'https://sdbullion.com/silver/perth-mint-silver-coins/australian-silver-kangaroo-coins', tag:'kangaroo'},
   {size:'1oz', name:'1oz Australian Silver Kangaroo (BU)', dealer:'JM Bullion',       prem:3.99,  oz:1, ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-australian-silver-kangaroo-coin-vyc/', tag:'kangaroo'},
   {size:'1oz', name:'1oz Australian Silver Kangaroo (BU)', dealer:'APMEX',            prem:4.49,  oz:1, ship:'Free @ $199', url:'https://www.apmex.com/category/24045/the-perth-mint-silver-kangaroo-coins', tag:'kangaroo'},
+
+  // ── Engelhard Silver Bars (est. Mar 24, 2026 · Spot ~$68.92) ──
+  {size:'1oz',  name:'1oz Engelhard Silver Bar (Vintage)',   dealer:'JM Bullion',       prem:18.00, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+silver+bar', tag:'engelhard'},
+  {size:'1oz',  name:'1oz Engelhard Silver Bar (Vintage)',   dealer:'APMEX',            prem:20.00, oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+1+oz+silver+bar', tag:'engelhard'},
+  {size:'5oz',  name:'5oz Engelhard Silver Bar (Vintage)',   dealer:'JM Bullion',       prem:10.00, oz:5,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+silver+bar', tag:'engelhard'},
+  {size:'5oz',  name:'5oz Engelhard Silver Bar (Vintage)',   dealer:'APMEX',            prem:11.00, oz:5,      ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+5+oz+silver+bar', tag:'engelhard'},
+  {size:'10oz', name:'10oz Engelhard Silver Bar (Vintage)',  dealer:'JM Bullion',       prem:7.00,  oz:10,     ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+silver+bar', tag:'engelhard'},
+  {size:'10oz', name:'10oz Engelhard Silver Bar (Vintage)',  dealer:'APMEX',            prem:8.00,  oz:10,     ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+10+oz+silver+bar', tag:'engelhard'},
+
+  // ── Engelhard Prospector Rounds (est. Mar 24, 2026 · Spot ~$68.92) ──
+  {size:'1oz',  name:'1oz Engelhard Prospector Silver Round',dealer:'JM Bullion',       prem:20.00, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+prospector', tag:'prospector'},
+  {size:'1oz',  name:'1oz Engelhard Prospector Silver Round',dealer:'APMEX',            prem:22.00, oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+prospector+silver+round', tag:'prospector'},
+  {size:'1oz',  name:'1oz Engelhard Prospector Silver Round',dealer:'SD Bullion',       prem:19.00, oz:1,      ship:'Free @ $499', url:'https://sdbullion.com/search?q=engelhard+prospector', tag:'prospector'},
 
   // ── Geiger Silver Bars (all OOS as of Mar 23, 2026) ──
   {size:'1oz',  name:'1oz Geiger Original Silver Bar',      dealer:'JM Bullion',       prem:5.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
@@ -663,6 +678,8 @@ function renderSilverDeals() {
   else if (silverFilter === 'britannia')  list = list.filter(d => d.tag === 'britannia');
   else if (silverFilter === 'krugerrand') list = list.filter(d => d.tag === 'krugerrand');
   else if (silverFilter === 'kangaroo')   list = list.filter(d => d.tag === 'kangaroo');
+  else if (silverFilter === 'engelhard')  list = list.filter(d => d.tag === 'engelhard');
+  else if (silverFilter === 'prospector') list = list.filter(d => d.tag === 'prospector');
   else if (silverFilter === 'apmex')      list = list.filter(d => d.dealer === 'APMEX');
   else if (silverFilter === 'provident')  list = list.filter(d => d.dealer === 'Provident Metals');
   else if (silverFilter !== 'all')        list = list.filter(d => d.size === silverFilter);
