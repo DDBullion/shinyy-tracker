@@ -50,6 +50,31 @@
     .metal-tab{flex:1;text-align:center;padding:10px 8px;font-size:0.9rem;font-weight:700;cursor:pointer;color:var(--mut);border-bottom:3px solid transparent;transition:all .2s;}
     .metal-tab.active-silver{color:var(--sil);border-bottom-color:var(--sil);}
     .metal-tab.active-gold{color:var(--gold);border-bottom-color:var(--gold);}
+    .metal-tab.active-sold{color:#16a34a;border-bottom-color:#16a34a;}
+
+    /* ── Last 3 Sold ── */
+    .sold-wrap{padding:14px;}
+    .sold-search-box{display:flex;gap:8px;margin-bottom:18px;}
+    .sold-input{flex:1;padding:11px 16px;border-radius:12px;border:1.5px solid var(--bdr);background:var(--sur);color:var(--txt);font-size:0.92rem;font-family:inherit;outline:none;}
+    .sold-input:focus{border-color:var(--acc);}
+    .sold-btn{padding:11px 20px;border-radius:12px;background:#16a34a;color:#fff;border:none;font-weight:700;font-size:0.88rem;cursor:pointer;white-space:nowrap;font-family:inherit;}
+    .sold-btn:hover{background:#15803d;}
+    .sold-btn:disabled{background:var(--bdr);cursor:not-allowed;}
+    .sold-hint{font-size:0.75rem;color:var(--mut);margin-bottom:16px;line-height:1.5;}
+    .sold-card{display:flex;gap:12px;background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:10px;text-decoration:none;color:inherit;transition:box-shadow .15s;}
+    .sold-card:hover{box-shadow:0 2px 12px rgba(91,94,246,.12);}
+    .sold-img{width:72px;height:72px;object-fit:contain;border-radius:8px;background:var(--sur2);flex-shrink:0;}
+    .sold-img-placeholder{width:72px;height:72px;border-radius:8px;background:var(--sur2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+    .sold-info{flex:1;min-width:0;}
+    .sold-title{font-size:0.82rem;font-weight:600;color:var(--txt);margin-bottom:5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .sold-price{font-size:1.2rem;font-weight:800;color:#16a34a;}
+    .sold-meta{font-size:0.72rem;color:var(--mut);margin-top:3px;}
+    .sold-empty{text-align:center;padding:40px 20px;color:var(--mut);font-size:0.9rem;}
+    .sold-loading{text-align:center;padding:30px;color:var(--mut);font-size:0.88rem;}
+    .sold-error{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);border-radius:10px;padding:12px;color:#dc2626;font-size:0.82rem;margin-top:8px;}
+    .sold-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+    .sold-sug{padding:5px 12px;border-radius:16px;border:1px solid var(--bdr);background:var(--sur);color:var(--mut);font-size:0.75rem;cursor:pointer;}
+    .sold-sug:hover{background:var(--acc);border-color:var(--acc);color:#fff;}
 
     /* ── Spot Card ── */
     .spot-wrap{padding:14px 14px 0;}
@@ -178,6 +203,7 @@
     <div class="metal-tabs">
       <div class="metal-tab active-silver" id="tabSilver" onclick="setMetal('silver')">🥈 Silver</div>
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
+      <div class="metal-tab" id="tabSold" onclick="setMetal('sold')">🔍 Last Sold</div>
     </div>
   </div>
 
@@ -323,6 +349,34 @@
     <div class="safe"></div>
   </div>
 
+  <!-- ════════════════════════════════════
+       LAST SOLD PAGE
+       ════════════════════════════════════ -->
+  <div class="page" id="pageSold">
+    <div class="sold-wrap">
+
+      <div class="sold-search-box">
+        <input type="search" id="soldInput" class="sold-input" placeholder="e.g. 1oz Silver Eagle, Morgan Dollar..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')doSoldSearch()">
+        <button class="sold-btn" id="soldBtn" onclick="doSoldSearch()">Search</button>
+      </div>
+
+      <div class="sold-hint">🔍 Search eBay's completed listings to see the <b>last 3 actual sold prices</b> — including accepted best offers that eBay hides from buyers.</div>
+
+      <div class="sold-suggestions">
+        <span class="sold-sug" onclick="soldQuick('1oz Silver Eagle')">1oz Silver Eagle</span>
+        <span class="sold-sug" onclick="soldQuick('1oz Gold Eagle')">1oz Gold Eagle</span>
+        <span class="sold-sug" onclick="soldQuick('100oz Silver Bar')">100oz Silver Bar</span>
+        <span class="sold-sug" onclick="soldQuick('1oz Silver Maple')">1oz Silver Maple</span>
+        <span class="sold-sug" onclick="soldQuick('Morgan Silver Dollar')">Morgan Dollar</span>
+        <span class="sold-sug" onclick="soldQuick('Engelhard Silver Bar')">Engelhard Bar</span>
+      </div>
+
+      <div id="soldResults"></div>
+
+    </div>
+    <div class="safe"></div>
+  </div>
+
 </div><!-- end #appContent -->
 
 <script>
@@ -332,13 +386,63 @@ function setMetal(m) {
   currentMetal = m;
   document.getElementById('pageSilver').classList.toggle('active', m === 'silver');
   document.getElementById('pageGold').classList.toggle('active', m === 'gold');
+  document.getElementById('pageSold').classList.toggle('active', m === 'sold');
   const ts = document.getElementById('tabSilver');
   const tg = document.getElementById('tabGold');
+  const td = document.getElementById('tabSold');
   ts.className = 'metal-tab' + (m === 'silver' ? ' active-silver' : '');
   tg.className = 'metal-tab' + (m === 'gold' ? ' active-gold' : '');
-  document.getElementById('headerSub').textContent = m === 'silver' ? '🥈 Silver · Live Every 5 Min' : '🥇 Gold · Live Every 5 Min';
+  td.className = 'metal-tab' + (m === 'sold' ? ' active-sold' : '');
+  if (m === 'silver') document.getElementById('headerSub').textContent = '🥈 Silver · Live Every 5 Min';
+  else if (m === 'gold') document.getElementById('headerSub').textContent = '🥇 Gold · Live Every 5 Min';
+  else document.getElementById('headerSub').textContent = '🔍 Last 3 Sold on eBay';
   if (m === 'silver' && silverSpot) renderSilver();
   if (m === 'gold' && goldSpot) renderGold();
+}
+
+// ── Last 3 Sold ──
+function soldQuick(q) {
+  document.getElementById('soldInput').value = q;
+  doSoldSearch();
+}
+
+async function doSoldSearch() {
+  const q = document.getElementById('soldInput').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('soldBtn');
+  const out = document.getElementById('soldResults');
+  btn.disabled = true;
+  btn.textContent = 'Searching...';
+  out.innerHTML = '<div class="sold-loading">⏳ Searching eBay sold listings...</div>';
+  try {
+    const res = await fetch('/.netlify/functions/ebay-sold?query=' + encodeURIComponent(q));
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Request failed');
+    if (!data.length) {
+      out.innerHTML = '<div class="sold-empty">No sold listings found for "<b>' + q + '</b>".<br>Try a different search term.</div>';
+      return;
+    }
+    out.innerHTML = data.map(item => {
+      const d = item.date ? new Date(item.date) : null;
+      const dateStr = d ? d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '';
+      const img = item.image
+        ? `<img class="sold-img" src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="sold-img-placeholder">🪙</div>`;
+      return `<a class="sold-card" href="${item.url}" target="_blank" rel="noopener">
+        ${img}
+        <div class="sold-info">
+          <div class="sold-title">${item.title}</div>
+          <div class="sold-price">$${item.price}</div>
+          <div class="sold-meta">${dateStr}${item.condition ? ' · ' + item.condition : ''}</div>
+        </div>
+      </a>`;
+    }).join('');
+  } catch(e) {
+    out.innerHTML = `<div class="sold-error">⚠️ ${e.message || 'Could not fetch results. Please try again.'}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Search';
+  }
 }
 
 // ═══════════════════════════════════════════════
