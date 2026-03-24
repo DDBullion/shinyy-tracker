@@ -110,6 +110,10 @@
     .err-card{margin:16px 12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:16px;text-align:center;font-size:0.85rem;color:#fca5a5;line-height:1.6;}
     .retry{margin-top:10px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:8px 20px;border-radius:20px;font-size:0.8rem;cursor:pointer;}
     .fnote{margin:6px 12px 10px;background:rgba(129,140,248,.07);border:1px solid rgba(129,140,248,.2);border-radius:10px;padding:10px 12px;font-size:0.73rem;color:#a5b4fc;line-height:1.6;}
+    .donate-wrap{margin:4px 12px 22px;text-align:center;}
+    .donate-btn{display:inline-flex;align-items:center;gap:8px;background:#003087;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:0.3px;transition:background 0.2s;}
+    .donate-btn:hover{background:#002065;}
+    .donate-sub{font-size:0.65rem;color:var(--mut);margin-top:6px;}
     .inote{margin:4px 12px 10px;background:rgba(234,179,8,.07);border:1px solid rgba(234,179,8,.2);border-radius:10px;padding:10px 12px;font-size:0.72rem;color:#fde047;line-height:1.6;}
     .safe{height:calc(env(safe-area-inset-bottom,0px) + 20px);}
 
@@ -136,9 +140,12 @@
   <!-- Sticky Header -->
   <div class="header">
     <div class="hrow">
-      <div>
-        <div class="htitle" id="headerTitle">🥈 Shinyy — Silver</div>
-        <div class="hsub">Shinyy Tracker · Live Every 5 Min</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <img src="icons/apple-touch-icon.png" alt="Shinyy Tracker" style="width:42px;height:42px;border-radius:10px;flex-shrink:0;">
+        <div>
+          <div class="htitle" id="headerTitle">🥈 Shinyy — Silver</div>
+          <div class="hsub">Shinyy Tracker · Live Every 5 Min</div>
+        </div>
       </div>
       <button class="rbtn" id="rbtn" onclick="doRefresh()">↻ Refresh</button>
     </div>
@@ -207,6 +214,13 @@
     <div id="silverDeals"><div class="loading-msg">Fetching live silver prices...</div></div>
 
     <div class="fnote">💡 <b>All-In</b> includes 3.5% CC fee. Pay by <b>check / ACH / wire</b> to use base price and save more. Premiums verified March 23, 2026 · Spot ~$68.92.</div>
+    <div class="donate-wrap">
+      <a class="donate-btn" href="https://www.paypal.com/donate?business=Dominic.dellaripa%40gmail.com&item_name=Shinyy+Tracker&currency_code=USD" target="_blank" rel="noopener">
+        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
+        Support Shinyy Tracker
+      </a>
+      <div class="donate-sub">Enjoying the tracker? A small donation keeps it free & running 🙏</div>
+    </div>
     <div class="safe"></div>
   </div>
 
@@ -265,6 +279,13 @@
     <div id="goldDeals"><div class="loading-msg">Fetching live gold prices...</div></div>
 
     <div class="fnote" style="border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.05);color:#fcd34d;">💡 <b>All-In</b> includes 3.5% CC fee. Gold premiums verified March 23, 2026 · Spot ~$4,452/oz. Gram items display per-gram price.</div>
+    <div class="donate-wrap">
+      <a class="donate-btn" href="https://www.paypal.com/donate?business=Dominic.dellaripa%40gmail.com&item_name=Shinyy+Tracker&currency_code=USD" target="_blank" rel="noopener">
+        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
+        Support Shinyy Tracker
+      </a>
+      <div class="donate-sub">Enjoying the tracker? A small donation keeps it free & running 🙏</div>
+    </div>
     <div class="safe"></div>
   </div>
 
