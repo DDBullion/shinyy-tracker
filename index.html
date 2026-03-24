@@ -920,7 +920,7 @@ if (navigator.standalone || matchMedia('(display-mode: standalone)').matches) {
   const b = document.getElementById('inote'); if (b) b.style.display='none';
 }
 
-if (sessionStorage.getItem('st_auth') === '1') fetchSpot();
+fetchSpot();
 </script>
 
 <script>
