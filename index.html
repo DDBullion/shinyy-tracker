@@ -69,11 +69,22 @@
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
     /* ── Sub Filter Tabs ── */
-    .tabs{display:flex;gap:6px;padding:6px 12px 10px;overflow-x:auto;scrollbar-width:none;}
+    .tabs{display:flex;gap:6px;padding:6px 12px 10px;overflow-x:auto;scrollbar-width:none;align-items:center;}
     .tabs::-webkit-scrollbar{display:none;}
     .tab{padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;border:1px solid var(--bdr);color:var(--mut);background:var(--sur);cursor:pointer;white-space:nowrap;}
     .tab.active{background:var(--acc);border-color:var(--acc);color:#fff;}
     .tab.active.gold-active{background:var(--gold);border-color:var(--gold);color:#000;}
+    /* ── Coin Dropdown ── */
+    .coin-dd-wrap{position:relative;display:inline-flex;align-items:center;flex-shrink:0;}
+    .coin-dropdown{padding:6px 28px 6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;border:1px solid var(--bdr);color:var(--mut);background:var(--sur);cursor:pointer;white-space:nowrap;-webkit-appearance:none;appearance:none;outline:none;font-family:inherit;}
+    .coin-dropdown.coin-active{background:var(--acc);border-color:var(--acc);color:#fff;}
+    .coin-dropdown.coin-active-gold{background:var(--gold);border-color:var(--gold);color:#000;}
+    .coin-dd-wrap::after{content:'▾';position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:0.72rem;color:var(--mut);pointer-events:none;}
+    .coin-dd-wrap.dd-active::after{color:#fff;}
+    .coin-dd-wrap.dd-active-gold::after{color:#000;}
+    /* ── Donate Button ── */
+    .donate-btn{display:inline-flex;align-items:center;gap:8px;background:#ffffff;color:#003087;border:2px solid #003087;border-radius:10px;padding:11px 22px;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:0.3px;transition:background 0.2s;}
+    .donate-btn:hover{background:#eef2ff;}
 
     /* ── Section Labels ── */
     .sec{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--mut);padding:4px 16px 6px;}
@@ -114,8 +125,6 @@
     .retry{margin-top:10px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:#dc2626;padding:8px 20px;border-radius:20px;font-size:0.8rem;cursor:pointer;}
     .fnote{margin:6px 12px 10px;background:rgba(91,94,246,.05);border:1px solid rgba(91,94,246,.15);border-radius:10px;padding:10px 12px;font-size:0.73rem;color:#4a4aaa;line-height:1.6;}
     .donate-wrap{margin:4px 12px 22px;text-align:center;}
-    .donate-btn{display:inline-flex;align-items:center;gap:8px;background:#003087;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:0.3px;transition:background 0.2s;}
-    .donate-btn:hover{background:#002065;}
     .donate-sub{font-size:0.65rem;color:var(--mut);margin-top:6px;}
     .inote{margin:4px 12px 10px;background:rgba(180,83,9,.06);border:1px solid rgba(180,83,9,.18);border-radius:10px;padding:10px 12px;font-size:0.72rem;color:#b45309;line-height:1.6;}
     .safe{height:calc(env(safe-area-inset-bottom,0px) + 20px);}
@@ -193,19 +202,24 @@
       <div class="tab" onclick="setFilter('10oz')">10 oz</div>
       <div class="tab" onclick="setFilter('100oz')">100 oz</div>
       <div class="tab" onclick="setFilter('kilo')">Kilo</div>
-      <div class="tab" onclick="setFilter('eagle')">🇺🇸 Eagles</div>
-      <div class="tab" onclick="setFilter('maple')">🍁 Maples</div>
-      <div class="tab" onclick="setFilter('buffalo')">🦬 Buffalos</div>
-      <div class="tab" onclick="setFilter('britannia')">🇬🇧 Britannias</div>
-      <div class="tab" onclick="setFilter('krugerrand')">🦁 Krugerrands</div>
-      <div class="tab" onclick="setFilter('kangaroo')">🦘 Kangaroos</div>
-      <div class="tab" onclick="setFilter('scottsdale')">🏔 Scottsdale</div>
-      <div class="tab" onclick="setFilter('libertad')">🦅 Libertads</div>
-      <div class="tab" onclick="setFilter('panda')">🐼 Pandas</div>
-      <div class="tab" onclick="setFilter('zombucks')">🧟 Zombucks</div>
-      <div class="tab" onclick="setFilter('geiger')">🇩🇪 Geiger</div>
-      <div class="tab" onclick="setFilter('engelhard')">⚗️ Engelhard</div>
-      <div class="tab" onclick="setFilter('prospector')">⛏️ Prospector</div>
+      <div class="coin-dd-wrap" id="silverDDWrap">
+        <select class="coin-dropdown" id="silverCoinDD" onchange="setSilverCoinFilter(this.value)">
+          <option value="">🪙 Coin Type</option>
+          <option value="eagle">🇺🇸 Eagles</option>
+          <option value="maple">🍁 Maples</option>
+          <option value="buffalo">🦬 Buffalos</option>
+          <option value="britannia">🇬🇧 Britannias</option>
+          <option value="krugerrand">🦁 Krugerrands</option>
+          <option value="kangaroo">🦘 Kangaroos</option>
+          <option value="scottsdale">🏔 Scottsdale</option>
+          <option value="libertad">🦅 Libertads</option>
+          <option value="panda">🐼 Pandas</option>
+          <option value="zombucks">🧟 Zombucks</option>
+          <option value="geiger">🇩🇪 Geiger</option>
+          <option value="engelhard">⚗️ Engelhard</option>
+          <option value="prospector">⛏️ Prospector</option>
+        </select>
+      </div>
     </div>
 
     <div class="search-wrap" id="silverSearchWrap">
@@ -262,15 +276,19 @@
       <div class="tab" onclick="setGoldFilter('half')">1/2 oz</div>
       <div class="tab" onclick="setGoldFilter('1oz')">1 oz</div>
       <div class="tab" onclick="setGoldFilter('kilo')">Kilo</div>
-      <div class="tab" onclick="setGoldFilter('eagle')">🇺🇸 Eagles</div>
-      <div class="tab" onclick="setGoldFilter('maple')">🍁 Maples</div>
-      <div class="tab" onclick="setGoldFilter('buffalo')">🦬 Buffalos</div>
-      <div class="tab" onclick="setGoldFilter('britannia')">🇬🇧 Britannias</div>
-      <div class="tab" onclick="setGoldFilter('krugerrand')">🦁 Krugerrands</div>
-      <div class="tab" onclick="setGoldFilter('kangaroo')">🦘 Kangaroos</div>
-      <div class="tab" onclick="setGoldFilter('scottsdale')">🏔 Scottsdale</div>
-      <div class="tab" onclick="setGoldFilter('libertad')">🦅 Libertads</div>
-      <div class="tab" onclick="setGoldFilter('panda')">🐼 Pandas</div>
+      <div class="coin-dd-wrap" id="goldDDWrap">
+        <select class="coin-dropdown" id="goldCoinDD" onchange="setGoldCoinFilter(this.value)">
+          <option value="">🪙 Coin Type</option>
+          <option value="eagle">🇺🇸 Eagles</option>
+          <option value="maple">🍁 Maples</option>
+          <option value="buffalo">🦬 Buffalos</option>
+          <option value="britannia">🇬🇧 Britannias</option>
+          <option value="krugerrand">🦁 Krugerrands</option>
+          <option value="kangaroo">🦘 Kangaroos</option>
+          <option value="libertad">🦅 Libertads</option>
+          <option value="panda">🐼 Pandas</option>
+        </select>
+      </div>
     </div>
 
     <div class="search-wrap" id="goldSearchWrap">
@@ -856,6 +874,11 @@ function setFilter(f) {
   document.querySelectorAll('#silverTabs .tab').forEach(t =>
     t.classList.toggle('active', t.getAttribute('onclick')?.includes("'"+f+"'"))
   );
+  // Reset coin dropdown
+  const dd = document.getElementById('silverCoinDD');
+  const wrap = document.getElementById('silverDDWrap');
+  if (dd) { dd.value = ''; dd.classList.remove('coin-active'); }
+  if (wrap) wrap.classList.remove('dd-active');
   renderSilverDeals();
 }
 
@@ -866,6 +889,42 @@ function setGoldFilter(f) {
     t.classList.toggle('active', on);
     t.classList.toggle('gold-active', on);
   });
+  // Reset coin dropdown
+  const dd = document.getElementById('goldCoinDD');
+  const wrap = document.getElementById('goldDDWrap');
+  if (dd) { dd.value = ''; dd.classList.remove('coin-active-gold'); }
+  if (wrap) wrap.classList.remove('dd-active-gold');
+  renderGoldDeals();
+}
+
+function setSilverCoinFilter(val) {
+  const dd = document.getElementById('silverCoinDD');
+  const wrap = document.getElementById('silverDDWrap');
+  if (!val) {
+    setFilter('all');
+    return;
+  }
+  silverFilter = val;
+  document.querySelectorAll('#silverTabs .tab').forEach(t => t.classList.remove('active'));
+  dd.classList.add('coin-active');
+  wrap.classList.add('dd-active');
+  renderSilverDeals();
+}
+
+function setGoldCoinFilter(val) {
+  const dd = document.getElementById('goldCoinDD');
+  const wrap = document.getElementById('goldDDWrap');
+  if (!val) {
+    setGoldFilter('all');
+    return;
+  }
+  goldFilter = val;
+  document.querySelectorAll('#goldTabs .tab').forEach(t => {
+    t.classList.remove('active');
+    t.classList.remove('gold-active');
+  });
+  dd.classList.add('coin-active-gold');
+  wrap.classList.add('dd-active-gold');
   renderGoldDeals();
 }
 
