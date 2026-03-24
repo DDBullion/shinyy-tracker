@@ -4,28 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Shinyy Tracker">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#0f0f14">
+  <meta name="theme-color" content="#ffffff">
   <title>Shinyy Tracker</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
   <style>
-    :root{--bg:#0f0f14;--sur:#1a1a22;--sur2:#22222e;--bdr:#2a2a3a;--txt:#e8e8f0;--mut:#7777a0;--sil:#d4d4e8;--grn:#22c55e;--yel:#eab308;--orn:#f97316;--red:#ef4444;--acc:#818cf8;--gold:#f59e0b;--gold2:#fcd34d;}
+    :root{--bg:#f2f3f9;--sur:#ffffff;--sur2:#eaecf5;--bdr:#d4d7e8;--txt:#1a1a30;--mut:#7070a0;--sil:#4a4aaa;--grn:#16a34a;--yel:#b45309;--orn:#c2410c;--red:#dc2626;--acc:#5b5ef6;--gold:#d97706;--gold2:#f59e0b;}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;min-height:100dvh;}
 
 
     /* ── Header ── */
-    .header{background:linear-gradient(160deg,#1a1a2e,#16213e);padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 0;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:10;}
+    .header{background:linear-gradient(160deg,#ffffff,#f0f1fb);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 0;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:10;}
     .hrow{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;}
-    .htitle{font-size:1.2rem;font-weight:800;color:var(--sil);}
-    .hsub{font-size:0.68rem;color:var(--mut);margin-top:1px;}
-    .rbtn{background:var(--sur2);border:1px solid var(--bdr);border-radius:20px;padding:6px 12px;font-size:0.78rem;color:var(--acc);cursor:pointer;font-weight:600;transition:opacity .15s;}
+    .hbrand{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
+    .hlogo{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(91,94,246,0.18));}
+    .htitle{font-size:1.45rem;font-weight:900;color:var(--txt);letter-spacing:0.5px;text-align:center;}
+    .hsub{font-size:0.7rem;color:var(--mut);margin-top:1px;text-align:center;letter-spacing:0.3px;}
+    .rbtn{background:#ffffff;border:1px solid var(--bdr);border-radius:20px;padding:6px 12px;font-size:0.78rem;color:var(--acc);cursor:pointer;font-weight:600;transition:opacity .15s;white-space:nowrap;}
     .rbtn:active{opacity:.6;}
+    .hspacer{width:80px;}
 
     /* ── Top-level Metal Tabs ── */
     .metal-tabs{display:flex;gap:0;border-bottom:none;}
@@ -36,19 +39,19 @@
     /* ── Spot Card ── */
     .spot-wrap{padding:14px 14px 0;}
     .spot-card{border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
-    .spot-card.silver-card{background:linear-gradient(135deg,var(--sur),var(--sur2));border:1px solid var(--bdr);}
-    .spot-card.gold-card{background:linear-gradient(135deg,#1f1a0a,#2a2210);border:1px solid #3a3010;}
+    .spot-card.silver-card{background:linear-gradient(135deg,#f0f0ff,#e5e6f8);border:1px solid #c8caec;}
+    .spot-card.gold-card{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #e9c84a;}
     .spot-lbl{font-size:0.62rem;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
     .spot-val{font-size:2.6rem;font-weight:900;letter-spacing:-1.5px;line-height:1;}
-    .spot-val.silver-val{color:var(--sil);}
-    .spot-val.gold-val{color:var(--gold);}
+    .spot-val.silver-val{color:#3b3baa;}
+    .spot-val.gold-val{color:#b45309;}
     .spot-sub{font-size:0.7rem;color:var(--mut);margin-top:3px;}
     .spot-badge{font-size:0.8rem;font-weight:700;padding:5px 12px;border-radius:20px;margin-bottom:5px;display:inline-block;}
-    .badge-live{background:rgba(34,197,94,.15);color:var(--grn);}
-    .badge-up{background:rgba(34,197,94,.15);color:var(--grn);}
-    .badge-dn{background:rgba(239,68,68,.15);color:var(--red);}
-    .badge-load{background:rgba(129,140,248,.15);color:var(--acc);}
-    .badge-err{background:rgba(239,68,68,.12);color:var(--red);}
+    .badge-live{background:rgba(22,163,74,.12);color:var(--grn);}
+    .badge-up{background:rgba(22,163,74,.12);color:var(--grn);}
+    .badge-dn{background:rgba(220,38,38,.12);color:var(--red);}
+    .badge-load{background:rgba(91,94,246,.12);color:var(--acc);}
+    .badge-err{background:rgba(220,38,38,.1);color:var(--red);}
     .spot-time{font-size:0.62rem;color:var(--mut);}
     .tgt{font-size:0.7rem;color:var(--grn);font-weight:600;margin-top:4px;}
     .tgt.gold-tgt{color:var(--gold);}
@@ -76,24 +79,24 @@
     .sec{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--mut);padding:4px 16px 6px;}
 
     /* ── Deal Cards ── */
-    .deal{background:var(--sur);border-radius:12px;margin:0 12px 7px;padding:11px 13px;border:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;color:inherit;}
+    .deal{background:var(--sur);border-radius:12px;margin:0 12px 7px;padding:11px 13px;border:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;color:inherit;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
     .deal:active{opacity:.7;}
     .deal.hot{border-left:3px solid var(--grn);}
-    .deal.good{border-left:3px solid var(--yel);}
+    .deal.good{border-left:3px solid #ca8a04;}
     .deal.fair{border-left:3px solid var(--orn);}
     .deal.high{border-left:3px solid var(--red);}
-    .deal.oos{border-left:3px solid #555;opacity:0.65;}
-    .oos-lbl{font-size:0.58rem;background:rgba(120,120,140,.3);color:#aaa;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px;vertical-align:middle;}
-    .ztag{background:rgba(239,68,68,.2);color:#fca5a5;}
-    .smint-tag{background:rgba(245,158,11,.2);color:#fcd34d;}
-    .gtag-style{background:rgba(129,140,248,.15);color:var(--acc);}
+    .deal.oos{border-left:3px solid #bbb;opacity:0.6;}
+    .oos-lbl{font-size:0.58rem;background:rgba(120,120,140,.15);color:#999;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px;vertical-align:middle;}
+    .ztag{background:rgba(220,38,38,.12);color:#b91c1c;}
+    .smint-tag{background:rgba(180,83,9,.12);color:#b45309;}
+    .gtag-style{background:rgba(91,94,246,.12);color:var(--acc);}
     .dl{flex:1;min-width:0;}
     .dn{font-size:0.83rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .dm{font-size:0.7rem;color:var(--mut);margin-top:2px;}
     .ds{font-size:0.62rem;color:var(--grn);margin-top:2px;}
-    .stag{display:inline-block;font-size:0.62rem;padding:1px 5px;border-radius:6px;background:rgba(129,140,248,.2);color:var(--acc);font-weight:700;margin-right:3px;}
-    .mmtag{background:rgba(234,179,8,.15);color:var(--yel);}
-    .btag{font-size:0.58rem;background:var(--grn);color:#000;padding:1px 5px;border-radius:4px;font-weight:800;margin-left:3px;vertical-align:middle;}
+    .stag{display:inline-block;font-size:0.62rem;padding:1px 5px;border-radius:6px;background:rgba(91,94,246,.1);color:var(--acc);font-weight:700;margin-right:3px;}
+    .mmtag{background:rgba(180,83,9,.1);color:#b45309;}
+    .btag{font-size:0.58rem;background:var(--grn);color:#fff;padding:1px 5px;border-radius:4px;font-weight:800;margin-left:3px;vertical-align:middle;}
     .dr{text-align:right;flex-shrink:0;}
     .dp{font-size:1.15rem;font-weight:900;line-height:1;}
     .g{color:var(--grn);}.y{color:var(--yel);}.o{color:var(--orn);}.r{color:var(--red);}
@@ -107,20 +110,20 @@
 
     /* ── Misc ── */
     .loading-msg{padding:40px;text-align:center;color:var(--mut);font-size:0.9rem;}
-    .err-card{margin:16px 12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:16px;text-align:center;font-size:0.85rem;color:#fca5a5;line-height:1.6;}
-    .retry{margin-top:10px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:8px 20px;border-radius:20px;font-size:0.8rem;cursor:pointer;}
-    .fnote{margin:6px 12px 10px;background:rgba(129,140,248,.07);border:1px solid rgba(129,140,248,.2);border-radius:10px;padding:10px 12px;font-size:0.73rem;color:#a5b4fc;line-height:1.6;}
+    .err-card{margin:16px 12px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:12px;padding:16px;text-align:center;font-size:0.85rem;color:#dc2626;line-height:1.6;}
+    .retry{margin-top:10px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:#dc2626;padding:8px 20px;border-radius:20px;font-size:0.8rem;cursor:pointer;}
+    .fnote{margin:6px 12px 10px;background:rgba(91,94,246,.05);border:1px solid rgba(91,94,246,.15);border-radius:10px;padding:10px 12px;font-size:0.73rem;color:#4a4aaa;line-height:1.6;}
     .donate-wrap{margin:4px 12px 22px;text-align:center;}
     .donate-btn{display:inline-flex;align-items:center;gap:8px;background:#003087;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:0.3px;transition:background 0.2s;}
     .donate-btn:hover{background:#002065;}
     .donate-sub{font-size:0.65rem;color:var(--mut);margin-top:6px;}
-    .inote{margin:4px 12px 10px;background:rgba(234,179,8,.07);border:1px solid rgba(234,179,8,.2);border-radius:10px;padding:10px 12px;font-size:0.72rem;color:#fde047;line-height:1.6;}
+    .inote{margin:4px 12px 10px;background:rgba(180,83,9,.06);border:1px solid rgba(180,83,9,.18);border-radius:10px;padding:10px 12px;font-size:0.72rem;color:#b45309;line-height:1.6;}
     .safe{height:calc(env(safe-area-inset-bottom,0px) + 20px);}
 
 
     /* ── Search Bar ── */
     .search-wrap{padding:0 12px 8px;}
-    .search-bar{width:100%;background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:10px 36px 10px 14px;color:var(--txt);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+    .search-bar{width:100%;background:#ffffff;border:1px solid var(--bdr);border-radius:10px;padding:10px 36px 10px 14px;color:var(--txt);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color .2s;-webkit-appearance:none;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
     .search-bar::placeholder{color:var(--mut);}
     .search-bar:focus{border-color:var(--acc);}
     .search-bar.gold-focus:focus{border-color:var(--gold);}
@@ -140,12 +143,11 @@
   <!-- Sticky Header -->
   <div class="header">
     <div class="hrow">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <img src="icons/apple-touch-icon.png" alt="Shinyy Tracker" style="width:42px;height:42px;border-radius:10px;flex-shrink:0;">
-        <div>
-          <div class="htitle" id="headerTitle">🥈 Shinyy — Silver</div>
-          <div class="hsub">Shinyy Tracker · Live Every 5 Min</div>
-        </div>
+      <div class="hspacer"></div>
+      <div class="hbrand">
+        <img src="icons/apple-touch-icon.png" alt="Shinyy Tracker" class="hlogo">
+        <div class="htitle" id="headerTitle">Shinyy Tracker</div>
+        <div class="hsub" id="headerSub">🥈 Silver · Live Every 5 Min</div>
       </div>
       <button class="rbtn" id="rbtn" onclick="doRefresh()">↻ Refresh</button>
     </div>
@@ -302,7 +304,7 @@ function setMetal(m) {
   const tg = document.getElementById('tabGold');
   ts.className = 'metal-tab' + (m === 'silver' ? ' active-silver' : '');
   tg.className = 'metal-tab' + (m === 'gold' ? ' active-gold' : '');
-  document.getElementById('headerTitle').textContent = m === 'silver' ? '🥈 Shinyy — Silver' : '🥇 Shinyy — Gold';
+  document.getElementById('headerSub').textContent = m === 'silver' ? '🥈 Silver · Live Every 5 Min' : '🥇 Gold · Live Every 5 Min';
   if (m === 'silver' && silverSpot) renderSilver();
   if (m === 'gold' && goldSpot) renderGold();
 }
