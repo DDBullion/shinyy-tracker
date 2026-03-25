@@ -307,7 +307,7 @@
           <option value="maple">🍁 Maples</option>
           <option value="buffalo">🦬 Buffalos</option>
           <option value="britannia">🇬🇧 Britannias</option>
-          <option value="krugerrand">🦁 Krugerrands</option>
+          <option value="krugerrand">🦌 Krugerrands</option>
           <option value="kangaroo">🦘 Kangaroos</option>
           <option value="scottsdale">🏔 Scottsdale</option>
           <option value="libertad">🦅 Libertads</option>
@@ -381,7 +381,7 @@
           <option value="maple">🍁 Maples</option>
           <option value="buffalo">🦬 Buffalos</option>
           <option value="britannia">🇬🇧 Britannias</option>
-          <option value="krugerrand">🦁 Krugerrands</option>
+          <option value="krugerrand">🦌 Krugerrands</option>
           <option value="kangaroo">🦘 Kangaroos</option>
           <option value="libertad">🦅 Libertads</option>
           <option value="panda">🐼 Pandas</option>
@@ -883,6 +883,8 @@ function renderSilverDeals() {
   const inStock  = list.filter(d => !d.oos).sort((a,b) => a.prem - b.prem);
   const outStock = list.filter(d =>  d.oos).sort((a,b) => a.prem - b.prem);
   list = [...inStock, ...outStock];
+  const bestPerSize = {};
+  inStock.forEach(d => { if (!bestPerSize[d.size]) bestPerSize[d.size] = d; });
 
   const hot = inStock.filter(d => d.prem < 2).length;
   document.getElementById('stext').textContent =
@@ -900,7 +902,7 @@ function renderSilverDeals() {
     }
     const col  = d.oos ? '' : d.prem < 2 ? 'g' : d.prem < 3 ? 'y' : d.prem < 5 ? 'o' : 'r';
     const card = d.oos ? 'oos' : d.prem < 2 ? 'hot' : d.prem < 3 ? 'good' : d.prem < 5 ? 'fair' : 'high';
-    const best = i === 0 && silverFilter === 'all' && !d.oos;
+    const best = !d.oos && bestPerSize[d.size] === d;
     const featuredClass = best ? ' featured-deal' : '';
     const stagger = `animation-delay:${Math.min(i,10)*0.04}s`;
     const ozLabel = d.size === 'misc' ? d.oz.toFixed(3)+'oz' : d.size;
@@ -914,7 +916,7 @@ function renderSilverDeals() {
     const mtag  = d.tag === 'maple'      ? '<span class="stag" style="background:rgba(239,68,68,.2);color:#fca5a5">🍁</span>' : '';
     const buftag= d.tag === 'buffalo'    ? '<span class="stag" style="background:rgba(120,113,108,.3);color:#d6d3d1">🦬</span>' : '';
     const brttag= d.tag === 'britannia'  ? '<span class="stag" style="background:rgba(30,64,175,.25);color:#bfdbfe">🇬🇧</span>' : '';
-    const krugtag=d.tag === 'krugerrand' ? '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦁</span>' : '';
+    const krugtag=d.tag === 'krugerrand' ? '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦌</span>' : '';
     const kantag= d.tag === 'kangaroo'   ? '<span class="stag" style="background:rgba(234,88,12,.2);color:#fdba74">🦘</span>' : '';
     const oosBadge = d.oos ? '<span class="oos-lbl">OOS</span>' : '';
     const vtag = d.verified ? '<span style="font-size:0.58rem;color:var(--grn);margin-left:3px;">✓</span>' : '';
@@ -922,7 +924,7 @@ function renderSilverDeals() {
     const prefix = d.oos ? '~' : '';
     html += `<a class="deal ${card}${featuredClass}" href="${d.url}" target="_blank" style="${stagger}">
       <div class="dl">
-        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?'<span class="btag">BEST</span>':''}${oosBadge}</div>
+        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?`<span class="btag">🏆 BEST ${sizeLabel}</span>`:''}${oosBadge}</div>
         <div class="dm">${d.dealer}${vtag} · ${d.oos?'Check dealer for stock':'✈ '+d.ship}</div>
       </div>
       <div class="dr">
@@ -954,6 +956,8 @@ function renderGoldDeals() {
 
   // Sort by total price per oz (premOz)
   list = [...list].sort((a,b) => a.premOz - b.premOz);
+  const bestPerGsize = {};
+  list.forEach(d => { if (!bestPerGsize[d.gsize]) bestPerGsize[d.gsize] = d; });
 
   let html = '', lastSec = '';
   list.forEach((d, i) => {
@@ -975,7 +979,7 @@ function renderGoldDeals() {
 
     const col  = d.premOz < 50 ? 'g' : d.premOz < 150 ? 'y' : d.premOz < 400 ? 'o' : 'r';
     const card = d.premOz < 50 ? 'hot' : d.premOz < 150 ? 'good' : d.premOz < 400 ? 'fair' : 'high';
-    const best = i === 0 && goldFilter === 'all';
+    const best = bestPerGsize[d.gsize] === d;
     const featuredClassG = best ? ' featured-deal' : '';
     const staggerG = `animation-delay:${Math.min(i,10)*0.04}s`;
     const smtag= d.tag === 'scottsdale' ? '<span class="stag smint-tag">🏔</span>' : '';
@@ -985,7 +989,7 @@ function renderGoldDeals() {
     const mtag  = d.tag === 'maple'      ? '<span class="stag" style="background:rgba(239,68,68,.2);color:#fca5a5">🍁</span>' : '';
     const buftag= d.tag === 'buffalo'    ? '<span class="stag" style="background:rgba(120,113,108,.3);color:#d6d3d1">🦬</span>' : '';
     const brttag= d.tag === 'britannia'  ? '<span class="stag" style="background:rgba(30,64,175,.25);color:#bfdbfe">🇬🇧</span>' : '';
-    const krugtag=d.tag === 'krugerrand' ? '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦁</span>' : '';
+    const krugtag=d.tag === 'krugerrand' ? '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦌</span>' : '';
     const kantag= d.tag === 'kangaroo'   ? '<span class="stag" style="background:rgba(234,88,12,.2);color:#fdba74">🦘</span>' : '';
     const vtag = d.verified ? '<span style="font-size:0.58rem;color:var(--gold);margin-left:3px;">✓</span>' : '';
     const sizeLabel = d.gramLabel || d.gsize;
@@ -1005,7 +1009,7 @@ function renderGoldDeals() {
 
     html += `<a class="deal ${card}${featuredClassG}" href="${d.url}" target="_blank" style="${staggerG}">
       <div class="dl">
-        <div class="dn"><span class="stag" style="background:rgba(245,158,11,.2);color:var(--gold)">${sizeLabel}</span>${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?'<span class="btag" style="background:var(--gold);color:#000">BEST</span>':''}</div>
+        <div class="dn"><span class="stag" style="background:rgba(245,158,11,.2);color:var(--gold)">${sizeLabel}</span>${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?`<span class="btag" style="background:var(--gold);color:#000">🏆 BEST ${d.gsize||''}</span>`:''}</div>
         <div class="dm">${d.dealer}${vtag} · ✈ ${d.ship}</div>
       </div>
       <div class="dr">
