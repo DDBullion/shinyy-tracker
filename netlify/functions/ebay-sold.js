@@ -38,7 +38,7 @@ exports.handler = async function(event) {
     const res = await fetch(url);
     const data = await res.json();
 
-    const items = data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
+    const ack = data?.findCompletedItemsResponse?.[0]?.ack?.[0]; const count = data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.['@count']; const errMsg = JSON.stringify(data?.findCompletedItemsResponse?.[0]?.errorMessage || null); const items = data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
 
     const results = items.map(item => ({
       title: item.title?.[0] || 'Unknown',
@@ -50,6 +50,7 @@ exports.handler = async function(event) {
       condition: item.condition?.[0]?.conditionDisplayName?.[0] || ''
     }));
 
+    if (items.length === 0) return { statusCode: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ debug: { ack, count, errMsg }, items: [] }) };
     return {
       statusCode: 200,
       headers: {
