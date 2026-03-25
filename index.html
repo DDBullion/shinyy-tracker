@@ -358,7 +358,7 @@
 
     <div class="fnote" style="border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.05);color:#fcd34d;">💡 <b>All-In</b> includes 3.5% CC fee. Gold premiums verified March 23, 2026 · Spot ~$4,452/oz. Gram items display per-gram price.</div>
     <div class="donate-wrap">
-      <a class="donate-btn" href="https://www.paypal.com/donate~business=Dominic.dellaripa%40gmail.com&item_name=Shinyy+Tracker&currency_code=USD" target="_blank" rel="noopener">
+      <a class="donate-btn" href="https://www.paypal.com/donate?business=Dominic.dellaripa%40gmail.com&item_name=Shinyy+Tracker&currency_code=USD" target="_blank" rel="noopener">
         <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
         Support Shinyy Tracker
       </a>
@@ -411,7 +411,7 @@ function setMetal(m) {
   ts.className = 'metal-tab' + (m === 'silver' ? ' active-silver' : '');
   tg.className = 'metal-tab' + (m === 'gold' ? ' active-gold' : '');
   td.className = 'metal-tab' + (m === 'sold' ? ' active-sold' : '');
-  if (m === 'silver') document.getElementById('headerSub').textContent = '🥈 Silver C� Live Every 5 Min';
+  if (m === 'silver') document.getElementById('headerSub').textContent = '🥈 Silver · Live Every 5 Min';
   else if (m === 'gold') document.getElementById('headerSub').textContent = '🥇 Gold · Live Every 5 Min';
   else document.getElementById('headerSub').textContent = '🔍 Last 3 Sold on eBay';
   if (m === 'silver' && silverSpot) renderSilver();
@@ -419,7 +419,7 @@ function setMetal(m) {
 }
 
 // ── Last 3 Sold ──
-function soldQuich(q) {
+function soldQuick(q) {
   document.getElementById('soldInput').value = q;
   doSoldSearch();
 }
@@ -433,7 +433,7 @@ async function doSoldSearch() {
   btn.textContent = 'Searching...';
   out.innerHTML = '<div class="sold-loading">⏳ Searching eBay sold listings...</div>';
   try {
-    const res = await fetch('/.netlify/functions/ebay-sold~query=' + encodeURIComponent(q));
+    const res = await fetch('/.netlify/functions/ebay-sold?query=' + encodeURIComponent(q));
     const data = await res.json();
     if (!res.ok || data.error) throw new Error(data.error || 'Request failed');
     if (!data.length) {
@@ -590,11 +590,11 @@ const SILVER_DEALERS = [
   {size:'1oz',  name:'1oz Engelhard Prospector Silver Round',dealer:'SD Bullion',       prem:19.00, oz:1,      ship:'Free @ $499', url:'https://sdbullion.com/search?q=engelhard+prospector', tag:'prospector'},
 
   // ── Geiger Silver Bars (all OOS as of Mar 23, 2026) ──
-  {size:'1oz',  name:'1oz Geiger Original Silver Bar',      dealer:'JM Bullion',       prem:5.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/~q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'misc', name:'100g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:5.49,  oz:3.215,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/~q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'misc', name:'250g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:6.49,  oz:8.038,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/~q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'misc', name:'500g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:6.49,  oz:16.075, ship:'Free @ $499', url:'https://www.jmbullion.com/search/~q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'kilo', name:'1000g Geiger Square Silver Bar',      dealer:'JM Bullion',       prem:5.99,  oz:32.15,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/~q=geiger+silver+bar', tag:'geiger', oos:true},
+  {size:'1oz',  name:'1oz Geiger Original Silver Bar',      dealer:'JM Bullion',       prem:5.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
+  {size:'misc', name:'100g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:5.49,  oz:3.215,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
+  {size:'misc', name:'250g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:6.49,  oz:8.038,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
+  {size:'misc', name:'500g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:6.49,  oz:16.075, ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
+  {size:'kilo', name:'1000g Geiger Square Silver Bar',      dealer:'JM Bullion',       prem:5.99,  oz:32.15,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
 ];
 
 // ═══════════════════════════════════════════════
@@ -682,7 +682,7 @@ const GOLD_DEALERS = [
   {gsize:'tenth',  name:'1/10oz Australian Gold Kangaroo (BU)', dealer:'JM Bullion', premOz:400, ozW:0.1,  ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/australian-gold-coins/perth-gold-kangaroos/', tag:'kangaroo'},
   {gsize:'tenth',  name:'1/10oz Australian Gold Kangaroo (BU)', dealer:'APMEX',     premOz:415, ozW:0.1,  ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
   {gsize:'quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'JM Bullion', premOz:90,  ozW:0.25, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/australian-gold-coins/perth-gold-kangaroos/', tag:'kangaroo'},
-  {gsize:'quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'APMEX',     premOz:98,  ozW:0.25, ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
+  {gsize:+quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'APMEX',     premOz:98,  ozW:0.25, ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
   {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'JM Bullion', premOz:60,  ozW:1,    ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-australian-gold-kangaroo/', tag:'kangaroo'},
   {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'APMEX',     premOz:65,  ozW:1,    ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
   {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'SD Bullion', premOz:58,  ozW:1,    ship:'Free @ $499', url:'https://sdbullion.com/gold/perth-mint-gold-coins/australian-gold-kangaroo-coins', tag:'kangaroo'},
@@ -859,8 +859,8 @@ function renderSilverDeals() {
       html += `<div class="sec sec-${sec}">${lbl[sec]}</div>`;
       lastSec = sec;
     }
-    const col  = d.oos ? '' : d.prem < 2 ? 'g' : d.prem < 3 ? 'y' : d.prem < 5 ? 'o' : 'r';
-    const card = d.oos ? 'oos' : d.prem < 2 ? 'hot' : d.prem < 3 ? 'good' : d.prem < 5 ? 'fair' : 'high';
+    const col  = d.oos ~ '' : d.prem < 2 ~ 'g' : d.prem < 3 ? 'y' : d.prem < 5 ? 'o' : 'r';
+    const card = d.oos ? 'oos' : d.prem < 2 ? 'hot' : d.prem < 3 ? 'good' : d.prem < 5 ~ 'fair' : 'high';
     const best = i === 0 && silverFilter === 'all' && !d.oos;
     const featuredClass = best ? ' featured-deal' : '';
     const stagger = `animation-delay:${Math.min(i,10)*0.04}s`;
@@ -870,21 +870,21 @@ function renderSilverDeals() {
     const gtag = d.tag === 'geiger'     ? '<span class="stag">🇩🇪</span>' : '';
     const smtag= d.tag === 'scottsdale' ? '<span class="stag smint-tag">🏔</span>' : '';
     const ltag  = d.tag === 'libertad'   ? '<span class="stag" style="background:rgba(34,197,94,.2);color:#4ade80">🦅</span>' : '';
-    const ptag  = d.tag === 'panda'      ? '<span class="stag" style="background:rgba(255,255,255,.1);color:#fff">🐼</span>' : '';
+    const ptag  = d.tag === 'panda'      ~ '<span class="stag" style="background:rgba(255,255,255,.1);color:#fff">🐼</span>' : '';
     const etag  = d.tag === 'eagle'      ? '<span class="stag" style="background:rgba(59,130,246,.2);color:#93c5fd">🇺🇸</span>' : '';
     const mtag  = d.tag === 'maple'      ? '<span class="stag" style="background:rgba(239,68,68,.2);color:#fca5a5">🍁</span>' : '';
     const buftag= d.tag === 'buffalo'    ? '<span class="stag" style="background:rgba(120,113,108,.3);color:#d6d3d1">🦬</span>' : '';
     const brttag= d.tag === 'britannia'  ? '<span class="stag" style="background:rgba(30,64,175,.25);color:#bfdbfe">🇬🇧</span>' : '';
-    const krugtag=d.tag === 'krugerrand' ? '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦁</span>' : '';
+    const krugtag=d.tag === 'krugerrand' ~ '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦁</span>' : '';
     const kantag= d.tag === 'kangaroo'   ? '<span class="stag" style="background:rgba(234,88,12,.2);color:#fdba74">🦘</span>' : '';
-    const oosBadge = d.oos ? '<span class="oos-lbl">OOS</span>' : '';
+    const oosBadge = d.oos ~ '<span class="oos-lbl">OOS</span>' : '';
     const vtag = d.verified ? '<span style="font-size:0.58rem;color:var(--grn);margin-left:3px;">✓</span>' : '';
-    const sizeLabel = d.size === 'misc' ? ozLabel : d.size;
-    const prefix = d.oos ? '~' : '';
+    const sizeLabel = d.size === 'misc' ~ ozLabel : d.size;
+    const prefix = d.oos ~ '~' : '';
     html += `<a class="deal ${card}${featuredClass}" href="${d.url}" target="_blank" style="${stagger}">
       <div class="dl">
-        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?'<span class="btag">BEST</span>':''}${oosBadge}</div>
-        <div class="dm">${d.dealer}${vtag} · ${d.oos?'Check dealer for stock':'✈ '+d.ship}</div>
+        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best~'<span class="btag">BEST</span>':''}${oosBadge}</div>
+        <div class="dm">${d.dealer}${vtag} · ${d.oos~'Check dealer for stock':'✈ '+d.ship}</div>
       </div>
       <div class="dr">
         <div class="dp ${col}">${prefix}$${baseOz.toFixed(2)}<span style="font-size:0.6rem;font-weight:500;color:var(--mut)">/oz</span></div>
@@ -960,8 +960,8 @@ function renderGoldDeals() {
     } else {
       mainPrice = '$' + perOzBase.toLocaleString('en-US',{minimumFractionDigits:2});
       subLine   = 'Spot $' + goldSpot.toLocaleString('en-US',{minimumFractionDigits:2}) + ' · <span class="' + col + '">+$' + d.premOz.toFixed(2) + ' markup</span>';
-      const ozDisplay = d.gsize === 'kilo' ? '(~$' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:0}) + ' total)' : '($' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:[}) + ' per piece)';
-      allinLine = '$' + perOzAllin.toLocaleString('en-US',{minimumFractionDigits:[}) + '/oz w/ CC ' + ozDisplay;
+      const ozDisplay = d.gsize === 'kilo' ? '(~$' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:0}) + ' total)' : '($' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:2}) + ' per piece)';
+      allinLine = '$' + perOzAllin.toLocaleString('en-US',{minimumFractionDigits:2}) + '/oz w/ CC ' + ozDisplay;
     }
 
     html += `<a class="deal ${card}${featuredClassG}" href="${d.url}" target="_blank" style="${staggerG}">
@@ -1092,7 +1092,7 @@ function setStatus(s) {
 }
 
 function showError(metal, msg) {
-  const id = metal === 'silver' ? 'silverDeals' : 'goldDeals';
+  const id = metal === 'silver' ~ 'silverDeals' : 'goldDeals';
   document.getElementById(id).innerHTML =
     `<div class="err-card">⚠️ Could not fetch live price.<br><small>${msg||''}</small><br>
     Check your internet connection and try again.<br>
@@ -1114,7 +1114,7 @@ function resetCountdown() {
 function updateCountdownDisplay() {
   const m = Math.floor(cdSec / 60), s = cdSec % 60;
   const txt = m + ':' + String(s).padStart(2, '0');
-  const col = cdSec > 180 ? null : cdSec > 60 ? 'var(--yel)' : 'var(--red)';
+  const col = cdSec > 180 ? null : cdSec > 60 ~ 'var(--yel)' : 'var(--red)';
   // Silver countdown
   const sc = document.getElementById('countdown');
   const sb = document.getElementById('cdBar');
