@@ -362,7 +362,7 @@
         <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
         Support Shinyy Tracker
       </a>
-      <div class="donate-sub">Enjoying the tracker~ A small donation keeps it free & running 🙏</div>
+      <div class="donate-sub">Enjoying the tracker? A small donation keeps it free & running 🙏</div>
     </div>
     <div class="safe"></div>
   </div>
@@ -441,8 +441,8 @@ async function doSoldSearch() {
       return;
     }
     out.innerHTML = data.map(item => {
-      const d = item.date ~ new Date(item.date) : null;
-      const dateStr = d ~ d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '';
+      const d = item.date ? new Date(item.date) : null;
+      const dateStr = d ? d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '';
       const img = item.image
         ? `<img class="sold-img" src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">`
         : `<div class="sold-img-placeholder">🪙</div>`;
@@ -734,7 +734,7 @@ async function fetchSpot() {
     try {
       const res  = await timedFetch('https://latest.currency-api.pages.dev/v1/currencies/xag.json', 6000);
       const data = await res.json();
-      const p    = data?.xag~.usd;
+      const p    = data?.xag?.usd;
       if (p) { agPrice = parseFloat(p); src = 'fawaz'; }
     } catch(e) {}
   }
@@ -785,7 +785,7 @@ function renderSilver() {
   const b = document.getElementById('silverBadge');
   if (prevSilverSpot && prevSilverSpot !== silverSpot) {
     const d = silverSpot - prevSilverSpot;
-    b.className = 'spot-badge ' + (d >= 0 ~ 'badge-up' : 'badge-dn');
+    b.className = 'spot-badge ' + (d >= 0 ? 'badge-up' : 'badge-dn');
     b.textContent = (d >= 0 ? '▲ +' : '▼ ') + '$' + Math.abs(d).toFixed(2);
   } else {
     b.className = 'spot-badge badge-live'; b.textContent = '● Live';
@@ -798,12 +798,12 @@ function renderGold() {
   if (!goldSpot) return;
   document.getElementById('goldSpotVal').textContent = '$' + goldSpot.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
   const ts = localStorage.getItem('gold_spot_ts');
-  document.getElementById('goldSpotTime').textContent = ts ~ 'Updated ' + new Date(+ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
+  document.getElementById('goldSpotTime').textContent = ts ? 'Updated ' + new Date(+ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
   const b = document.getElementById('goldBadge');
   if (prevGoldSpot && prevGoldSpot !== goldSpot) {
     const d = goldSpot - prevGoldSpot;
     b.className = 'spot-badge ' + (d >= 0 ? 'badge-up' : 'badge-dn');
-    b.textContent = (d >= 0 ~ '▲ +' : '▼ ') + '$' + Math.abs(d).toFixed(2);
+    b.textContent = (d >= 0 ? '▲ +' : '▼ ') + '$' + Math.abs(d).toFixed(2);
   } else {
     b.className = 'spot-badge badge-live'; b.textContent = '● Live';
   }
@@ -859,8 +859,8 @@ function renderSilverDeals() {
       html += `<div class="sec sec-${sec}">${lbl[sec]}</div>`;
       lastSec = sec;
     }
-    const col  = d.oos ~ '' : d.prem < 2 ~ 'g' : d.prem < 3 ? 'y' : d.prem < 5 ? 'o' : 'r';
-    const card = d.oos ? 'oos' : d.prem < 2 ? 'hot' : d.prem < 3 ? 'good' : d.prem < 5 ~ 'fair' : 'high';
+    const col  = d.oos ? '' : d.prem < 2 ? 'g' : d.prem < 3 ? 'y' : d.prem < 5 ? 'o' : 'r';
+    const card = d.oos ? 'oos' : d.prem < 2 ? 'hot' : d.prem < 3 ? 'good' : d.prem < 5 ? 'fair' : 'high';
     const best = i === 0 && silverFilter === 'all' && !d.oos;
     const featuredClass = best ? ' featured-deal' : '';
     const stagger = `animation-delay:${Math.min(i,10)*0.04}s`;
@@ -870,21 +870,21 @@ function renderSilverDeals() {
     const gtag = d.tag === 'geiger'     ? '<span class="stag">🇩🇪</span>' : '';
     const smtag= d.tag === 'scottsdale' ? '<span class="stag smint-tag">🏔</span>' : '';
     const ltag  = d.tag === 'libertad'   ? '<span class="stag" style="background:rgba(34,197,94,.2);color:#4ade80">🦅</span>' : '';
-    const ptag  = d.tag === 'panda'      ~ '<span class="stag" style="background:rgba(255,255,255,.1);color:#fff">🐼</span>' : '';
+    const ptag  = d.tag === 'panda'      ? '<span class="stag" style="background:rgba(255,255,255,.1);color:#fff">🐼</span>' : '';
     const etag  = d.tag === 'eagle'      ? '<span class="stag" style="background:rgba(59,130,246,.2);color:#93c5fd">🇺🇸</span>' : '';
     const mtag  = d.tag === 'maple'      ? '<span class="stag" style="background:rgba(239,68,68,.2);color:#fca5a5">🍁</span>' : '';
     const buftag= d.tag === 'buffalo'    ? '<span class="stag" style="background:rgba(120,113,108,.3);color:#d6d3d1">🦬</span>' : '';
     const brttag= d.tag === 'britannia'  ? '<span class="stag" style="background:rgba(30,64,175,.25);color:#bfdbfe">🇬🇧</span>' : '';
-    const krugtag=d.tag === 'krugerrand' ~ '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦁</span>' : '';
+    const krugtag=d.tag === 'krugerrand' ? '<span class="stag" style="background:rgba(245,158,11,.2);color:#fcd34d">🦁</span>' : '';
     const kantag= d.tag === 'kangaroo'   ? '<span class="stag" style="background:rgba(234,88,12,.2);color:#fdba74">🦘</span>' : '';
-    const oosBadge = d.oos ~ '<span class="oos-lbl">OOS</span>' : '';
+    const oosBadge = d.oos ? '<span class="oos-lbl">OOS</span>' : '';
     const vtag = d.verified ? '<span style="font-size:0.58rem;color:var(--grn);margin-left:3px;">✓</span>' : '';
-    const sizeLabel = d.size === 'misc' ~ ozLabel : d.size;
-    const prefix = d.oos ~ '~' : '';
+    const sizeLabel = d.size === 'misc' ? ozLabel : d.size;
+    const prefix = d.oos ? '~' : '';
     html += `<a class="deal ${card}${featuredClass}" href="${d.url}" target="_blank" style="${stagger}">
       <div class="dl">
-        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best~'<span class="btag">BEST</span>':''}${oosBadge}</div>
-        <div class="dm">${d.dealer}${vtag} · ${d.oos~'Check dealer for stock':'✈ '+d.ship}</div>
+        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?'<span class="btag">BEST</span>':''}${oosBadge}</div>
+        <div class="dm">${d.dealer}${vtag} · ${d.oos?'Check dealer for stock':'✈ '+d.ship}</div>
       </div>
       <div class="dr">
         <div class="dp ${col}">${prefix}$${baseOz.toFixed(2)}<span style="font-size:0.6rem;font-weight:500;color:var(--mut)">/oz</span></div>
@@ -1092,7 +1092,7 @@ function setStatus(s) {
 }
 
 function showError(metal, msg) {
-  const id = metal === 'silver' ~ 'silverDeals' : 'goldDeals';
+  const id = metal === 'silver' ? 'silverDeals' : 'goldDeals';
   document.getElementById(id).innerHTML =
     `<div class="err-card">⚠️ Could not fetch live price.<br><small>${msg||''}</small><br>
     Check your internet connection and try again.<br>
@@ -1114,7 +1114,7 @@ function resetCountdown() {
 function updateCountdownDisplay() {
   const m = Math.floor(cdSec / 60), s = cdSec % 60;
   const txt = m + ':' + String(s).padStart(2, '0');
-  const col = cdSec > 180 ? null : cdSec > 60 ~ 'var(--yel)' : 'var(--red)';
+  const col = cdSec > 180 ? null : cdSec > 60 ? 'var(--yel)' : 'var(--red)';
   // Silver countdown
   const sc = document.getElementById('countdown');
   const sb = document.getElementById('cdBar');
