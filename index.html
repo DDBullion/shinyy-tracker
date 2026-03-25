@@ -28,7 +28,8 @@
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
-  <style>  .root{--bg:#f0f1f8;--sur:#ffffff;--sur2:#eaecf5;--bdr:#d4d7e8;--txt:#1a1a30;--mut:#7070a0;--sil:#4a4aaa;--grn:#16a34a;--yel:#b45309;--orn:#c2410c;--red:#dc2626;--acc:#5b5ef6;--gold:#d97706;--gold2:#f59e0b;}
+  <style>
+    :root{--bg:#f0f1f8;--sur:#ffffff;--sur2:#eaecf5;--bdr:#d4d7e8;--txt:#1a1a30;--mut:#7070a0;--sil:#4a4aaa;--grn:#16a34a;--yel:#b45309;--orn:#c2410c;--red:#dc2626;--acc:#5b5ef6;--gold:#d97706;--gold2:#f59e0b;}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     body{background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(91,94,246,0.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(217,119,6,0.05) 0%,transparent 60%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;min-height:100dvh;}
 
@@ -164,44 +165,6 @@
     .mmtag{background:rgba(180,83,9,.1);color:#b45309;}
     .btag{font-size:0.6rem;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;padding:2px 7px;border-radius:5px;font-weight:800;margin-left:4px;vertical-align:middle;box-shadow:0 1px 4px rgba(22,163,74,0.35);}
     .dr{text-align:right;flex-shrink:0;}
-    .dp{font-size:1.22rem;font-weight:900;line-height:1;}
-    .g{color:#15803d;}.y{color:var(--yel);}.o{color:var(--orn);}.r{color:var(--red);}
-    .doz{font-size:0.58rem;color:var(--mut);margin-top:1px;}
-    .dspot{font-size:0.62rem;color:var(--mut);margin-top:3px;}
-    .dpm{font-size:0.7rem;font-weight:700;margin-top:1px;}
-    .dallin{font-size:0.62rem;color:var(--mut);margin-top:3px;padding-top:3px;border-top:1px solid var(--bdr);}
-
-    /* ââ Gold gram sub-label ââ */
-    .gram-sub{font-size:0.6rem;color:var(--gold);margin-top:1px;opacity:.8;}
-
-    /* ââ Misc ââ */
-    .loading-msg{padding:40px;text-align:center;color:var(--mut);font-size:0.9rem;}
-    .err-card{margin:16px 12px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:12px;padding:16px;text-align:center;font-size:0.85rem;color:#dc2626;line-height:1.6;}
-    .retry{margin-top:10px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:#dc2626;padding:8px 20px;border-radius:20px;font-size:0.8rem;cursor:pointer;}
-    .fnote{margin:6px 12px 10px;background:rgba(91,94,246,.05);border:1px solid rgba(91,94,246,.15);border-radius:10px;padding:10px 12px;font-size:0.73rem;color:#4a4aaa;line-height:1.6;}
-    .donate-wrap{margin:4px 12px 22px;text-align:center;}
-    .donate-sub{font-size:0.65rem;color:var(--mut);margin-top:6px;}
-    .inote{margin:4px 12px 10px;background:rgba(180,83,9,.06);border:1px solid rgba(180,83,9,.18);border-radius:10px;padding:10px 12px;font-size:0.72rem;color:#b45309;line-height:1.6;}
-    .safe{height:calc(env(safe-area-inset-bottom,0px) + 20px);}
-
-
-    /* ââ Search Bar ââ */
-    .search-wrap{padding:0 12px 8px;}
-    .search-bar{width:100%;background:#ffffff;border:1.5px solid var(--bdr);border-radius:12px;padding:10px 36px 10px 14px;color:var(--txt);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s;"webkit-appearance:none;box-shadow:0 2px 6px rgba(0,0,0,0.06);}
-    .search-bar:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(91,94,246,0.12);}
-    .search-bar.gold-focus:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,119,6,0.12);}
-    .search-bar::placeholder{color:var(--mut);}
-    .search-bar:focus{border-color:var(--acc);}
-    .search-bar.gold-focus:focus{border-color:var(--gold);}
-    .search-clear{position:absolute;right:20px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mut);font-size:1rem;cursor:pointer;padding:4px;display:none;}
-    .search-wrap.has-text .search-clear{display:block;}
-    .search-wrap{position:relative;}
-
-    /* ââ Page visibility ââ */
-    .page{display:none;}.page.active{display:block;}
-  </style>
-</head>
-<body>xt-align:right;flex-shrink:0;}
     .dp{font-size:1.22rem;font-weight:900;line-height:1;}
     .g{color:#15803d;}.y{color:var(--yel);}.o{color:var(--orn);}.r{color:var(--red);}
     .doz{font-size:0.58rem;color:var(--mut);margin-top:1px;}
@@ -641,7 +604,7 @@ const SILVER_DEALERS = [
 // âââââââââââââââââââââââââââââââââââââââââââââââ
 const GOLD_DEALERS = [
   // ââ Gram items (ozWeight = grams Ã 0.032151) ââ
-  {gsize:'gram', name:'1g Gold Bar',                       dealer:'JM Bullion',       premOz:1olw, ozW:0.032151, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/1-gram-gold-bars/', verified:true, gramLabel:'1g'},
+  {gsize:'gram', name:'1g Gold Bar',                       dealer:'JM Bullion',       premOz:1017, ozW:0.032151, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/1-gram-gold-bars/', verified:true, gramLabel:'1g'},
   {gsize:'gram', name:'1.5g Gold Bar',                     dealer:'JM Bullion',       premOz:950,  ozW:0.048227, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/', verified:true, gramLabel:'1.5g'},
   {gsize:'gram', name:'2g Gold Bar',                       dealer:'JM Bullion',       premOz:850,  ozW:0.064302, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/', verified:true, gramLabel:'2g'},
   {gsize:'gram', name:'5g Gold Bar',                       dealer:'JM Bullion',       premOz:469,  ozW:0.160755, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/5-gram-gold-bars/', verified:true, gramLabel:'5g'},
@@ -671,7 +634,7 @@ const GOLD_DEALERS = [
   {gsize:'1oz',  name:'1oz Canadian Gold Maple Leaf',     dealer:'APMEX',            premOz:55,   ozW:1,        ship:'Free @ $199', url:'https://www.apmex.com/category/24894/1-oz-canadian-gold-maple-leafs', verified:true, tag:'maple'},
   {gsize:'1oz',  name:'1oz Gold Bar (Secondary Mkt)',     dealer:'APMEX',            premOz:32,   ozW:1,        ship:'Free @ $199', url:'https://www.apmex.com/category/25625/1-oz-gold-bars', verified:true},
   {gsize:'tenth',name:'1/10oz American Gold Eagle',       dealer:'APMEX',            premOz:420,  ozW:0.1,      ship:'Free @ $199', url:'https://www.apmex.com/category/24891/1-10-oz-american-gold-eagles', verified:true, tag:'eagle'},
-  {gsize:'quarter',name:'1/4oz American Gold Eagle',      dealer:'APMEX',            premOz:95,   ozW:0.25,     ship:'Free @ $199', url:'https://www.apmex.com/category/24892/1-4-oz-american-gold-eagles', verified:true, tag:'eagle'},
+  {gsize:+quarter',name:'1/4oz American Gold Eagle',      dealer:'APMEX',            premOz:95,   ozW:0.25,     ship:'Free @ $199', url:'https://www.apmex.com/category/24892/1-4-oz-american-gold-eagles', verified:true, tag:'eagle'},
 
 
   // ââ Gold Libertads (estimated premiums, Mar 24, 2026 Â· Spot ~$4,452) ââ
@@ -688,7 +651,7 @@ const GOLD_DEALERS = [
   // ââ Gold Pandas (estimated premiums, Mar 24, 2026 Â· Spot ~$4,452) ââ
   {gsize:'tenth',  name:'1/10oz Chinese Gold Panda (Random Yr)',    dealer:'JM Bullion',      premOz:500, ozW:0.1,   ship:'Free @ $499', url:'https://www.jmbullion.com/1-10-chinese-gold-panda-varied/', tag:'panda'},
   {gsize:'tenth',  name:'1/10oz Chinese Gold Panda (Random Yr)',    dealer:'APMEX',           premOz:520, ozW:0.1,   ship:'Free @ $199', url:'https://www.apmex.com/category/24356/1-10-oz-chinese-gold-panda-coins', tag:'panda'},
-  {gsize:'quarter',name:'1/4oz Chinese Gold Panda (Random Yr)',     dealer:'JM Bullion',      premOz:210, ozW:0.25,  ship:'Free @ $499', url:'https://www.jmbullion.com/1-4-chinese-gold-panda-varied/', tag:'panda'},
+  {gsize:+quarter',name:'1/4oz Chinese Gold Panda (Random Yr)',     dealer:'JM Bullion',      premOz:210, ozW:0.25,  ship:'Free @ $499', url:'https://www.jmbullion.com/1-4-chinese-gold-panda-varied/', tag:'panda'},
   {gsize:'quarter',name:'1/4oz Chinese Gold Panda (Random Yr)',     dealer:'APMEX',           premOz:225, ozW:0.25,  ship:'Free @ $199', url:'https://www.apmex.com/category/24357/1-4-oz-chinese-gold-panda-coins', tag:'panda'},
   {gsize:'half',   name:'1/2oz Chinese Gold Panda (Random Yr)',     dealer:'JM Bullion',      premOz:160, ozW:0.5,   ship:'Free @ $499', url:'https://www.jmbullion.com/1-2-chinese-gold-panda-varied/', tag:'panda'},
   {gsize:'half',   name:'1/2oz Chinese Gold Panda (Random Yr)',     dealer:'APMEX',           premOz:170, ozW:0.5,   ship:'Free @ $199', url:'https://www.apmex.com/category/24358/1-2-oz-chinese-gold-panda-coins', tag:'panda'},
@@ -718,8 +681,8 @@ const GOLD_DEALERS = [
   // ââ Gold Kangaroos (est. Mar 24, 2026) ââ
   {gsize:'tenth',  name:'1/10oz Australian Gold Kangaroo (BU)', dealer:'JM Bullion', premOz:400, ozW:0.1,  ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/australian-gold-coins/perth-gold-kangaroos/', tag:'kangaroo'},
   {gsize:'tenth',  name:'1/10oz Australian Gold Kangaroo (BU)', dealer:'APMEX',     premOz:415, ozW:0.1,  ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
-  {gsize:'quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'JM Bullion', premOz:90,  ozW:0.25, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/australian-gold-coins/perth-gold-kangaroos/', tag:'kangaroo'},
-  {gsize:'quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'APMEX',     premOz:98,  ozW:0.25, ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
+  {gsize:+quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'JM Bullion', premOz:90,  ozW:0.25, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/australian-gold-coins/perth-gold-kangaroos/', tag:'kangaroo'},
+  {gsize:+quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'APMEX',     premOz:98,  ozW:0.25, ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
   {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'JM Bullion', premOz:60,  ozW:1,    ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-australian-gold-kangaroo/', tag:'kangaroo'},
   {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'APMEX',     premOz:65,  ozW:1,    ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
   {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'SD Bullion', premOz:58,  ozW:1,    ship:'Free @ $499', url:'https://sdbullion.com/gold/perth-mint-gold-coins/australian-gold-kangaroo-coins', tag:'kangaroo'},
@@ -997,8 +960,8 @@ function renderGoldDeals() {
     } else {
       mainPrice = '$' + perOzBase.toLocaleString('en-US',{minimumFractionDigits:2});
       subLine   = 'Spot $' + goldSpot.toLocaleString('en-US',{minimumFractionDigits:2}) + ' Â· <span class="' + col + '">+$' + d.premOz.toFixed(2) + ' markup</span>';
-      const ozDisplay = d.gsize === 'kilo' ? '(~$' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:0}) + ' total)' : '($' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:2}) + ' per piece)';
-      allinLine = '$' + perOzAllin.toLocaleString('en-US',{minimumFractionDigits:2}) + '/oz w/ CC ' + ozDisplay;
+      const ozDisplay = d.gsize === 'kilo' ? '(~$' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:0}) + ' total)' : '($' + totalPrice.toLocaleString('en-US',{minimumFractionDigits:3}) + ' per piece)';
+      allinLine = '$' + perOzAllin.toLocaleString('en-US',{minimumFractionDigits:3}) + '/oz w/ CC ' + ozDisplay;
     }
 
     html += `<a class="deal ${card}${featuredClassG}" href="${d.url}" target="_blank" style="${staggerG}">
