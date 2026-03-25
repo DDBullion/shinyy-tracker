@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Shinyy Tracker">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#5b5ef6">
   <meta name="google-site-verification" content="o83J6yrzIxWURLpTjthwXMI4YmDway0YCr6_Dn2rsjY" />
   <title>Shinyy Tracker – Live Silver & Gold Bullion Prices</title>
   <meta name="description" content="Compare live silver and gold bullion prices from top dealers. Track premiums on Silver Eagles, Maples, bars, and more. Updated every 5 minutes.">
@@ -29,9 +29,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
   <style>
-    :root{--bg:#f2f3f9;--sur:#ffffff;--sur2:#eaecf5;--bdr:#d4d7e8;--txt:#1a1a30;--mut:#7070a0;--sil:#4a4aaa;--grn:#16a34a;--yel:#b45309;--orn:#c2410c;--red:#dc2626;--acc:#5b5ef6;--gold:#d97706;--gold2:#f59e0b;}
+    :root{--bg:#f0f1f8;--sur:#ffffff;--sur2:#eaecf5;--bdr:#d4d7e8;--txt:#1a1a30;--mut:#7070a0;--sil:#4a4aaa;--grn:#16a34a;--yel:#b45309;--orn:#c2410c;--red:#dc2626;--acc:#5b5ef6;--gold:#d97706;--gold2:#f59e0b;}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-    body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;min-height:100dvh;}
+    body{background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(91,94,246,0.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(217,119,6,0.05) 0%,transparent 60%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;min-height:100dvh;}
 
 
     /* ── Header ── */
@@ -48,9 +48,9 @@
     /* ── Top-level Metal Tabs ── */
     .metal-tabs{display:flex;gap:0;border-bottom:none;}
     .metal-tab{flex:1;text-align:center;padding:10px 8px;font-size:0.9rem;font-weight:700;cursor:pointer;color:var(--mut);border-bottom:3px solid transparent;transition:all .2s;}
-    .metal-tab.active-silver{color:var(--sil);border-bottom-color:var(--sil);}
-    .metal-tab.active-gold{color:var(--gold);border-bottom-color:var(--gold);}
-    .metal-tab.active-sold{color:#16a34a;border-bottom-color:#16a34a;}
+    .metal-tab.active-silver{color:var(--sil);border-bottom-color:var(--sil);text-shadow:0 0 20px rgba(91,94,246,0.3);}
+    .metal-tab.active-gold{color:var(--gold);border-bottom-color:var(--gold);text-shadow:0 0 20px rgba(217,119,6,0.3);}
+    .metal-tab.active-sold{color:#16a34a;border-bottom-color:#16a34a;text-shadow:0 0 20px rgba(22,163,74,0.3);}
 
     /* ── Last 3 Sold ── */
     .sold-wrap{padding:14px;}
@@ -61,8 +61,9 @@
     .sold-btn:hover{background:#15803d;}
     .sold-btn:disabled{background:var(--bdr);cursor:not-allowed;}
     .sold-hint{font-size:0.75rem;color:var(--mut);margin-bottom:16px;line-height:1.5;}
-    .sold-card{display:flex;gap:12px;background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:10px;text-decoration:none;color:inherit;transition:box-shadow .15s;}
-    .sold-card:hover{box-shadow:0 2px 12px rgba(91,94,246,.12);}
+    .sold-card{display:flex;gap:12px;background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:10px;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s;animation:fadeUp .3s ease both;}
+    .sold-card:nth-child(1){animation-delay:.05s}.sold-card:nth-child(2){animation-delay:.1s}.sold-card:nth-child(3){animation-delay:.15s}
+    .sold-card:hover{box-shadow:0 4px 18px rgba(91,94,246,.15);transform:translateY(-1px);}
     .sold-img{width:72px;height:72px;object-fit:contain;border-radius:8px;background:var(--sur2);flex-shrink:0;}
     .sold-img-placeholder{width:72px;height:72px;border-radius:8px;background:var(--sur2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
     .sold-info{flex:1;min-width:0;}
@@ -73,47 +74,56 @@
     .sold-loading{text-align:center;padding:30px;color:var(--mut);font-size:0.88rem;}
     .sold-error{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);border-radius:10px;padding:12px;color:#dc2626;font-size:0.82rem;margin-top:8px;}
     .sold-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
-    .sold-sug{padding:5px 12px;border-radius:16px;border:1px solid var(--bdr);background:var(--sur);color:var(--mut);font-size:0.75rem;cursor:pointer;}
-    .sold-sug:hover{background:var(--acc);border-color:var(--acc);color:#fff;}
+    .sold-sug{padding:7px 16px;border-radius:20px;border:1.5px solid var(--bdr);background:var(--sur);color:var(--mut);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .2s;}
+    .sold-sug:hover{background:linear-gradient(135deg,#16a34a,#15803d);border-color:transparent;color:#fff;transform:translateY(-1px);box-shadow:0 3px 10px rgba(22,163,74,0.3);}
 
     /* ── Spot Card ── */
     .spot-wrap{padding:14px 14px 0;}
-    .spot-card{border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
-    .spot-card.silver-card{background:linear-gradient(135deg,#f0f0ff,#e5e6f8);border:1px solid #c8caec;}
-    .spot-card.gold-card{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #e9c84a;}
+    .spot-card{border-radius:18px;padding:18px 18px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;animation:fadeIn .4s ease both;}
+    .spot-card::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;opacity:0.07;}
+    .spot-card.silver-card{background:linear-gradient(135deg,#e8eaff 0%,#d8dbf5 50%,#cdd0f0 100%);border:1px solid #b8bcdf;box-shadow:0 4px 20px rgba(91,94,246,0.12);}
+    .spot-card.silver-card::before{background:var(--acc);}
+    .spot-card.gold-card{background:linear-gradient(135deg,#fff8e1 0%,#fdedb0 50%,#fce58a 100%);border:1px solid #e5c840;box-shadow:0 4px 20px rgba(217,119,6,0.15);}
+    .spot-card.gold-card::before{background:var(--gold);}
     .spot-lbl{font-size:0.62rem;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-    .spot-val{font-size:2.6rem;font-weight:900;letter-spacing:-1.5px;line-height:1;}
-    .spot-val.silver-val{color:#3b3baa;}
-    .spot-val.gold-val{color:#b45309;}
+    .spot-val{font-size:3rem;font-weight:900;letter-spacing:-2px;line-height:1;}
+    .spot-val.silver-val{color:#2d2d8e;text-shadow:0 2px 8px rgba(45,45,142,0.2);}
+    .spot-val.gold-val{color:#92400e;text-shadow:0 2px 8px rgba(146,64,14,0.2);}
     .spot-sub{font-size:0.7rem;color:var(--mut);margin-top:3px;}
-    .spot-badge{font-size:0.8rem;font-weight:700;padding:5px 12px;border-radius:20px;margin-bottom:5px;display:inline-block;}
-    .badge-live{background:rgba(22,163,74,.12);color:var(--grn);}
-    .badge-up{background:rgba(22,163,74,.12);color:var(--grn);}
-    .badge-dn{background:rgba(220,38,38,.12);color:var(--red);}
+    .spot-badge{font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:6px;display:inline-flex;align-items:center;gap:5px;}
+    .badge-live{background:rgba(22,163,74,.15);color:#15803d;border:1px solid rgba(22,163,74,.25);}
+    .badge-up{background:rgba(22,163,74,.15);color:#15803d;border:1px solid rgba(22,163,74,.25);}
+    .badge-dn{background:rgba(220,38,38,.12);color:var(--red);border:1px solid rgba(220,38,38,.2);}
     .badge-load{background:rgba(91,94,246,.12);color:var(--acc);}
     .badge-err{background:rgba(220,38,38,.1);color:var(--red);}
     .spot-time{font-size:0.62rem;color:var(--mut);}
     .tgt{font-size:0.7rem;color:var(--grn);font-weight:600;margin-top:4px;}
-    .tgt.gold-tgt{color:var(--gold);}
+    .tgt.gold-tgt{color:#92400e;}
     .cd-wrap{margin-top:8px;text-align:right;}
     .cd-label{font-size:0.6rem;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;}
-    .cd-time{font-size:0.85rem;font-weight:700;letter-spacing:.5px;font-variant-numeric:tabular-nums;}
-    .cd-bar-bg{height:3px;border-radius:2px;background:var(--bdr);margin-top:4px;overflow:hidden;width:80px;margin-left:auto;}
+    .cd-time{font-size:0.88rem;font-weight:800;letter-spacing:.5px;font-variant-numeric:tabular-nums;}
+    .cd-bar-bg{height:4px;border-radius:2px;background:rgba(0,0,0,0.1);margin-top:4px;overflow:hidden;width:80px;margin-left:auto;}
     .cd-bar-fg{height:100%;border-radius:2px;transition:width 1s linear;}
 
     /* ── Status Bar ── */
     .sbar{display:flex;justify-content:space-between;padding:8px 16px 4px;font-size:0.7rem;color:var(--mut);}
-    .sdot{width:6px;height:6px;border-radius:50%;background:var(--grn);display:inline-block;margin-right:4px;animation:pulse 2s infinite;}
+    .sdot{width:8px;height:8px;border-radius:50%;background:var(--grn);display:inline-block;margin-right:5px;position:relative;}
+    .sdot::after{content:'';position:absolute;top:-3px;left:-3px;width:14px;height:14px;border-radius:50%;background:var(--grn);opacity:0.3;animation:ping 2s cubic-bezier(0,0,.2,1) infinite;}
     .sdot.loading{background:var(--yel);}
-    .sdot.error{background:var(--red);animation:none;}
+    .sdot.loading::after{background:var(--yel);}
+    .sdot.error{background:var(--red);}
+    .sdot.error::after{display:none;}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes ping{0%{transform:scale(1);opacity:.4}75%,100%{transform:scale(2);opacity:0}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
 
     /* ── Sub Filter Tabs ── */
     .tabs{display:flex;gap:6px;padding:6px 12px 10px;overflow-x:auto;scrollbar-width:none;align-items:center;}
     .tabs::-webkit-scrollbar{display:none;}
     .tab{padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;border:1px solid var(--bdr);color:var(--mut);background:var(--sur);cursor:pointer;white-space:nowrap;}
-    .tab.active{background:var(--acc);border-color:var(--acc);color:#fff;}
-    .tab.active.gold-active{background:var(--gold);border-color:var(--gold);color:#000;}
+    .tab.active{background:linear-gradient(135deg,var(--acc),#7c3aed);border-color:transparent;color:#fff;box-shadow:0 2px 10px rgba(91,94,246,0.38);}
+    .tab.active.gold-active{background:linear-gradient(135deg,var(--gold),#f59e0b);border-color:transparent;color:#000;box-shadow:0 2px 10px rgba(217,119,6,0.32);}
     /* ── Coin Dropdown ── */
     .coin-dd-wrap{position:relative;display:inline-flex;align-items:center;flex-shrink:0;}
     .coin-dropdown{padding:6px 28px 6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;border:1px solid var(--bdr);color:var(--mut);background:var(--sur);cursor:pointer;white-space:nowrap;-webkit-appearance:none;appearance:none;outline:none;font-family:inherit;}
@@ -127,33 +137,39 @@
     .donate-btn:hover{background:#eef2ff;}
 
     /* ── Section Labels ── */
-    .sec{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--mut);padding:4px 16px 6px;}
+    .sec{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;color:var(--mut);padding:10px 16px 6px;display:flex;align-items:center;gap:6px;}
+    .sec-hot{color:#15803d;font-size:0.75rem;}
+    .sec-good{color:#a16207;font-size:0.73rem;}
+    .sec-fair{color:var(--orn);font-size:0.73rem;}
+    .sec-high{color:var(--red);font-size:0.73rem;}
 
     /* ── Deal Cards ── */
-    .deal{background:var(--sur);border-radius:12px;margin:0 12px 7px;padding:11px 13px;border:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;color:inherit;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
-    .deal:active{opacity:.7;}
-    .deal.hot{border-left:3px solid var(--grn);}
-    .deal.good{border-left:3px solid #ca8a04;}
-    .deal.fair{border-left:3px solid var(--orn);}
-    .deal.high{border-left:3px solid var(--red);}
-    .deal.oos{border-left:3px solid #bbb;opacity:0.6;}
+    .deal{background:var(--sur);border-radius:14px;margin:0 12px 8px;padding:13px 14px;border:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;color:inherit;box-shadow:0 1px 4px rgba(0,0,0,0.06);transition:transform .15s,box-shadow .15s;animation:fadeUp .3s ease both;}
+    .deal:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.1);}
+    .deal:active{opacity:.8;transform:none;}
+    .deal.featured-deal{border:2px solid var(--grn) !important;box-shadow:0 4px 24px rgba(22,163,74,0.22) !important;background:linear-gradient(to right,rgba(22,163,74,0.09),var(--sur) 55%) !important;}
+    .deal.hot{border-left:4px solid var(--grn);background:linear-gradient(to right,rgba(22,163,74,0.04),var(--sur) 60%);}
+    .deal.good{border-left:4px solid #ca8a04;background:linear-gradient(to right,rgba(202,138,4,0.04),var(--sur) 60%);}
+    .deal.fair{border-left:4px solid var(--orn);background:linear-gradient(to right,rgba(194,65,12,0.04),var(--sur) 60%);}
+    .deal.high{border-left:4px solid var(--red);background:linear-gradient(to right,rgba(220,38,38,0.04),var(--sur) 60%);}
+    .deal.oos{border-left:4px solid #bbb;opacity:0.55;}
     .oos-lbl{font-size:0.58rem;background:rgba(120,120,140,.15);color:#999;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px;vertical-align:middle;}
     .ztag{background:rgba(220,38,38,.12);color:#b91c1c;}
     .smint-tag{background:rgba(180,83,9,.12);color:#b45309;}
     .gtag-style{background:rgba(91,94,246,.12);color:var(--acc);}
     .dl{flex:1;min-width:0;}
-    .dn{font-size:0.83rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .dn{font-size:0.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .dm{font-size:0.7rem;color:var(--mut);margin-top:2px;}
     .ds{font-size:0.62rem;color:var(--grn);margin-top:2px;}
     .stag{display:inline-block;font-size:0.62rem;padding:1px 5px;border-radius:6px;background:rgba(91,94,246,.1);color:var(--acc);font-weight:700;margin-right:3px;}
     .mmtag{background:rgba(180,83,9,.1);color:#b45309;}
-    .btag{font-size:0.58rem;background:var(--grn);color:#fff;padding:1px 5px;border-radius:4px;font-weight:800;margin-left:3px;vertical-align:middle;}
+    .btag{font-size:0.6rem;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;padding:2px 7px;border-radius:5px;font-weight:800;margin-left:4px;vertical-align:middle;box-shadow:0 1px 4px rgba(22,163,74,0.35);}
     .dr{text-align:right;flex-shrink:0;}
-    .dp{font-size:1.15rem;font-weight:900;line-height:1;}
-    .g{color:var(--grn);}.y{color:var(--yel);}.o{color:var(--orn);}.r{color:var(--red);}
+    .dp{font-size:1.22rem;font-weight:900;line-height:1;}
+    .g{color:#15803d;}.y{color:var(--yel);}.o{color:var(--orn);}.r{color:var(--red);}
     .doz{font-size:0.58rem;color:var(--mut);margin-top:1px;}
     .dspot{font-size:0.62rem;color:var(--mut);margin-top:3px;}
-    .dpm{font-size:0.68rem;font-weight:700;margin-top:1px;}
+    .dpm{font-size:0.7rem;font-weight:700;margin-top:1px;}
     .dallin{font-size:0.62rem;color:var(--mut);margin-top:3px;padding-top:3px;border-top:1px solid var(--bdr);}
 
     /* ── Gold gram sub-label ── */
@@ -172,7 +188,9 @@
 
     /* ── Search Bar ── */
     .search-wrap{padding:0 12px 8px;}
-    .search-bar{width:100%;background:#ffffff;border:1px solid var(--bdr);border-radius:10px;padding:10px 36px 10px 14px;color:var(--txt);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color .2s;-webkit-appearance:none;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+    .search-bar{width:100%;background:#ffffff;border:1.5px solid var(--bdr);border-radius:12px;padding:10px 36px 10px 14px;color:var(--txt);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;box-shadow:0 2px 6px rgba(0,0,0,0.06);}
+    .search-bar:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(91,94,246,0.12);}
+    .search-bar.gold-focus:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,119,6,0.12);}
     .search-bar::placeholder{color:var(--mut);}
     .search-bar:focus{border-color:var(--acc);}
     .search-bar.gold-focus:focus{border-color:var(--gold);}
@@ -360,7 +378,7 @@
         <button class="sold-btn" id="soldBtn" onclick="doSoldSearch()">Search</button>
       </div>
 
-      <div class="sold-hint">🔍 Search eBay's completed listings to see the <b>last 3 actual sold prices</b> — including accepted best offers that eBay hides from buyers.</div>
+      <div class="sold-hint">🔍 Search eBay's completed listings to see the <b>last 3 actual sold prices</b> — including accepted best offers that eBay hides from buyers. Great for knowing what something <b>actually</b> sold for before you list or buy.</div>
 
       <div class="sold-suggestions">
         <span class="sold-sug" onclick="soldQuick('1oz Silver Eagle')">1oz Silver Eagle</span>
@@ -838,12 +856,14 @@ function renderSilverDeals() {
     const sec = d.oos ? 'oos' : d.prem < 2 ? 'hot' : d.prem < 5 ? 'good' : 'high';
     if (sec !== lastSec) {
       const lbl = {hot:'🔥 Under $2/oz — Best Value', good:'✅ Good Deals — $2 to $5/oz', high:'💰 Higher Premium', oos:'📦 Out of Stock — Est. Price'};
-      html += `<div class="sec">${lbl[sec]}</div>`;
+      html += `<div class="sec sec-${sec}">${lbl[sec]}</div>`;
       lastSec = sec;
     }
     const col  = d.oos ? '' : d.prem < 2 ? 'g' : d.prem < 3 ? 'y' : d.prem < 5 ? 'o' : 'r';
     const card = d.oos ? 'oos' : d.prem < 2 ? 'hot' : d.prem < 3 ? 'good' : d.prem < 5 ? 'fair' : 'high';
     const best = i === 0 && silverFilter === 'all' && !d.oos;
+    const featuredClass = best ? ' featured-deal' : '';
+    const stagger = `animation-delay:${Math.min(i,10)*0.04}s`;
     const ozLabel = d.size === 'misc' ? d.oz.toFixed(3)+'oz' : d.size;
     const mm   = d.mm   ? '<span class="stag mmtag">MM</span>' : '';
     const ztag = d.tag === 'zombucks'   ? '<span class="stag ztag">🧟</span>' : '';
@@ -861,7 +881,7 @@ function renderSilverDeals() {
     const vtag = d.verified ? '<span style="font-size:0.58rem;color:var(--grn);margin-left:3px;">✓</span>' : '';
     const sizeLabel = d.size === 'misc' ? ozLabel : d.size;
     const prefix = d.oos ? '~' : '';
-    html += `<a class="deal ${card}" href="${d.url}" target="_blank">
+    html += `<a class="deal ${card}${featuredClass}" href="${d.url}" target="_blank" style="${stagger}">
       <div class="dl">
         <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?'<span class="btag">BEST</span>':''}${oosBadge}</div>
         <div class="dm">${d.dealer}${vtag} · ${d.oos?'Check dealer for stock':'✈ '+d.ship}</div>
@@ -910,13 +930,15 @@ function renderGoldDeals() {
     const tier = d.premOz < 50 ? 'hot' : d.premOz < 150 ? 'good' : d.premOz < 400 ? 'fair' : 'high';
     const secLbl = {hot:'🔥 Under $50/oz — Best Value', good:'✅ Good — $50 to $150/oz', fair:'⚠️ Moderate — $150 to $400/oz', high:'💰 High Premium — $400+/oz'};
     if (tier !== lastSec) {
-      html += `<div class="sec">${secLbl[tier]}</div>`;
+      html += `<div class="sec sec-${tier}">${secLbl[tier]}</div>`;
       lastSec = tier;
     }
 
     const col  = d.premOz < 50 ? 'g' : d.premOz < 150 ? 'y' : d.premOz < 400 ? 'o' : 'r';
     const card = d.premOz < 50 ? 'hot' : d.premOz < 150 ? 'good' : d.premOz < 400 ? 'fair' : 'high';
     const best = i === 0 && goldFilter === 'all';
+    const featuredClassG = best ? ' featured-deal' : '';
+    const staggerG = `animation-delay:${Math.min(i,10)*0.04}s`;
     const smtag= d.tag === 'scottsdale' ? '<span class="stag smint-tag">🏔</span>' : '';
     const ltag  = d.tag === 'libertad'   ? '<span class="stag" style="background:rgba(34,197,94,.2);color:#4ade80">🦅</span>' : '';
     const ptag  = d.tag === 'panda'      ? '<span class="stag" style="background:rgba(255,255,255,.1);color:#fff">🐼</span>' : '';
@@ -942,7 +964,7 @@ function renderGoldDeals() {
       allinLine = '$' + perOzAllin.toLocaleString('en-US',{minimumFractionDigits:2}) + '/oz w/ CC ' + ozDisplay;
     }
 
-    html += `<a class="deal ${card}" href="${d.url}" target="_blank">
+    html += `<a class="deal ${card}${featuredClassG}" href="${d.url}" target="_blank" style="${staggerG}">
       <div class="dl">
         <div class="dn"><span class="stag" style="background:rgba(245,158,11,.2);color:var(--gold)">${sizeLabel}</span>${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?'<span class="btag" style="background:var(--gold);color:#000">BEST</span>':''}</div>
         <div class="dm">${d.dealer}${vtag} · ✈ ${d.ship}</div>
