@@ -23,19 +23,7 @@
   ],
   "screenshots": [],
   "shortcuts": [
-    {
-      "name": "Silver Prices",
-      "short_name": "Silver",
-      "description": "Jump to live silver deals",
-      "url": "/?tab=silver",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Gold Prices",
-      "short_name": "Gold",
-      "description": "Jump to live gold deals",
-      "url": "/?tab=gold",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
-    }
+    {"name": "Silver Prices","short_name": "Silver","description": "Jump to live silver deals","url": "/?tab=silver","icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]},
+    {"name": "Gold Prices","short_name": "Gold","description": "Jump to live gold deals","url": "/?tab=gold","icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]}
   ]
 }
