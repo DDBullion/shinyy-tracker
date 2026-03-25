@@ -1,7 +1,7 @@
 // Shinyy Tracker — Service Worker
 // Caches the app shell for offline use; always fetches fresh spot prices
 
-const CACHE = 'shinyy-v1';
+const CACHE = 'shinyy-v2';
 const SHELL = ['/', '/index.html', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
