@@ -38,7 +38,6 @@ exports.handler = async function(event) {
     const token = await getAccessToken(clientId, clientSecret);
     const searchUrl = 'https://api.ebay.com/buy/browse/v1/item_summary/search'
       + '?q=' + encodeURIComponent(query)
-      + '&sort=price'
       + '&limit=12';
     const res = await fetch(searchUrl, {
       headers: {
