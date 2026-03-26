@@ -41,6 +41,7 @@ exports.handler = async function(event) {
   try {
     const res = await fetch(url);
     const data = await res.json();
+        console.log('eBay raw ack:', data?.findCompletedItemsResponse?.[0]?.ack?.[0], '| totalEntries:', data?.findCompletedItemsResponse?.[0]?.paginationOutput?.[0]?.totalEntries?.[0], '| errorMsg:', JSON.stringify(data?.findCompletedItemsResponse?.[0]?.errorMessage));
 
     const ackStatus = data?.findCompletedItemsResponse?.[0]?.ack?.[0];
     if (ackStatus === 'Failure') {
