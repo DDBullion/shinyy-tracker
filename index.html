@@ -59,6 +59,7 @@
     .metal-tab.active-silver{color:var(--sil);border-bottom-color:var(--sil);text-shadow:0 0 20px rgba(91,94,246,0.3);}
     .metal-tab.active-gold{color:var(--gold);border-bottom-color:var(--gold);text-shadow:0 0 20px rgba(217,119,6,0.3);}
     .metal-tab.active-sold{color:#16a34a;border-bottom-color:#16a34a;text-shadow:0 0 20px rgba(22,163,74,0.3);}
+    .metal-tab.active-ebay{color:#e53e0a;border-bottom-color:#e53e0a;text-shadow:0 0 20px rgba(229,62,10,0.3);}
 
     /* ── Last 3 Sold ── */
     .sold-wrap{padding:14px;}
@@ -84,6 +85,22 @@
     .sold-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
     .sold-sug{padding:7px 16px;border-radius:20px;border:1.5px solid var(--bdr);background:var(--sur);color:var(--mut);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .2s;}
     .sold-sug:hover{background:linear-gradient(135deg,#16a34a,#15803d);border-color:transparent;color:#fff;transform:translateY(-1px);box-shadow:0 3px 10px rgba(22,163,74,0.3);}
+
+    /* ── eBay Live Listings ── */
+    .ebay-card{display:flex;gap:12px;border:2px solid #16a34a;border-radius:14px;padding:13px 14px;margin-bottom:12px;background:var(--sur);box-shadow:0 2px 12px rgba(22,163,74,0.10);text-decoration:none;color:inherit;transition:all .2s;}
+    .ebay-card:hover{box-shadow:0 4px 20px rgba(22,163,74,0.22);transform:translateY(-1px);}
+    .ebay-thumb{width:72px;height:72px;object-fit:contain;border-radius:8px;flex-shrink:0;background:#f8f9fa;}
+    .ebay-thumb-ph{width:72px;height:72px;border-radius:8px;flex-shrink:0;background:#e9ecef;display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
+    .ebay-info{flex:1;min-width:0;}
+    .ebay-title{font-size:0.88rem;font-weight:600;color:var(--txt);margin-bottom:4px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .ebay-price{font-size:1.1rem;font-weight:700;color:#16a34a;}
+    .ebay-ship{font-size:0.78rem;color:var(--mut);margin-left:6px;}
+    .ebay-meta{font-size:0.75rem;color:var(--mut);margin-top:3px;}
+    .ebay-badge{display:inline-block;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:middle;}
+    .ebay-badge-bin{background:#e6f4ea;color:#16a34a;}
+    .ebay-badge-auc{background:#fff3e0;color:#e65100;}
+    .ebay-msg{text-align:center;padding:28px 16px;color:var(--mut);font-size:0.92rem;}
+    .ebay-err{text-align:center;padding:20px 16px;color:#dc2626;font-size:0.9rem;}
 
     /* ── Spot Card ── */
     .spot-wrap{padding:14px 14px 0;}
@@ -261,6 +278,7 @@
       <div class="metal-tab active-silver" id="tabSilver" onclick="setMetal('silver')">🥈 Silver</div>
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
       <div class="metal-tab" id="tabSold" onclick="setMetal('sold')">🔍 Last Sold</div>
+      <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
     </div>
   </div>
 
@@ -434,6 +452,36 @@
     <div class="safe"></div>
   </div>
 
+
+  <!-- ════════════════════════════════════
+       EBAY LIVE LISTINGS PAGE
+       ════════════════════════════════════ -->
+  <div class="page" id="pageEbay">
+    <div class="sold-wrap">
+
+      <div class="sold-search-box">
+        <input type="search" id="ebayInput" class="sold-input" placeholder="e.g. 1oz Silver Eagle, Gold Krugerrand..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')doEbaySearch()">
+        <button class="sold-btn" id="ebayBtn" onclick="doEbaySearch()">Search</button>
+      </div>
+
+      <div class="sold-hint">🛒 Browse <b>live eBay listings</b> for coins currently for sale — sorted by lowest price + shipping. Results are cached 30 min to protect API limits.</div>
+
+      <div class="sold-suggestions">
+        <span class="sold-sug" onclick="ebayQuick('1oz Silver Eagle')">1oz Silver Eagle</span>
+        <span class="sold-sug" onclick="ebayQuick('1oz Gold Eagle')">1oz Gold Eagle</span>
+        <span class="sold-sug" onclick="ebayQuick('Silver Maple Leaf 1oz')">Silver Maple</span>
+        <span class="sold-sug" onclick="ebayQuick('Gold Maple Leaf 1oz')">Gold Maple</span>
+        <span class="sold-sug" onclick="ebayQuick('1oz Silver Krugerrand')">Silver Krugerrand</span>
+        <span class="sold-sug" onclick="ebayQuick('1oz Gold Krugerrand')">Gold Krugerrand</span>
+        <span class="sold-sug" onclick="ebayQuick('Morgan Silver Dollar')">Morgan Dollar</span>
+        <span class="sold-sug" onclick="ebayQuick('Walking Liberty Half Dollar')">Walking Liberty</span>
+      </div>
+
+      <div id="ebayResults"></div>
+
+    </div>
+    <div class="safe"></div>
+  </div>
 </div><!-- end #appContent -->
 
 <script>
@@ -444,14 +492,18 @@ function setMetal(m) {
   document.getElementById('pageSilver').classList.toggle('active', m === 'silver');
   document.getElementById('pageGold').classList.toggle('active', m === 'gold');
   document.getElementById('pageSold').classList.toggle('active', m === 'sold');
+  document.getElementById('pageEbay').classList.toggle('active', m === 'ebay');
   const ts = document.getElementById('tabSilver');
   const tg = document.getElementById('tabGold');
   const td = document.getElementById('tabSold');
+  const te = document.getElementById('tabEbay');
   ts.className = 'metal-tab' + (m === 'silver' ? ' active-silver' : '');
   tg.className = 'metal-tab' + (m === 'gold' ? ' active-gold' : '');
   td.className = 'metal-tab' + (m === 'sold' ? ' active-sold' : '');
+  if (te) te.className = 'metal-tab' + (m === 'ebay' ? ' active-ebay' : '');
   if (m === 'silver') document.getElementById('headerSub').textContent = '🥈 Silver · Live Every 5 Min';
   else if (m === 'gold') document.getElementById('headerSub').textContent = '🥇 Gold · Live Every 5 Min';
+  else if (m === 'ebay') document.getElementById('headerSub').textContent = '🛒 eBay Live Listings';
   else document.getElementById('headerSub').textContent = '🔍 Last 3 Sold on eBay';
   if (m === 'silver' && silverSpot) renderSilver();
   if (m === 'gold' && goldSpot) renderGold();
@@ -500,6 +552,58 @@ async function doSoldSearch() {
     btn.disabled = false;
     btn.textContent = 'Search';
   }
+}
+
+// ── eBay Live Listings ──────────────────────────────────────────
+async function doEbaySearch() {
+  const q = document.getElementById('ebayInput').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('ebayBtn');
+  const out = document.getElementById('ebayResults');
+  btn.disabled = true;
+  btn.textContent = 'Searching…';
+  out.innerHTML = '<div class="ebay-msg">🔍 Searching eBay live listings…</div>';
+  try {
+    const res = await fetch('/.netlify/functions/ebay-listings?query=' + encodeURIComponent(q));
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      out.innerHTML = '<div class="ebay-err">⚠️ ' + (data.error || 'Could not load listings.') + '</div>';
+      return;
+    }
+    if (!data.length) {
+      out.innerHTML = '<div class="ebay-msg">No listings found for <b>' + q.replace(/[<>&]/g,'') + '</b>.</div>';
+      return;
+    }
+    out.innerHTML = data.map(item => {
+      const ship = parseFloat(item.shippingCost) === 0 ? 'Free shipping' : ('+$' + parseFloat(item.shippingCost).toFixed(2) + ' ship');
+      const total = (parseFloat(item.price) + parseFloat(item.shippingCost)).toFixed(2);
+      const isBIN = item.buyItNow || item.listingType === 'FixedPrice';
+      const badge = isBIN
+        ? '<span class="ebay-badge ebay-badge-bin">Buy It Now</span>'
+        : '<span class="ebay-badge ebay-badge-auc">Auction</span>';
+      const img = item.image
+        ? '<img class="ebay-thumb" src="' + item.image + '" alt="" loading="lazy">'
+        : '<div class="ebay-thumb-ph">🪙</div>';
+      return '<a class="ebay-card" href="' + item.url + '" target="_blank" rel="noopener noreferrer">'
+        + img
+        + '<div class="ebay-info">'
+        + '<div class="ebay-title">' + item.title.replace(/[<>&]/g,'') + '</div>'
+        + '<div><span class="ebay-price">$' + item.price + '</span>'
+        + '<span class="ebay-ship">' + ship + '</span>' + badge + '</div>'
+        + '<div class="ebay-meta">Total: $' + total + (item.condition ? ' · ' + item.condition : '') + '</div>'
+        + '</div></a>';
+    }).join('');
+  } catch(e) {
+    out.innerHTML = '<div class="ebay-err">⚠️ Network error — ' + e.message + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Search';
+  }
+}
+
+function ebayQuick(q) {
+  document.getElementById('ebayInput').value = q;
+  doEbaySearch();
 }
 
 // ═══════════════════════════════════════════════
