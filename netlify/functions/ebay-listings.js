@@ -41,9 +41,7 @@ exports.handler = async function(event) {
     'RESPONSE-DATA-FORMAT': 'JSON',
     'keywords': query,
     'sortOrder': 'PricePlusShippingLowest',
-    'paginationInput.entriesPerPage': '10',
-    'itemFilter(0).name': 'CategoryId',
-    'itemFilter(0).value': '11116',
+    'paginationInput.entriesPerPage': '12',
     'outputSelector(0)': 'GalleryInfo',
     'outputSelector(1)': 'SellerInfo'
   });
