@@ -40,9 +40,10 @@ exports.handler = async function(event) {
     'SECURITY-APPNAME': appId,
     'RESPONSE-DATA-FORMAT': 'JSON',
     'keywords': query,
-    'categoryId': '11116',
     'sortOrder': 'PricePlusShippingLowest',
     'paginationInput.entriesPerPage': '10',
+    'itemFilter(0).name': 'CategoryId',
+    'itemFilter(0).value': '11116',
     'outputSelector(0)': 'GalleryInfo',
     'outputSelector(1)': 'SellerInfo'
   });
