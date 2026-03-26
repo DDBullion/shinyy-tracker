@@ -28,15 +28,21 @@ exports.handler = async function(event) {
   try {
     const res = await fetch(url);
     const text = await res.text();
-    console.log('[ebay-listings] raw (first 600):', text.substring(0, 600));
     let data;
-    try { data = JSON.parse(text); } catch(e) { return { statusCode: 502, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Non-JSON from eBay: ' + text.substring(0, 200) }) }; }
-    const topKeys = Object.keys(data).join(',');
-    console.log('[ebay-listings] top-level keys:', topKeys);
+    try { data = JSON.parse(text); } catch(e) {
+      return { statusCode: 502, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Unexpected response from eBay. Please try again later.' }) };
+    }
+    // Top-level errorMessage means API-level error (rate limit, auth, etc.)
+    const topErr = data?.errorMessage?.[0]?.error?.[0];
+    if (topErr) {
+      const isRateLimit = topErr.errorId?.[0] === '10001' || topErr.subdomain?.[0] === 'RateLimiter';
+      const userMsg = isRateLimit
+        ? 'eBay search is temporarily unavailable — daily API limit reached. Please try again in a few hours.'
+        : (topErr.message?.[0] || 'eBay API error');
+      return { statusCode: isRateLimit ? 429 : 502, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: userMsg }) };
+    }
     const resp = data?.findItemsByKeywordsResponse?.[0];
     const ackStatus = resp?.ack?.[0];
-    const total = resp?.paginationOutput?.[0]?.totalEntries?.[0];
-    console.log('[ebay-listings] ack=' + ackStatus + ' total=' + total);
     if (ackStatus === 'Failure') {
       const errMsg = resp?.errorMessage?.[0]?.error?.[0]?.message?.[0] || 'eBay API error';
       return { statusCode: 502, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: errMsg }) };
