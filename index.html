@@ -571,6 +571,7 @@ async function doEbaySearch() {
       return;
     }
     if (!data.length) {
+      if (data && data.error) { out.innerHTML = '<div class="ebay-err">' + data.error + '</div>'; return; }
       out.innerHTML = '<div class="ebay-msg">No listings found for <b>' + q.replace(/[<>&]/g,'') + '</b>.</div>';
       return;
     }
