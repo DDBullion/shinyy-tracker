@@ -34,24 +34,23 @@ exports.handler = async function(event) {
     };
   }
 
-  const params = new URLSearchParams({
-    'OPERATION-NAME': 'findItemsByKeywords',
-    'SERVICE-VERSION': '1.0.0',
-    'SECURITY-APPNAME': appId,
-    'RESPONSE-DATA-FORMAT': 'JSON',
-    'keywords': query,
-    'sortOrder': 'PricePlusShippingLowest',
-    'paginationInput.entriesPerPage': '12',
-    'outputSelector(0)': 'GalleryInfo',
-    'outputSelector(1)': 'SellerInfo'
-  });
-
-  const url = 'https://svcs.ebay.com/services/search/FindingService/v1?' + params;
+  // Build URL as a string so outputSelector(n) parens are NOT percent-encoded
+  const url = 'https://svcs.ebay.com/services/search/FindingService/v1'
+    + '?OPERATION-NAME=findItemsByKeywords'
+    + '&SERVICE-VERSION=1.0.0'
+    + '&SECURITY-APPNAME=' + encodeURIComponent(appId)
+    + '&RESPONSE-DATA-FORMAT=JSON'
+    + '&keywords=' + encodeURIComponent(query)
+    + '&sortOrder=PricePlusShippingLowest'
+    + '&paginationInput.entriesPerPage=12'
+    + '&outputSelector(0)=GalleryInfo'
+    + '&outputSelector(1)=SellerInfo';
 
   try {
     const res = await fetch(url);
     const data = await res.json();
 
+    console.log('[ebay-listings] ack=' + data?.findItemsByKeywordsResponse?.[0]?.ack?.[0] + ' total=' + data?.findItemsByKeywordsResponse?.[0]?.paginationOutput?.[0]?.totalEntries?.[0]);
     const ackStatus = data?.findItemsByKeywordsResponse?.[0]?.ack?.[0];
     if (ackStatus === 'Failure') {
       const errMsg = data?.findItemsByKeywordsResponse?.[0]?.errorMessage?.[0]?.error?.[0]?.message?.[0] || 'eBay API error';
