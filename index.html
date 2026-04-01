@@ -574,7 +574,7 @@ async function doSoldSearch() {
       const d = item.date ? new Date(item.date) : null;
       const dateStr = d ? d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '';
       const img = item.image
-        ? `<img class="sold-img" src="${item.image}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        ? `<img class="sold-img" src="${item.image}" alt="" loading="lazy" onerror="this.remove()">`
         : `<div class="sold-img-placeholder">🪙</div>`;
       return `<a class="sold-card" href="${item.url}" target="_blank" rel="noopener">
         ${img}
@@ -1397,8 +1397,8 @@ function renderPopularGrid(products,ts){
       const ds=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
       const t=s.title.length>45?s.title.substring(0,45)+'…':s.title;
       const img=s.image
-        ?'<img class="sold-sale-img" src="'+s.image+'" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">'
-          +'<div class="sold-sale-img-placeholder" style="display:none">'+me+'</div>'
+        ?'<img class="sold-sale-img" src="'+s.image+'" alt="" loading="lazy" onerror="this.remove()">'
+          +'<div class="sold-sale-img-placeholder">'+me+'</div>'
         :'<div class="sold-sale-img-placeholder">'+me+'</div>';
       return '<div class="sold-sale-row">'+img
         +'<div class="sold-sale-info"><div class="sold-sale-title" title="'+s.title+'">'+t+'</div>'
@@ -1449,7 +1449,7 @@ async function doSoldSearch(){
       +data.map(item=>{
         const d=item.soldDate?new Date(item.soldDate):null;
         const ds=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
-        const img=item.image?'<img class="sold-sale-img" src="'+item.image+'" alt="" loading="lazy" onerror="this.style.display='none'">':'<div class="sold-sale-img-placeholder">🪙</div>';
+        const img=item.image?'<img class="sold-sale-img" src="'+item.image+'" alt="" loading="lazy" onerror="this.remove()">':'<div class="sold-sale-img-placeholder">🪙</div>';
         return '<div class="sold-sale-row" style="padding:10px 0">'+img
           +'<div class="sold-sale-info"><div class="sold-sale-title" style="max-width:240px" title="'+item.title+'">'+item.title.substring(0,60)+(item.title.length>60?'…':'')+'</div>'
           +'<div class="sold-sale-date">'+ds+(item.condition?' · '+item.condition:'')+'</div></div>'
