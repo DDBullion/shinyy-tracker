@@ -32,12 +32,10 @@
   <meta name="twitter:title" content="Shinyy Tracker | The #1 Free Silver & Gold Bullion Price Comparison Tool">
   <meta name="twitter:description" content="Compare live silver & gold prices from APMEX, JM Bullion, SD Bullion & more. Track premiums over spot. Updated every 5 minutes.">
   <meta name="twitter:image" content="https://shinyytracker.com/logo.png">
-  <link rel="manifest" href="/site.webmanifest">
-      <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-          <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-              <link rel="shortcut icon" href="/favicon.ico" />
-                  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-                      <meta name="apple-mobile-web-app-title" content="Shinyy" />>
+  <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">>
   <style>
     :root{--bg:#f0f1f8;--sur:#ffffff;--sur2:#eaecf5;--bdr:#d4d7e8;--txt:#1a1a30;--mut:#7070a0;--sil:#4a4aaa;--grn:#16a34a;--yel:#b45309;--orn:#c2410c;--red:#dc2626;--acc:#5b5ef6;--gold:#d97706;--gold2:#f59e0b;}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -857,7 +855,7 @@ function timedFetch(url, ms) {
 }
 
 // ── Fetch both silver AND gold from Kitco in one call ──
-async function fetchSpot() 
+async function fetchSpot() { 
   setStatus('loading');
   document.getElementById('rbtn').textContent = '↻ ...';
 
