@@ -1404,9 +1404,7 @@ function renderPopularGrid(products,ts){
         +'<div class="sold-sale-info"><div class="sold-sale-title" title="'+s.title+'">'+t+'</div>'
         +'<div class="sold-sale-date">'+ds+(s.condition?' · '+s.condition:'')+'</div></div>'
         +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">'
-        +'<span class="sold-sale-price">
-</html>
-+parseFloat(s.soldPrice).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
+        +'<span class="sold-sale-price">$'+parseFloat(s.soldPrice).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
         +'<a class="sold-sale-link" href="'+s.url+'" target="_blank" rel="noopener noreferrer">View ↗</a>'
         +'</div></div>';
     }).join('');
@@ -1454,9 +1452,7 @@ async function doSoldSearch(){
           +'<div class="sold-sale-info"><div class="sold-sale-title" style="max-width:240px" title="'+item.title+'">'+item.title.substring(0,60)+(item.title.length>60?'…':'')+'</div>'
           +'<div class="sold-sale-date">'+ds+(item.condition?' · '+item.condition:'')+'</div></div>'
           +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">'
-          +'<span class="sold-sale-price">
-</html>
-+parseFloat(item.soldPrice).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
+          +'<span class="sold-sale-price">$'+parseFloat(item.soldPrice).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
           +'<a class="sold-sale-link" href="'+item.url+'" target="_blank" rel="noopener noreferrer">View ↗</a>'
           +'</div></div>';
       }).join('');
