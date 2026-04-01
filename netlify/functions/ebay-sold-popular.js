@@ -95,20 +95,25 @@ function delay(ms) {
 }
 
 exports.handler = async function (event) {
+  // Use private Cache-Control so Netlify CDN does NOT cache this response
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=14400',
+    'Cache-Control': 'private, max-age=0',
   };
 
   const BLOB_KEY = 'popular_products_v2';
 
   // 1. Try to serve from Netlify Blobs cache (4-hour TTL)
+  // Only use cache if it actually has products (skip empty cached results)
   try {
     const store = getStore('ebay-sold-cache');
     const cached = await store.getWithMetadata(BLOB_KEY, { type: 'text' });
     if (cached?.metadata?.ts && (Date.now() - cached.metadata.ts) < CACHE_TTL) {
-      return { statusCode: 200, headers, body: cached.data };
+      const parsed = JSON.parse(cached.data);
+      if (parsed.products && parsed.products.length > 0) {
+        return { statusCode: 200, headers, body: cached.data };
+      }
     }
   } catch (_) {
     // Blobs unavailable — continue to live scrape
@@ -132,11 +137,13 @@ exports.handler = async function (event) {
   const payload = { products, cachedAt: Date.now() };
   const body = JSON.stringify(payload);
 
-  // 3. Save to Netlify Blobs
-  try {
-    const store = getStore('ebay-sold-cache');
-    await store.set(BLOB_KEY, body, { metadata: { ts: Date.now() } });
-  } catch (_) {}
+  // 3. Only save to Netlify Blobs if we got real results (don't cache blocked responses)
+  if (products.length > 0) {
+    try {
+      const store = getStore('ebay-sold-cache');
+      await store.set(BLOB_KEY, body, { metadata: { ts: Date.now() } });
+    } catch (_) {}
+  }
 
   return { statusCode: 200, headers, body };
 };
