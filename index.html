@@ -225,7 +225,33 @@
 
     /* ── Page visibility ── */
     .page{display:none;}.page.active{display:block;}
-  </style>
+  
+/* ── Last Sold: Popular Products Grid ── */
+.sold-popular-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.sold-popular-title{font-size:0.85rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:0.05em;}
+.sold-popular-meta{font-size:0.75rem;color:var(--mut);display:flex;align-items:center;gap:8px;}
+.sold-refresh-btn{background:none;border:1px solid var(--bdr);border-radius:6px;color:var(--sil);font-size:0.72rem;padding:3px 8px;cursor:pointer;transition:background 0.15s;}
+.sold-refresh-btn:hover{background:var(--sur2);}
+.sold-popular-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
+.sold-product-card{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;transition:border-color 0.2s;}
+.sold-product-card:hover{border-color:var(--sil);}
+.sold-product-name{font-size:0.82rem;font-weight:700;color:var(--txt);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.sold-metal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sold-metal-dot.silver{background:#aab4c8;} .sold-metal-dot.gold{background:#d4a833;}
+.sold-sale-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr);gap:8px;}
+.sold-sale-row:last-child{border-bottom:none;}
+.sold-sale-img{width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--sur2);}
+.sold-sale-img-placeholder{width:36px;height:36px;border-radius:6px;background:var(--sur2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.sold-sale-info{flex:1;min-width:0;}
+.sold-sale-title{font-size:0.72rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+.sold-sale-date{font-size:0.68rem;color:var(--mut);opacity:0.7;}
+.sold-sale-price{font-size:0.9rem;font-weight:700;color:var(--grn);white-space:nowrap;flex-shrink:0;}
+.sold-sale-link{font-size:0.68rem;color:var(--sil);text-decoration:none;opacity:0.8;transition:opacity 0.15s;}
+.sold-sale-link:hover{opacity:1;text-decoration:underline;}
+.sold-popular-loading{text-align:center;color:var(--mut);padding:32px 0;font-size:0.85rem;}
+.sold-popular-error{text-align:center;color:var(--orn);padding:16px;font-size:0.82rem;background:var(--sur);border-radius:10px;border:1px solid var(--bdr);margin-bottom:16px;}
+.sold-divider{border:none;border-top:1px solid var(--bdr);margin:20px 0;}
+</style>
   <!-- Structured Data -->
   <script type="application/ld+json">
   {
@@ -277,7 +303,7 @@
     <div class="metal-tabs">
       <div class="metal-tab active-silver" id="tabSilver" onclick="setMetal('silver')">🥈 Silver</div>
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
-      <div class="metal-tab" id="tabSold" onclick="setMetal('sold')">🔍 Last Sold</div>
+      <div class="metal-tab" id="tabSold" onclick="setMetal('sold');loadPopularSold()">🔍 Last Sold</div>
       <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
     </div>
   </div>
@@ -430,20 +456,33 @@
   <div class="page" id="pageSold">
     <div class="sold-wrap">
 
+      <div class="sold-popular-header">
+        <span class="sold-popular-title">🔥 Recently Sold on eBay</span>
+        <span class="sold-popular-meta">
+          <span id="soldPopularAge"></span>
+          <button class="sold-refresh-btn" onclick="loadPopularSold(true)">↻ Refresh</button>
+        </span>
+      </div>
+      <div id="soldPopularGrid" class="sold-popular-grid">
+        <div class="sold-popular-loading">Loading recent sales data…</div>
+      </div>
+
+      <hr class="sold-divider">
+
       <div class="sold-search-box">
-        <input type="search" id="soldInput" class="sold-input" placeholder="e.g. 1oz Silver Eagle, Morgan Dollar..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')doSoldSearch()">
+        <input type="search" id="soldInput" class="sold-input" placeholder="Search any item, e.g. Morgan Dollar, Engelhard Bar..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')doSoldSearch()">
         <button class="sold-btn" id="soldBtn" onclick="doSoldSearch()">Search</button>
       </div>
 
-      <div class="sold-hint">🔍 Search eBay's completed listings to see the <b>last 3 actual sold prices</b> — including accepted best offers that eBay hides from buyers. Great for knowing what something <b>actually</b> sold for before you list or buy.</div>
+      <div class="sold-hint">🔍 Search eBay's completed listings to see the <b>last 5 actual sold prices</b> — including accepted best offers that eBay hides from buyers.</div>
 
       <div class="sold-suggestions">
         <span class="sold-sug" onclick="soldQuick('1oz Silver Eagle')">1oz Silver Eagle</span>
         <span class="sold-sug" onclick="soldQuick('1oz Gold Eagle')">1oz Gold Eagle</span>
         <span class="sold-sug" onclick="soldQuick('100oz Silver Bar')">100oz Silver Bar</span>
         <span class="sold-sug" onclick="soldQuick('1oz Silver Maple')">1oz Silver Maple</span>
-        <span class="sold-sug" onclick="soldQuick('Morgan Silver Dollar')">Morgan Dollar</span>
-        <span class="sold-sug" onclick="soldQuick('Engelhard Silver Bar')">Engelhard Bar</span>
+        <span class="sold-sug" onclick="soldQuick('Morgan Dollar')">Morgan Dollar</span>
+        <span class="sold-sug" onclick="soldQuick('Engelhard Bar')">Engelhard Bar</span>
       </div>
 
       <div id="soldResults"></div>
@@ -1336,5 +1375,96 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>
   </footer>
+
+<script>
+// ── Popular Sold Feature ─────────────────────────────────────────────
+const SOLD_CACHE_KEY = 'shinyy_sold_popular_v1';
+const SOLD_CACHE_TTL = 4 * 60 * 60 * 1000;
+function getSoldCache(){try{const r=localStorage.getItem(SOLD_CACHE_KEY);if(!r)return null;const p=JSON.parse(r);if(Date.now()-p.ts>SOLD_CACHE_TTL)return null;return p;}catch{return null;}}
+function setSoldCache(d){try{localStorage.setItem(SOLD_CACHE_KEY,JSON.stringify({ts:Date.now(),data:d}));}catch{}}
+function soldAge(ts){if(!ts)return '';const m=Math.round((Date.now()-ts)/60000);if(m<2)return 'just updated';if(m<60)return 'updated '+m+'m ago';return 'updated '+Math.floor(m/60)+'h ago';}
+
+function renderPopularGrid(products,ts){
+  const grid=document.getElementById('soldPopularGrid');
+  const ageEl=document.getElementById('soldPopularAge');
+  if(ageEl)ageEl.textContent=soldAge(ts);
+  if(!products||!products.length){grid.innerHTML='<div class="sold-popular-error">No data available. Try refreshing.</div>';return;}
+  grid.innerHTML=products.map(p=>{
+    const mc=p.metal==='gold'?'gold':'silver';
+    const me=p.metal==='gold'?'🥇':'🥈';
+    const rows=(p.sales||[]).slice(0,3).map(s=>{
+      const d=s.soldDate?new Date(s.soldDate):null;
+      const ds=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+      const t=s.title.length>45?s.title.substring(0,45)+'…':s.title;
+      const img=s.image
+        ?'<img class="sold-sale-img" src="'+s.image+'" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">'
+          +'<div class="sold-sale-img-placeholder" style="display:none">'+me+'</div>'
+        :'<div class="sold-sale-img-placeholder">'+me+'</div>';
+      return '<div class="sold-sale-row">'+img
+        +'<div class="sold-sale-info"><div class="sold-sale-title" title="'+s.title+'">'+t+'</div>'
+        +'<div class="sold-sale-date">'+ds+(s.condition?' · '+s.condition:'')+'</div></div>'
+        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">'
+        +'<span class="sold-sale-price">
+</html>
++parseFloat(s.soldPrice).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
+        +'<a class="sold-sale-link" href="'+s.url+'" target="_blank" rel="noopener noreferrer">View ↗</a>'
+        +'</div></div>';
+    }).join('');
+    return '<div class="sold-product-card"><div class="sold-product-name"><span class="sold-metal-dot '+mc+'"></span>'+p.label+'</div>'
+      +(rows||'<div class="sold-popular-loading" style="padding:8px 0;font-size:0.78rem">No recent sales found</div>')+'</div>';
+  }).join('');
+}
+
+async function loadPopularSold(forceRefresh){
+  const grid=document.getElementById('soldPopularGrid');
+  if(!grid)return;
+  if(!forceRefresh){const cached=getSoldCache();if(cached){renderPopularGrid(cached.data,cached.ts);return;}}
+  grid.innerHTML='<div class="sold-popular-loading">Loading recent sales… ⏳</div>';
+  try{
+    const res=await fetch('/.netlify/functions/ebay-sold-popular');
+    if(!res.ok)throw new Error('Server returned '+res.status);
+    const json=await res.json();
+    if(json.error)throw new Error(json.error);
+    setSoldCache(json.products);
+    renderPopularGrid(json.products,Date.now());
+  }catch(err){
+    grid.innerHTML='<div class="sold-popular-error">⚠️ Could not load recent sales ('+err.message+').<br><small>Use the search below.</small></div>';
+  }
+}
+
+// Override doSoldSearch to use new response field names (soldPrice/soldDate)
+async function doSoldSearch(){
+  const q=document.getElementById('soldInput').value.trim();
+  if(!q)return;
+  const btn=document.getElementById('soldBtn');
+  const out=document.getElementById('soldResults');
+  btn.disabled=true;btn.textContent='Searching…';
+  out.innerHTML='<div class="sold-popular-loading">Searching eBay completed listings…</div>';
+  try{
+    const res=await fetch('/.netlify/functions/ebay-sold?query='+encodeURIComponent(q));
+    const data=await res.json();
+    if(data.error)throw new Error(data.error);
+    if(!data.length){out.innerHTML='<div class="sold-popular-error">No sold listings found.</div>';return;}
+    out.innerHTML='<div style="font-size:0.8rem;color:var(--mut);margin:12px 0 8px">Last '+data.length+' sold for "<b>'+q+'</b>"</div>'
+      +data.map(item=>{
+        const d=item.soldDate?new Date(item.soldDate):null;
+        const ds=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+        const img=item.image?'<img class="sold-sale-img" src="'+item.image+'" alt="" loading="lazy" onerror="this.style.display='none'">':'<div class="sold-sale-img-placeholder">🪙</div>';
+        return '<div class="sold-sale-row" style="padding:10px 0">'+img
+          +'<div class="sold-sale-info"><div class="sold-sale-title" style="max-width:240px" title="'+item.title+'">'+item.title.substring(0,60)+(item.title.length>60?'…':'')+'</div>'
+          +'<div class="sold-sale-date">'+ds+(item.condition?' · '+item.condition:'')+'</div></div>'
+          +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">'
+          +'<span class="sold-sale-price">
+</html>
++parseFloat(item.soldPrice).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
+          +'<a class="sold-sale-link" href="'+item.url+'" target="_blank" rel="noopener noreferrer">View ↗</a>'
+          +'</div></div>';
+      }).join('');
+  }catch(err){out.innerHTML='<div class="sold-popular-error">⚠️ '+err.message+'</div>';}
+  finally{btn.disabled=false;btn.textContent='Search';}
+}
+
+function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch();}
+</script>
 </body>
 </html>
