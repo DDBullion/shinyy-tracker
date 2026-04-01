@@ -457,19 +457,6 @@
   <div class="page" id="pageSold">
     <div class="sold-wrap">
 
-      <div class="sold-popular-header">
-        <span class="sold-popular-title">🔥 Recently Sold on eBay</span>
-        <span class="sold-popular-meta">
-          <span id="soldPopularAge"></span>
-          <button class="sold-refresh-btn" onclick="loadPopularSold(true)">↻ Refresh</button>
-        </span>
-      </div>
-      <div id="soldPopularGrid" class="sold-popular-grid">
-        <div class="sold-popular-loading">Loading recent sales data…</div>
-      </div>
-
-      <hr class="sold-divider">
-
       <div class="sold-search-box">
         <input type="search" id="soldInput" class="sold-input" placeholder="Search any item, e.g. Morgan Dollar, Engelhard Bar..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')doSoldSearch()">
         <button class="sold-btn" id="soldBtn" onclick="doSoldSearch()">Search</button>
