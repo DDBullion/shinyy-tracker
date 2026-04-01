@@ -1,9 +1,10 @@
 // ebay-sold.js — Netlify Function
-// Scrapes eBay completed/sold listings. No API key required.
+// Scrapes eBay completed/sold listings for a given search query.
+// Routes through ScraperAPI to avoid IP blocking.
 // Caches results in Netlify Blobs for 30 minutes.
 
 const { getStore } = require('@netlify/blobs');
-const CACHE_TTL = 30 * 60 * 1000;
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
 function addAffiliate(url) {
   if (!url || url === '#') return url;
@@ -14,41 +15,26 @@ function addAffiliate(url) {
 function parseSoldListings(html) {
   const results = [];
   const seen = new Set();
-
-  // Find each data-listingid occurrence directly — avoids brittle <li> tag matching
   const listingIdRegex = /data-listingid=["']?(\d+)["']?/g;
   let idMatch;
-
   while ((idMatch = listingIdRegex.exec(html)) !== null && results.length < 5) {
     const listingId = idMatch[1];
     if (seen.has(listingId)) continue;
     seen.add(listingId);
-
-    // Extract a 3000-char block after the listing ID to find all its details
     const block = html.substring(idMatch.index, idMatch.index + 3000);
-
-    // Must be a sold listing (has "Sold Sep 9, 2025" style text)
     const soldMatch = block.match(/su-styled-text positive[^>]*>(Sold[^<]+)/);
     if (!soldMatch) continue;
-
-    // Price e.g. $139.95
     const priceMatch = block.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
     if (!priceMatch) continue;
-
-    // Title — strip HTML tags and eBay's accessibility "Opens in a new window" text
     const titleMatch = block.match(/s-card__title[^>]*>([\s\S]{1,400}?)<\/span>/);
     let title = 'Sold Item';
     if (titleMatch) {
-      title = titleMatch[1]
-        .replace(/<[^>]*>/g, '')
+      title = titleMatch[1].replace(/<[^>]*>/g, '')
         .replace(/Opens in a new\s*(window|tab)?[^<]*/gi, '')
         .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
         .replace(/\s+/g, ' ').trim();
     }
-
-    // Image URL
     const imgMatch = block.match(/src=(https:\/\/i\.ebayimg\.com[^\s"'<>]+)/);
-
     results.push({
       title,
       soldPrice: parseFloat(priceMatch[1].replace(/,/g, '')).toFixed(2),
@@ -58,7 +44,6 @@ function parseSoldListings(html) {
       url: addAffiliate('https://www.ebay.com/itm/' + listingId),
     });
   }
-
   return results;
 }
 
@@ -66,7 +51,7 @@ exports.handler = async function (event) {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=1800',
+    'Cache-Control': 'private, max-age=0',
   };
 
   const query = event.queryStringParameters?.query || '';
@@ -76,39 +61,45 @@ exports.handler = async function (event) {
 
   const cacheKey = 'sold_' + query.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
 
-  // 1. Check Netlify Blobs cache
+  // 1. Try Netlify Blobs cache first
   try {
     const store = getStore('ebay-sold-cache');
     const cached = await store.getWithMetadata(cacheKey, { type: 'text' });
     if (cached?.metadata?.ts && (Date.now() - cached.metadata.ts) < CACHE_TTL) {
-      return { statusCode: 200, headers, body: cached.data };
+      const parsed = JSON.parse(cached.data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return { statusCode: 200, headers, body: cached.data };
+      }
     }
   } catch (_) {}
 
-  // 2. Scrape eBay completed/sold listings
+  // 2. Scrape via ScraperAPI (handles IP rotation + anti-bot automatically)
   try {
-    const searchUrl = 'https://www.ebay.com/sch/i.html?' + new URLSearchParams({
-      _nkw: query, LH_Complete: '1', LH_Sold: '1', _sop: '13', _ipg: '10',
+    const scraperKey = process.env.SCRAPERAPI_KEY;
+    if (!scraperKey) throw new Error('SCRAPERAPI_KEY not configured');
+
+    const ebayUrl = 'https://www.ebay.com/sch/i.html?' + new URLSearchParams({
+      _nkw: query,
+      LH_Complete: '1',
+      LH_Sold: '1',
+      _sop: '13',
+      _ipg: '10',
     });
 
-    const res = await fetch(searchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Cache-Control': 'no-cache',
-      },
+    const scraperUrl = 'https://api.scraperapi.com?' + new URLSearchParams({
+      api_key: scraperKey,
+      url: ebayUrl,
+      country_code: 'us',
     });
 
-    if (!res.ok) throw new Error('eBay returned HTTP ' + res.status);
+    const res = await fetch(scraperUrl);
+    if (!res.ok) throw new Error('ScraperAPI returned HTTP ' + res.status);
+
     const html = await res.text();
     const results = parseSoldListings(html);
     const body = JSON.stringify(results);
 
-    // 3. Cache successful results in Netlify Blobs
+    // 3. Cache to Blobs if we got results
     if (results.length > 0) {
       try {
         const store = getStore('ebay-sold-cache');
