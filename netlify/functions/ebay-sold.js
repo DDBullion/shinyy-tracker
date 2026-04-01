@@ -61,6 +61,7 @@ exports.handler = async function (event) {
   try {
     const res = await fetch(url);
     const data = await res.json();
+    if (event.queryStringParameters?._debug) { return { statusCode: 200, headers, body: JSON.stringify({ _ebayRaw: data }) }; }
 
     const items =
       data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
