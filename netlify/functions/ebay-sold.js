@@ -90,8 +90,14 @@ exports.handler = async function (event) {
     if (!res.ok) throw new Error('eBay returned HTTP ' + res.status);
     const html = await res.text();
 
-    // DEBUG: log what eBay actually returned so we can diagnose
-    console.log('eBay status:', res.status, '| HTML length:', html.length, '| Preview:', html.substring(0, 300).replace(/\s+/g, ' '));
+    // DEBUG: check what selectors are present in the HTML
+    const hasListingId = html.includes('data-listingid');
+    const hasSCard = html.includes('s-card');
+    const hasSoldText = html.includes('Sold ');
+    const firstListingIdx = html.indexOf('data-listingid');
+    const snippet = firstListingIdx > -1 ? html.substring(firstListingIdx, firstListingIdx + 200) : 'NOT FOUND';
+    console.log('HTML length:', html.length, '| hasListingId:', hasListingId, '| hasSCard:', hasSCard, '| hasSoldText:', hasSoldText);
+    console.log('First listingid snippet:', snippet.replace(/\s+/g, ' '));
 
     const results = parseSoldListings(html);
     const body = JSON.stringify(results);
