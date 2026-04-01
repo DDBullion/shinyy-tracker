@@ -8,16 +8,16 @@ const { getStore } = require('@netlify/blobs');
 const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours
 
 const POPULAR_PRODUCTS = [
-  { name: '1oz Silver Eagle',       query: '1oz American Silver Eagle coin' },
-  { name: '1oz Gold Eagle',         query: '1oz American Gold Eagle coin' },
-  { name: '1oz Gold Buffalo',       query: '1oz American Gold Buffalo coin' },
-  { name: '1oz Silver Maple',       query: '1oz Canadian Silver Maple Leaf' },
-  { name: '1oz Gold Maple',         query: '1oz Canadian Gold Maple Leaf coin' },
-  { name: '10oz Silver Bar',        query: '10oz silver bar .999' },
-  { name: '100oz Silver Bar',       query: '100oz silver bar .999' },
-  { name: '1oz Silver Round',       query: '1oz silver round .999' },
-  { name: 'Morgan Silver Dollar',   query: 'Morgan Silver Dollar' },
-  { name: 'Engelhard Silver Bar',   query: 'Engelhard silver bar' },
+  { label: '1oz Silver Eagle',     query: '1oz American Silver Eagle coin',    metal: 'silver' },
+  { label: '1oz Gold Eagle',       query: '1oz American Gold Eagle coin',      metal: 'gold'   },
+  { label: '1oz Gold Buffalo',     query: '1oz American Gold Buffalo coin',    metal: 'gold'   },
+  { label: '1oz Silver Maple',     query: '1oz Canadian Silver Maple Leaf',    metal: 'silver' },
+  { label: '1oz Gold Maple',       query: '1oz Canadian Gold Maple Leaf coin', metal: 'gold'   },
+  { label: '10oz Silver Bar',      query: '10oz silver bar .999',              metal: 'silver' },
+  { label: '100oz Silver Bar',     query: '100oz silver bar .999',             metal: 'silver' },
+  { label: '1oz Silver Round',     query: '1oz silver round .999',             metal: 'silver' },
+  { label: 'Morgan Silver Dollar', query: 'Morgan Silver Dollar',              metal: 'silver' },
+  { label: 'Engelhard Silver Bar', query: 'Engelhard silver bar',              metal: 'silver' },
 ];
 
 // EPN affiliate tracking — Campaign ID 5339146590
@@ -31,36 +31,27 @@ function addAffiliate(url) {
 function parseSoldListings(html, maxResults = 5) {
   const results = [];
   const seen = new Set();
-
-  const liRegex = /<li\s[^>]*data-listingid=(\d+)[^>]*>([\s\S]*?)(?=<li\s[^>]*data-listingid=|$)/g;
-  let match;
-
-  while ((match = liRegex.exec(html)) !== null && results.length < maxResults) {
-    const listingId = match[1];
-    const block = match[2];
-
+  const listingIdRegex = /data-listingid=["']?(\d+)["']?/g;
+  let idMatch;
+  while ((idMatch = listingIdRegex.exec(html)) !== null && results.length < maxResults) {
+    const listingId = idMatch[1];
     if (seen.has(listingId)) continue;
     seen.add(listingId);
-
+    const block = html.substring(idMatch.index, idMatch.index + 3000);
     const soldMatch = block.match(/su-styled-text positive[^>]*>(Sold[^<]+)/);
     if (!soldMatch) continue;
-
     const priceMatch = block.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
     if (!priceMatch) continue;
-
     const titleMatch = block.match(/s-card__title[^>]*>([\s\S]{1,400}?)<\/span>/);
     let title = 'Sold Item';
     if (titleMatch) {
       title = titleMatch[1]
         .replace(/<[^>]*>/g, '')
         .replace(/Opens in a new\s*(window|tab)?[^<]*/gi, '')
-        .replace(/&amp;/g, '&')
-        .replace(/\s+/g, ' ')
-        .trim();
+        .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+        .replace(/\s+/g, ' ').trim();
     }
-
     const imgMatch = block.match(/src=(https:\/\/i\.ebayimg\.com[^\s"'<>]+)/);
-
     results.push({
       title,
       soldPrice: parseFloat(priceMatch[1].replace(/,/g, '')).toFixed(2),
@@ -70,7 +61,6 @@ function parseSoldListings(html, maxResults = 5) {
       url: addAffiliate('https://www.ebay.com/itm/' + listingId),
     });
   }
-
   return results;
 }
 
@@ -83,16 +73,17 @@ async function fetchSoldForProduct(query) {
     _sop: '13',
     _ipg: '10',
   });
-
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'Accept-Language': 'en-US,en;q=0.9',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Connection': 'keep-alive',
       'Upgrade-Insecure-Requests': '1',
+      'Cache-Control': 'no-cache',
     },
   });
-
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const html = await res.text();
   return parseSoldListings(html, 5);
@@ -110,7 +101,7 @@ exports.handler = async function (event) {
     'Cache-Control': 'public, max-age=14400',
   };
 
-  const BLOB_KEY = 'popular_products_v1';
+  const BLOB_KEY = 'popular_products_v2';
 
   // 1. Try to serve from Netlify Blobs cache (4-hour TTL)
   try {
@@ -129,11 +120,10 @@ exports.handler = async function (event) {
     try {
       const sales = await fetchSoldForProduct(product.query);
       if (sales.length > 0) {
-        products.push({ name: product.name, query: product.query, sales });
+        products.push({ label: product.label, query: product.query, metal: product.metal, sales });
       }
     } catch (err) {
-      // Skip this product if scrape fails — don't abort the whole batch
-      console.error('Skipped ' + product.name + ': ' + err.message);
+      console.error('Skipped ' + product.label + ': ' + err.message);
     }
     // 500ms delay between requests to avoid triggering bot detection
     await delay(500);
