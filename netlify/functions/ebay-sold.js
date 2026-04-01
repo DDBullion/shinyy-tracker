@@ -1,4 +1,4 @@
-Temp: add console.log of raw eBay response for debugging// Uses eBay Finding API (findCompletedItems) — no special approval required.
+// Uses eBay Finding API (findCompletedItems) — no special approval required.
 // Swap to Marketplace Insights later by just changing the fetch logic below.
 
 const cache = {};
@@ -61,7 +61,6 @@ exports.handler = async function (event) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    console.log("EBAY_RAW", JSON.stringify(data).substring(0, 500));
 
     const items =
       data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
