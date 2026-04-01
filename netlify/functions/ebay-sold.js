@@ -1,72 +1,96 @@
-const cache = {};
-const tokenCache = { token: null, expiry: 0 };
-const CACHE_TTL = 30 * 60 * 1000;
+// netlify/functions/ebay-sold.js
+// Uses eBay Finding API (findCompletedItems) — no special approval required.
+// Swap to Marketplace Insights later by just changing the fetch logic below.
 
-async function getAccessToken(clientId, clientSecret) {
-  if (tokenCache.token && Date.now() < tokenCache.expiry - 60000) {
-    return tokenCache.token;
-  }
-  const creds = Buffer.from(clientId + ':' + clientSecret).toString('base64');
-  const res = await fetch('https://api.ebay.com/identity/v1/oauth2/token', {
-    method: 'POST',
-    headers: { 'Authorization': 'Basic ' + creds, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%20https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope%2Fbuy.marketplace.insights'
-  });
-  const data = await res.json();
-  if (!data.access_token) throw new Error('OAuth failed: ' + (data.error_description || JSON.stringify(data)));
-  tokenCache.token = data.access_token;
-  tokenCache.expiry = Date.now() + (data.expires_in * 1000);
-  return tokenCache.token;
+const cache = {};
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+// EPN affiliate tracking — Campaign ID 5339146590
+function addAffiliate(url) {
+  if (!url || url === '#') return url;
+  const sep = url.includes('?') ? '&' : '?';
+  return url + sep + 'mkevt=1&mkcid=1&mkrid=711-53200-19255-0&campid=5339146590&toolid=10001';
 }
 
-exports.handler = async function(event) {
+exports.handler = async function (event) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Cache-Control': 'public, max-age=1800',
+  };
+
   const query = event.queryStringParameters?.query || '';
   if (!query.trim()) {
-    return { statusCode: 400, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Query parameter is required' }) };
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Query parameter is required' }),
+    };
   }
-  const clientId = process.env.EBAY_CLIENT_ID || process.env.EBAY_APP_ID;
-  const clientSecret = process.env.EBAY_CLIENT_SECRET;
-  if (!clientId || !clientSecret) {
-    return { statusCode: 500, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'eBay API credentials not configured' }) };
+
+  const appId = process.env.EBAY_APP_ID;
+  if (!appId) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'EBAY_APP_ID not configured in Netlify environment variables.' }),
+    };
   }
+
+  // Serve from cache if fresh
   const cacheKey = query.toLowerCase().trim();
   const cached = cache[cacheKey];
   if (cached && Date.now() - cached.ts < CACHE_TTL) {
-    return { statusCode: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: cached.body };
+    return { statusCode: 200, headers, body: cached.body };
   }
+
+  const params = new URLSearchParams({
+    'OPERATION-NAME': 'findCompletedItems',
+    'SERVICE-VERSION': '1.0.0',
+    'SECURITY-APPNAME': appId,
+    'RESPONSE-DATA-FORMAT': 'JSON',
+    'keywords': query,
+    'itemFilter(0).name': 'SoldItemsOnly',
+    'itemFilter(0).value': 'true',
+    'sortOrder': 'EndTimeSoonest',
+    'paginationInput.entriesPerPage': '5',
+    'outputSelector': 'GalleryInfo',
+  });
+
+  const url = `https://svcs.ebay.com/services/search/FindingService/v1?${params}`;
+
   try {
-    const token = await getAccessToken(clientId, clientSecret);
-    const searchUrl = 'https://api.ebay.com/buy/marketplace_insights/v1_beta/item_sales/search'
-      + '?q=' + encodeURIComponent(query)
-      + '&sort=soldDate'
-      + '&limit=20';
-    const res = await fetch(searchUrl, {
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US'
-      }
-    });
+    const res = await fetch(url);
     const data = await res.json();
-    if (data.errors) {
-      const errMsg = data.errors[0]?.message || 'eBay API error';
-      return { statusCode: 502, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: errMsg }) };
-    }
-    const sales = data.itemSales || [];
-    const results = sales.map(item => ({
-      title: item.title || 'Unknown',
-      soldPrice: parseFloat(item.lastSoldPrice?.value || 0).toFixed(2),
-      currency: item.lastSoldPrice?.currency || 'USD',
-      soldDate: item.soldDate || '',
-      image: item.image?.imageUrl || '',
-      url: item.itemWebUrl || '#',
-      condition: item.condition || '',
-      seller: item.seller?.username || '',
-      shippingCost: '0'
-    }));
+
+    const items =
+      data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
+
+    const results = items.map((item) => {
+      const rawUrl = item.viewItemURL?.[0] || '#';
+      return {
+        title: item.title?.[0] || 'Unknown',
+        soldPrice: parseFloat(
+          item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__ || 0
+        ).toFixed(2),
+        currency:
+          item.sellingStatus?.[0]?.currentPrice?.[0]?.['@currencyId'] || 'USD',
+        soldDate: item.listingInfo?.[0]?.endTime?.[0] || '',
+        image: item.galleryURL?.[0] || '',
+        url: addAffiliate(rawUrl),
+        condition: item.condition?.[0]?.conditionDisplayName?.[0] || '',
+      };
+    });
+
     const responseBody = JSON.stringify(results);
     cache[cacheKey] = { ts: Date.now(), body: responseBody };
-    return { statusCode: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, body: responseBody };
+
+    return { statusCode: 200, headers, body: responseBody };
   } catch (err) {
-    return { statusCode: 500, headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ error: 'Failed to fetch eBay sold data: ' + err.message }) };
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Failed to fetch eBay sold data: ' + err.message }),
+    };
   }
 };
