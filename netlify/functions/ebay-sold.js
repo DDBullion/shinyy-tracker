@@ -1,7 +1,9 @@
-// Uses eBay Finding API (findCompletedItems) — no special approval required.
-// Swap to Marketplace Insights later by just changing the fetch logic below.
+// ebay-sold.js — Netlify Function
+// Scrapes eBay completed/sold listings. No API key required.
+// Caches results in Netlify Blobs (persistent DB) for 30 minutes.
 
-const cache = {};
+const { getStore } = require('@netlify/blobs');
+
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
 // EPN affiliate tracking — Campaign ID 5339146590
@@ -9,6 +11,64 @@ function addAffiliate(url) {
   if (!url || url === '#') return url;
   const sep = url.includes('?') ? '&' : '?';
   return url + sep + 'mkevt=1&mkcid=1&mkrid=711-53200-19255-0&campid=5339146590&toolid=10001';
+}
+
+// Parse sold listings out of raw eBay HTML
+function parseSoldListings(html) {
+  const results = [];
+  const seen = new Set();
+
+  // Each listing is a <li> with data-listingid=DIGITS
+  const liRegex = /<li\s[^>]*data-listingid=(\d+)[^>]*>([\s\S]*?)(?=<li\s[^>]*data-listingid=|$)/g;
+  let match;
+
+  while ((match = liRegex.exec(html)) !== null && results.length < 5) {
+    const listingId = match[1];
+    const block = match[2];
+
+    // Skip duplicates (promo cards repeat the same listing ID)
+    if (seen.has(listingId)) continue;
+    seen.add(listingId);
+
+    // Must be a sold/completed listing
+    const soldMatch = block.match(/su-styled-text positive[^>]*>(Sold[^<]+)/);
+    if (!soldMatch) continue;
+
+    // Price — e.g. "$139.95"
+    const priceMatch = block.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
+    if (!priceMatch) continue;
+
+    // Title — strip HTML tags and the "Opens in a new window" accessibility text
+    const titleMatch = block.match(/s-card__title[^>]*>([\s\S]{1,400}?)<\/span>/);
+    let title = 'Sold Item';
+    if (titleMatch) {
+      title = titleMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/Opens in a new\s*(window|tab)?[^<]*/gi, '')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    // Image — unquoted src in eBay's raw HTML: src=https://i.ebayimg.com/...
+    const imgMatch = block.match(/src=(https:\/\/i\.ebayimg\.com[^\s"'<>]+)/);
+
+    // Build clean item URL from the listing ID
+    const itemUrl = addAffiliate('https://www.ebay.com/itm/' + listingId);
+
+    results.push({
+      title,
+      soldPrice: parseFloat(priceMatch[1].replace(/,/g, '')).toFixed(2),
+      currency: 'USD',
+      soldDate: soldMatch[1].replace(/\s+/g, ' ').trim(),
+      image: imgMatch ? imgMatch[1] : '',
+      url: itemUrl,
+    });
+  }
+
+  return results;
 }
 
 exports.handler = async function (event) {
@@ -20,77 +80,65 @@ exports.handler = async function (event) {
 
   const query = event.queryStringParameters?.query || '';
   if (!query.trim()) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: 'Query parameter is required' }),
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Query parameter required' }) };
   }
 
-  const appId = process.env.EBAY_APP_ID;
-  if (!appId) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'EBAY_APP_ID not configured in Netlify environment variables.' }),
-    };
-  }
+  const cacheKey = 'sold_' + query.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
 
-  // Serve from cache if fresh
-  const cacheKey = query.toLowerCase().trim();
-  const cached = cache[cacheKey];
-  if (cached && Date.now() - cached.ts < CACHE_TTL) {
-    return { statusCode: 200, headers, body: cached.body };
-  }
-
-  const params = new URLSearchParams({
-    'OPERATION-NAME': 'findCompletedItems',
-    'SERVICE-VERSION': '1.0.0',
-    'SECURITY-APPNAME': appId,
-    'RESPONSE-DATA-FORMAT': 'JSON',
-    'keywords': query,
-    'itemFilter(0).name': 'SoldItemsOnly',
-    'itemFilter(0).value': 'true',
-    'sortOrder': 'EndTimeSoonest',
-    'paginationInput.entriesPerPage': '5',
-    'outputSelector': 'GalleryInfo',
-  });
-
-  const url = `https://svcs.ebay.com/services/search/FindingService/v1?${params}`;
-
+  // 1. Check Netlify Blobs cache first
   try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (event.queryStringParameters?._debug) { return { statusCode: 200, headers, body: JSON.stringify({ _ebayRaw: data }) }; }
+    const store = getStore('ebay-sold-cache');
+    const cached = await store.getWithMetadata(cacheKey, { type: 'text' });
+    if (cached?.metadata?.ts && (Date.now() - cached.metadata.ts) < CACHE_TTL) {
+      return { statusCode: 200, headers, body: cached.data };
+    }
+  } catch (_) {
+    // Blobs unavailable (local dev) — continue to live scrape
+  }
 
-    const items =
-      data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
-
-    const results = items.map((item) => {
-      const rawUrl = item.viewItemURL?.[0] || '#';
-      return {
-        title: item.title?.[0] || 'Unknown',
-        soldPrice: parseFloat(
-          item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__ || 0
-        ).toFixed(2),
-        currency:
-          item.sellingStatus?.[0]?.currentPrice?.[0]?.['@currencyId'] || 'USD',
-        soldDate: item.listingInfo?.[0]?.endTime?.[0] || '',
-        image: item.galleryURL?.[0] || '',
-        url: addAffiliate(rawUrl),
-        condition: item.condition?.[0]?.conditionDisplayName?.[0] || '',
-      };
+  // 2. Scrape eBay completed/sold listings
+  try {
+    const searchUrl = 'https://www.ebay.com/sch/i.html?' + new URLSearchParams({
+      _nkw: query,
+      LH_Complete: '1',
+      LH_Sold: '1',
+      _sop: '13',
+      _ipg: '10',
     });
 
-    const responseBody = JSON.stringify(results);
-    cache[cacheKey] = { ts: Date.now(), body: responseBody };
+    const res = await fetch(searchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Cache-Control': 'no-cache',
+      },
+    });
 
-    return { statusCode: 200, headers, body: responseBody };
+    if (!res.ok) throw new Error('eBay returned HTTP ' + res.status);
+
+    const html = await res.text();
+    const results = parseSoldListings(html);
+    const body = JSON.stringify(results);
+
+    // 3. Save to Netlify Blobs (only cache successful, non-empty results)
+    if (results.length > 0) {
+      try {
+        const store = getStore('ebay-sold-cache');
+        await store.set(cacheKey, body, { metadata: { ts: Date.now(), query } });
+      } catch (_) {}
+    }
+
+    return { statusCode: 200, headers, body };
+
   } catch (err) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Failed to fetch eBay sold data: ' + err.message }),
+      body: JSON.stringify({ error: 'Scrape failed: ' + err.message }),
     };
   }
 };
