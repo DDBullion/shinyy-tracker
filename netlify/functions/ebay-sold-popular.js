@@ -1,187 +1,152 @@
-// netlify/functions/ebay-sold-popular.js
-// Pre-fetches the last 5 sold listings for each popular bullion product.
-// Called once when the Last Sold tab loads — results are cached server-side
-// for 4 hours so eBay API usage stays very low (~10 calls per 4 hours).
-//
-// SWAP POINT: When eBay reopens the Marketplace Insights API, replace the
-// fetchProductSales() function below. The response format stays the same
-// so the frontend never needs to change.
+// ebay-sold-popular.js — Netlify Function
+// Pre-fetches last 5 sold prices for 10 popular bullion products.
+// Scrapes eBay completed listings — no API key required.
+// Caches in Netlify Blobs for 4 hours. Calls are staggered to be polite.
 
-const cache = { data: null, ts: 0 };
+const { getStore } = require('@netlify/blobs');
+
 const CACHE_TTL = 4 * 60 * 60 * 1000; // 4 hours
 
-// EPN affiliate tracking
+const POPULAR_PRODUCTS = [
+  { name: '1oz Silver Eagle',       query: '1oz American Silver Eagle coin' },
+  { name: '1oz Gold Eagle',         query: '1oz American Gold Eagle coin' },
+  { name: '1oz Gold Buffalo',       query: '1oz American Gold Buffalo coin' },
+  { name: '1oz Silver Maple',       query: '1oz Canadian Silver Maple Leaf' },
+  { name: '1oz Gold Maple',         query: '1oz Canadian Gold Maple Leaf coin' },
+  { name: '10oz Silver Bar',        query: '10oz silver bar .999' },
+  { name: '100oz Silver Bar',       query: '100oz silver bar .999' },
+  { name: '1oz Silver Round',       query: '1oz silver round .999' },
+  { name: 'Morgan Silver Dollar',   query: 'Morgan Silver Dollar' },
+  { name: 'Engelhard Silver Bar',   query: 'Engelhard silver bar' },
+];
+
+// EPN affiliate tracking — Campaign ID 5339146590
 function addAffiliate(url) {
   if (!url || url === '#') return url;
   const sep = url.includes('?') ? '&' : '?';
   return url + sep + 'mkevt=1&mkcid=1&mkrid=711-53200-19255-0&campid=5339146590&toolid=10001';
 }
 
-// Popular products to auto-populate the Last Sold tab
-const POPULAR_PRODUCTS = [
-  {
-    id: 'silver-eagle-1oz',
-    label: '1oz American Silver Eagle',
-    metal: 'silver',
-    ozContent: 1,
-    query: '1oz American Silver Eagle coin',
-  },
-  {
-    id: 'gold-eagle-1oz',
-    label: '1oz American Gold Eagle',
-    metal: 'gold',
-    ozContent: 1,
-    query: '1oz American Gold Eagle coin',
-  },
-  {
-    id: 'gold-buffalo-1oz',
-    label: '1oz Gold Buffalo',
-    metal: 'gold',
-    ozContent: 1,
-    query: '1oz Gold Buffalo coin',
-  },
-  {
-    id: 'silver-maple-1oz',
-    label: '1oz Silver Maple Leaf',
-    metal: 'silver',
-    ozContent: 1,
-    query: '1oz Canadian Silver Maple Leaf coin',
-  },
-  {
-    id: 'gold-maple-1oz',
-    label: '1oz Gold Maple Leaf',
-    metal: 'gold',
-    ozContent: 1,
-    query: '1oz Canadian Gold Maple Leaf coin',
-  },
-  {
-    id: 'silver-bar-10oz',
-    label: '10oz Silver Bar',
-    metal: 'silver',
-    ozContent: 10,
-    query: '10oz silver bar .999',
-  },
-  {
-    id: 'silver-bar-100oz',
-    label: '100oz Silver Bar',
-    metal: 'silver',
-    ozContent: 100,
-    query: '100oz silver bar .999',
-  },
-  {
-    id: 'silver-round-1oz',
-    label: '1oz Silver Round',
-    metal: 'silver',
-    ozContent: 1,
-    query: '1oz silver round .999 generic',
-  },
-  {
-    id: 'morgan-dollar',
-    label: 'Morgan Silver Dollar',
-    metal: 'silver',
-    ozContent: 0.7734,
-    query: 'Morgan Silver Dollar coin',
-  },
-  {
-    id: 'engelhard-bar',
-    label: 'Engelhard Silver Bar',
-    metal: 'silver',
-    ozContent: 1,
-    query: 'Engelhard silver bar 1oz',
-  },
-];
+// Parse sold listings from raw eBay HTML (same logic as ebay-sold.js)
+function parseSoldListings(html, maxResults = 5) {
+  const results = [];
+  const seen = new Set();
 
-// Fetch last 5 sold listings for a single product using eBay Finding API
-async function fetchProductSales(product, appId) {
-  const params = new URLSearchParams({
-    'OPERATION-NAME': 'findCompletedItems',
-    'SERVICE-VERSION': '1.0.0',
-    'SECURITY-APPNAME': appId,
-    'RESPONSE-DATA-FORMAT': 'JSON',
-    'keywords': product.query,
-    'itemFilter(0).name': 'SoldItemsOnly',
-    'itemFilter(0).value': 'true',
-    'sortOrder': 'EndTimeSoonest',
-    'paginationInput.entriesPerPage': '5',
-    'outputSelector': 'GalleryInfo',
+  const liRegex = /<li\s[^>]*data-listingid=(\d+)[^>]*>([\s\S]*?)(?=<li\s[^>]*data-listingid=|$)/g;
+  let match;
+
+  while ((match = liRegex.exec(html)) !== null && results.length < maxResults) {
+    const listingId = match[1];
+    const block = match[2];
+
+    if (seen.has(listingId)) continue;
+    seen.add(listingId);
+
+    const soldMatch = block.match(/su-styled-text positive[^>]*>(Sold[^<]+)/);
+    if (!soldMatch) continue;
+
+    const priceMatch = block.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
+    if (!priceMatch) continue;
+
+    const titleMatch = block.match(/s-card__title[^>]*>([\s\S]{1,400}?)<\/span>/);
+    let title = 'Sold Item';
+    if (titleMatch) {
+      title = titleMatch[1]
+        .replace(/<[^>]*>/g, '')
+        .replace(/Opens in a new\s*(window|tab)?[^<]*/gi, '')
+        .replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    const imgMatch = block.match(/src=(https:\/\/i\.ebayimg\.com[^\s"'<>]+)/);
+
+    results.push({
+      title,
+      soldPrice: parseFloat(priceMatch[1].replace(/,/g, '')).toFixed(2),
+      currency: 'USD',
+      soldDate: soldMatch[1].replace(/\s+/g, ' ').trim(),
+      image: imgMatch ? imgMatch[1] : '',
+      url: addAffiliate('https://www.ebay.com/itm/' + listingId),
+    });
+  }
+
+  return results;
+}
+
+// Fetch sold listings for one product query
+async function fetchSoldForProduct(query) {
+  const url = 'https://www.ebay.com/sch/i.html?' + new URLSearchParams({
+    _nkw: query,
+    LH_Complete: '1',
+    LH_Sold: '1',
+    _sop: '13',
+    _ipg: '10',
   });
 
-  const url = `https://svcs.ebay.com/services/search/FindingService/v1?${params}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  const items = data?.findCompletedItemsResponse?.[0]?.searchResult?.[0]?.item || [];
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Upgrade-Insecure-Requests': '1',
+    },
+  });
 
-  return items.map((item) => ({
-    title: item.title?.[0] || 'Unknown',
-    soldPrice: parseFloat(
-      item.sellingStatus?.[0]?.currentPrice?.[0]?.__value__ || 0
-    ).toFixed(2),
-    currency: item.sellingStatus?.[0]?.currentPrice?.[0]?.['@currencyId'] || 'USD',
-    soldDate: item.listingInfo?.[0]?.endTime?.[0] || '',
-    image: item.galleryURL?.[0] || '',
-    url: addAffiliate(item.viewItemURL?.[0] || '#'),
-    condition: item.condition?.[0]?.conditionDisplayName?.[0] || '',
-  }));
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const html = await res.text();
+  return parseSoldListings(html, 5);
+}
+
+// Small delay helper to be polite to eBay between requests
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 exports.handler = async function (event) {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'public, max-age=3600',
+    'Cache-Control': 'public, max-age=14400',
   };
 
-  const appId = process.env.EBAY_APP_ID;
-  if (!appId) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'EBAY_APP_ID not configured.' }),
-    };
-  }
+  const BLOB_KEY = 'popular_products_v1';
 
-  // Serve from server-side cache if fresh
-  if (cache.data && Date.now() - cache.ts < CACHE_TTL) {
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ products: cache.data, cachedAt: cache.ts }),
-    };
-  }
-
+  // 1. Try to serve from Netlify Blobs cache (4-hour TTL)
   try {
-    // Fetch all products in parallel — ~10 simultaneous API calls
-    const results = await Promise.allSettled(
-      POPULAR_PRODUCTS.map(async (product) => {
-        const sales = await fetchProductSales(product, appId);
-        return {
-          id: product.id,
-          label: product.label,
-          metal: product.metal,
-          ozContent: product.ozContent,
-          sales,
-        };
-      })
-    );
-
-    const products = results
-      .filter((r) => r.status === 'fulfilled')
-      .map((r) => r.value)
-      .filter((p) => p.sales.length > 0);
-
-    cache.data = products;
-    cache.ts = Date.now();
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ products, cachedAt: cache.ts }),
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Failed to fetch popular sold data: ' + err.message }),
-    };
+    const store = getStore('ebay-sold-cache');
+    const cached = await store.getWithMetadata(BLOB_KEY, { type: 'text' });
+    if (cached?.metadata?.ts && (Date.now() - cached.metadata.ts) < CACHE_TTL) {
+      return { statusCode: 200, headers, body: cached.data };
+    }
+  } catch (_) {
+    // Blobs unavailable — continue to live scrape
   }
+
+  // 2. Scrape each product one at a time (staggered, not all at once)
+  const products = [];
+  for (const product of POPULAR_PRODUCTS) {
+    try {
+      const sales = await fetchSoldForProduct(product.query);
+      if (sales.length > 0) {
+        products.push({ name: product.name, query: product.query, sales });
+      }
+    } catch (err) {
+      // Skip this product if scrape fails — don't abort the whole batch
+      console.error('Skipped ' + product.name + ': ' + err.message);
+    }
+    // 500ms delay between requests to avoid triggering bot detection
+    await delay(500);
+  }
+
+  const payload = { products, cachedAt: Date.now() };
+  const body = JSON.stringify(payload);
+
+  // 3. Save to Netlify Blobs
+  try {
+    const store = getStore('ebay-sold-cache');
+    await store.set(BLOB_KEY, body, { metadata: { ts: Date.now() } });
+  } catch (_) {}
+
+  return { statusCode: 200, headers, body };
 };
