@@ -28,34 +28,32 @@ function addAffiliate(url) {
 function parseSoldListings(html, maxResults = 5) {
   const results = [];
   const seen = new Set();
-  const itemUrlRegex = /href="https:\/\/www\.ebay\.com\/itm\/(\d+)[^"]*"/g;
+  const itemUrlRegex = new RegExp('href=https://(?:www\\.)?ebay\\.com/itm/(\\d+)', 'g');
   let idMatch;
   while ((idMatch = itemUrlRegex.exec(html)) !== null && results.length < maxResults) {
     const listingId = idMatch[1];
     if (seen.has(listingId)) continue;
     seen.add(listingId);
-    const block = html.substring(Math.max(0, idMatch.index - 200), idMatch.index + 4000);
-    const soldMatch = block.match(/class="POSITIVE"[^>]*>([^<]+)/) ||
-                      block.match(/POSITIVE[^>]*>\s*([^<]*Sold[^<]*)/i);
+    const block = html.substring(Math.max(0, idMatch.index - 300), idMatch.index + 3000);
+    const soldMatch = block.match(/su-styled-text positive[^>]+>([^<]+)/) ||
+                      block.match(/aria-label="Sold Item"[^>]*>([^<]+)/);
     if (!soldMatch) continue;
-    const priceMatch = block.match(/s-item__price[^>]*>[\s\S]*?\$(([\d,]+\.\d{2}))/) ||
-                       block.match(/\$(([\d,]+\.\d{2}))/);
+    const priceMatch = block.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
     if (!priceMatch) continue;
-    const titleMatch = block.match(/s-item__title[^>]*>([\s\S]{1,400}?)<\/(?:span|h3|div)>/);
     let title = 'Sold Item';
+    const titleMatch = block.match(/s-card__info[^>]*>[\s\S]{0,200}?<[^>]+>([^<]{8,150})/) ||
+                       block.match(/aria-label="([^"]{8,150})"[^>]*class="[^"]*s-card/);
     if (titleMatch) {
-      title = titleMatch[1].replace(/<[^>]*>/g, '')
-        .replace(/Opens in a new\s*(window|tab)?[^<]*/gi, '')
-        .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-        .replace(/\s+/g, ' ').trim();
+      title = titleMatch[1].replace(/&amp;/g,'&').replace(/&quot;/g,'"')
+        .replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
     }
     const imgMatch = block.match(/src="(https:\/\/i\.ebayimg\.com[^"]+)"/);
-    const priceVal = priceMatch[1] || priceMatch[2] || '0.00';
+    const priceVal = priceMatch[1] || '0.00';
     results.push({
       title,
-      soldPrice: parseFloat(priceVal.replace(/,/g, '')).toFixed(2),
+      soldPrice: parseFloat(priceVal.replace(/,/g,'')).toFixed(2),
       currency: 'USD',
-      soldDate: soldMatch[1].replace(/\s+/g, ' ').trim(),
+      soldDate: soldMatch[1].replace(/\s+/g,' ').trim(),
       image: imgMatch ? imgMatch[1] : '',
       url: addAffiliate('https://www.ebay.com/itm/' + listingId),
     });
