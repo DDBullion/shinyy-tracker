@@ -11,47 +11,41 @@ function addAffiliate(url) {
 function parseSoldListings(html) {
   const results = [];
   const seen = new Set();
-  const itemUrlRegex = new RegExp('href=https://(?:www\\.)?ebay\\.com/itm/(\\d+)', 'g');
-  let idMatch;
-  let debugCount = 0;
-  while ((idMatch = itemUrlRegex.exec(html)) !== null && results.length < 5) {
-    const listingId = idMatch[1];
+  // Anchor on sold date marker
+  const soldDateRegex = /su-styled-text positive[^>]*>([^<]+)/g;
+  let soldMatch;
+  while ((soldMatch = soldDateRegex.exec(html)) !== null && results.length < 5) {
+    const soldDateRaw = soldMatch[1].replace(/\s+/g,' ').trim();
+    if (!soldDateRaw.match(/\w+\s+\d/)) continue;
+    const soldPos = soldMatch.index;
+    // Look backwards up to 8000 chars for the LAST item URL before this sold date
+    const backBlock = html.substring(Math.max(0, soldPos - 8000), soldPos);
+    const urlRegex = new RegExp('href=https://(?:www\.)?ebay\.com/itm/(\\d+)', 'g');
+    let urlMatch, lastUrlMatch = null;
+    while ((urlMatch = urlRegex.exec(backBlock)) !== null) lastUrlMatch = urlMatch;
+    if (!lastUrlMatch) continue;
+    const listingId = lastUrlMatch[1];
     if (seen.has(listingId)) continue;
     seen.add(listingId);
-    const block = html.substring(Math.max(0, idMatch.index - 300), idMatch.index + 3000);
-    if (debugCount < 2) {
-      console.log('BLOCK_' + debugCount + '_LEN:', block.length);
-      console.log('BLOCK_' + debugCount + '_HAS_SCARDPRICE:', block.includes('s-card__price'));
-      console.log('BLOCK_' + debugCount + '_HAS_SUSTYLEDPOS:', block.includes('su-styled-text positive'));
-      console.log('BLOCK_' + debugCount + '_SOLD_IDX:', block.indexOf('su-styled-text positive'));
-      console.log('BLOCK_' + debugCount + '_PRICE_IDX:', block.indexOf('s-card__price'));
-      // Show chars around sold date in full HTML
-      const soldIdx = html.indexOf('su-styled-text positive');
-      const priceIdx = html.indexOf('s-card__price');
-      const urlIdx = idMatch.index;
-      console.log('FIRST_SOLD_AT:', soldIdx, 'FIRST_PRICE_AT:', priceIdx, 'URL_AT:', urlIdx);
-      console.log('DIFF_SOLD_MINUS_URL:', soldIdx - urlIdx);
-      console.log('DIFF_PRICE_MINUS_URL:', priceIdx - urlIdx);
-      debugCount++;
-    }
-    const soldMatch = block.match(/su-styled-text positive[^>]+>([^<]+)/) ||
-                      block.match(/aria-label="Sold Item"[^>]*>([^<]+)/);
-    if (!soldMatch) continue;
-    const priceMatch = block.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
+    // Look forward from sold date for price
+    const fwdBlock = html.substring(soldPos, soldPos + 5000);
+    const priceMatch = fwdBlock.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
     if (!priceMatch) continue;
+    // Title and image in full window
+    const fullBlock = html.substring(Math.max(0, soldPos - 8000), soldPos + 5000);
     let title = 'Sold Item';
-    const titleMatch = block.match(/s-card__info[^>]*>[\s\S]{0,200}?<[^>]+>([^<]{8,150})/) ||
-                       block.match(/aria-label="([^"]{8,150})"[^>]*class="[^"]*s-card/);
+    const titleMatch = fullBlock.match(/aria-label="([^"]{10,150})"[^>]*class="[^"]*s-card/) ||
+                       fullBlock.match(/s-card__info[^>]*>[\s\S]{0,300}?<[^>]+>([^<]{10,150})/);
     if (titleMatch) {
       title = titleMatch[1].replace(/&amp;/g,'&').replace(/&quot;/g,'"')
         .replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
     }
-    const imgMatch = block.match(/src="(https:\/\/i\.ebayimg\.com[^"]+)"/);
+    const imgMatch = fullBlock.match(/src="(https:\/\/i\.ebayimg\.com[^"]+)"/);
     results.push({
       title,
       soldPrice: parseFloat((priceMatch[1]||'0').replace(/,/g,'')).toFixed(2),
       currency: 'USD',
-      soldDate: soldMatch[1].replace(/\s+/g,' ').trim(),
+      soldDate: soldDateRaw,
       image: imgMatch ? imgMatch[1] : '',
       url: addAffiliate('https://www.ebay.com/itm/' + listingId),
     });
@@ -90,17 +84,6 @@ exports.handler = async function (event) {
     const res = await fetch(scraperUrl);
     if (!res.ok) throw new Error('ScraperAPI returned HTTP ' + res.status);
     const html = await res.text();
-    // DEBUG - remove after diagnosis
-    console.log("HTML_LEN:", html.length);
-    console.log("HAS_UNQUOTED_HREF:", html.includes("href=https://ebay.com/itm/"));
-    console.log("HAS_QUOTED_HREF:", html.includes("href=\"https://www.ebay.com/itm/"));
-    console.log("HAS_SCARDPRICE:", html.includes("s-card__price"));
-    console.log("HAS_SITEMPHPRICE:", html.includes("s-item__price"));
-    console.log("HAS_SUSTYLEDPOS:", html.includes("su-styled-text positive"));
-    console.log("HAS_POSITIVE_CLASS:", html.includes("class=\"POSITIVE\""));
-    console.log("HTML_SNIPPET:", html.substring(0, 300));
-    console.log("ITM_SNIPPET:", html.substring(html.indexOf("itm/"), html.indexOf("itm/") + 200));
-    // END DEBUG
     const results = parseSoldListings(html);
     const body = JSON.stringify(results);
     if (results.length > 0) {
