@@ -78,6 +78,17 @@ exports.handler = async function (event) {
     const res = await fetch(scraperUrl);
     if (!res.ok) throw new Error('ScraperAPI returned HTTP ' + res.status);
     const html = await res.text();
+    // DEBUG - remove after diagnosis
+    console.log("HTML_LEN:", html.length);
+    console.log("HAS_UNQUOTED_HREF:", html.includes("href=https://ebay.com/itm/"));
+    console.log("HAS_QUOTED_HREF:", html.includes("href=\"https://www.ebay.com/itm/"));
+    console.log("HAS_SCARDPRICE:", html.includes("s-card__price"));
+    console.log("HAS_SITEMPHPRICE:", html.includes("s-item__price"));
+    console.log("HAS_SUSTYLEDPOS:", html.includes("su-styled-text positive"));
+    console.log("HAS_POSITIVE_CLASS:", html.includes("class=\"POSITIVE\""));
+    console.log("HTML_SNIPPET:", html.substring(0, 300));
+    console.log("ITM_SNIPPET:", html.substring(html.indexOf("itm/"), html.indexOf("itm/") + 200));
+    // END DEBUG
     const results = parseSoldListings(html);
     const body = JSON.stringify(results);
     if (results.length > 0) {
