@@ -20,7 +20,7 @@ function parseSoldListings(html) {
     const soldPos = soldMatch.index;
     // Look backwards up to 8000 chars for the LAST item URL before this sold date
     const backBlock = html.substring(Math.max(0, soldPos - 8000), soldPos);
-    const urlRegex = new RegExp('href=https://(?:www\.)?ebay\.com/itm/(\\d+)', 'g');
+    const urlRegex = new RegExp('href=https://(?:www\\.)?ebay\\.com/itm/(\\d+)', 'g');
     let urlMatch, lastUrlMatch = null;
     while ((urlMatch = urlRegex.exec(backBlock)) !== null) lastUrlMatch = urlMatch;
     if (!lastUrlMatch) continue;
@@ -33,14 +33,15 @@ function parseSoldListings(html) {
     if (!priceMatch) continue;
     // Title and image in full window
     const fullBlock = html.substring(Math.max(0, soldPos - 8000), soldPos + 5000);
+    // Title: use alt="" on the item image (appears just before sold date)
     let title = 'Sold Item';
-    const titleMatch = fullBlock.match(/aria-label="([^"]{10,150})"[^>]*class="[^"]*s-card/) ||
-                       fullBlock.match(/s-card__info[^>]*>[\s\S]{0,300}?<[^>]+>([^<]{10,150})/);
+    const titleMatch = fullBlock.match(/alt="([^"]{10,150})"/);
     if (titleMatch) {
       title = titleMatch[1].replace(/&amp;/g,'&').replace(/&quot;/g,'"')
         .replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
     }
-    const imgMatch = fullBlock.match(/src="(https:\/\/i\.ebayimg\.com[^"]+)"/);
+    // Image: eBay uses unquoted src= attribute
+    const imgMatch = fullBlock.match(/src=(https:\/\/i\.ebayimg\.com[^\s>]+)/);
     results.push({
       title,
       soldPrice: parseFloat((priceMatch[1]||'0').replace(/,/g,'')).toFixed(2),
@@ -61,6 +62,7 @@ exports.handler = async function (event) {
   };
   const query = event.queryStringParameters?.query || '';
   if (!query.trim()) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Query parameter required' }) };
+
   const cacheKey = 'sold_' + query.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
   try {
     const store = getStore('ebay-sold-cache');
@@ -72,14 +74,21 @@ exports.handler = async function (event) {
       }
     }
   } catch (_) {}
+
   try {
     const scraperKey = process.env.SCRAPERAPI_KEY;
     if (!scraperKey) throw new Error('SCRAPERAPI_KEY not configured');
     const ebayUrl = 'https://www.ebay.com/sch/i.html?' + new URLSearchParams({
-      _nkw: query, LH_Complete: '1', LH_Sold: '1', _sop: '13', _ipg: '10',
+      _nkw: query,
+      LH_Complete: '1',
+      LH_Sold: '1',
+      _sop: '13',
+      _ipg: '10',
     });
     const scraperUrl = 'https://api.scraperapi.com?' + new URLSearchParams({
-      api_key: scraperKey, url: ebayUrl, country_code: 'us',
+      api_key: scraperKey,
+      url: ebayUrl,
+      country_code: 'us',
     });
     const res = await fetch(scraperUrl);
     if (!res.ok) throw new Error('ScraperAPI returned HTTP ' + res.status);
