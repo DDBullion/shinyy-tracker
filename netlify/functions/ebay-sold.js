@@ -11,22 +11,34 @@ function addAffiliate(url) {
 function parseSoldListings(html) {
   const results = [];
   const seen = new Set();
-  // eBay raw HTML uses unquoted href: href=https://ebay.com/itm/ID
-  const itemUrlRegex = new RegExp('href=https://(?:www\.)?ebay\.com/itm/(\\d+)', 'g');
+  const itemUrlRegex = new RegExp('href=https://(?:www\\.)?ebay\\.com/itm/(\\d+)', 'g');
   let idMatch;
+  let debugCount = 0;
   while ((idMatch = itemUrlRegex.exec(html)) !== null && results.length < 5) {
     const listingId = idMatch[1];
     if (seen.has(listingId)) continue;
     seen.add(listingId);
     const block = html.substring(Math.max(0, idMatch.index - 300), idMatch.index + 3000);
-    // Sold date: <span class="su-styled-text positive default" aria-label="Sold Item">Sold  Apr 1, 2026</span>
+    if (debugCount < 2) {
+      console.log('BLOCK_' + debugCount + '_LEN:', block.length);
+      console.log('BLOCK_' + debugCount + '_HAS_SCARDPRICE:', block.includes('s-card__price'));
+      console.log('BLOCK_' + debugCount + '_HAS_SUSTYLEDPOS:', block.includes('su-styled-text positive'));
+      console.log('BLOCK_' + debugCount + '_SOLD_IDX:', block.indexOf('su-styled-text positive'));
+      console.log('BLOCK_' + debugCount + '_PRICE_IDX:', block.indexOf('s-card__price'));
+      // Show chars around sold date in full HTML
+      const soldIdx = html.indexOf('su-styled-text positive');
+      const priceIdx = html.indexOf('s-card__price');
+      const urlIdx = idMatch.index;
+      console.log('FIRST_SOLD_AT:', soldIdx, 'FIRST_PRICE_AT:', priceIdx, 'URL_AT:', urlIdx);
+      console.log('DIFF_SOLD_MINUS_URL:', soldIdx - urlIdx);
+      console.log('DIFF_PRICE_MINUS_URL:', priceIdx - urlIdx);
+      debugCount++;
+    }
     const soldMatch = block.match(/su-styled-text positive[^>]+>([^<]+)/) ||
                       block.match(/aria-label="Sold Item"[^>]*>([^<]+)/);
     if (!soldMatch) continue;
-    // Price: <span class="...s-card__price">$20.00</span>
     const priceMatch = block.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
     if (!priceMatch) continue;
-    // Title: try aria-label on the card info link, or fallback to text near the href
     let title = 'Sold Item';
     const titleMatch = block.match(/s-card__info[^>]*>[\s\S]{0,200}?<[^>]+>([^<]{8,150})/) ||
                        block.match(/aria-label="([^"]{8,150})"[^>]*class="[^"]*s-card/);
@@ -37,7 +49,7 @@ function parseSoldListings(html) {
     const imgMatch = block.match(/src="(https:\/\/i\.ebayimg\.com[^"]+)"/);
     results.push({
       title,
-      soldPrice: parseFloat(priceMatch[1].replace(/,/g,'')).toFixed(2),
+      soldPrice: parseFloat((priceMatch[1]||'0').replace(/,/g,'')).toFixed(2),
       currency: 'USD',
       soldDate: soldMatch[1].replace(/\s+/g,' ').trim(),
       image: imgMatch ? imgMatch[1] : '',
