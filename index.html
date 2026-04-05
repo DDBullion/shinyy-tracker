@@ -1589,10 +1589,14 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     var link = document.getElementById('myStackNavLink');
     if (link) link.style.display = user ? 'inline-block' : 'none';
   }
-  // Script is at end of body — DOM ready, run immediately
+  // Two-path auth check:
+  // 1. gotrue.currentUser() reads localStorage synchronously (works at page load)
+  // 2. on('init', ...) catches the case where NI hasn't fired init yet
   injectMyStackLink();
   if (window.netlifyIdentity) {
-    showMyStack(netlifyIdentity.currentUser());
+    var _u = netlifyIdentity.gotrue && netlifyIdentity.gotrue.currentUser();
+    if (_u) { showMyStack(_u); }
+    netlifyIdentity.on('init', function(u) { showMyStack(u); });
     netlifyIdentity.on('login', function(u) { injectMyStackLink(); showMyStack(u); });
     netlifyIdentity.on('logout', function() { showMyStack(null); });
   }
