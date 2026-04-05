@@ -990,7 +990,7 @@ function renderGold() {
     localStorage.setItem(key, data);
     // Sync to server so stack persists across devices
     if (user.token && user.token.access_token) {
-      fetch('/.netlify/functions/watchlist', {
+      fetch('/api/watchlist', {
         method: 'POST',
         headers: {'Authorization': 'Bearer ' + user.token.access_token, 'Content-Type': 'application/json'},
         body: data
@@ -1000,7 +1000,7 @@ function renderGold() {
   // Load watchlist from server (called on login/init) to sync across devices
   function syncWatchlistFromServer(user) {
     if (!user || !user.token || !user.token.access_token) return;
-    fetch('/.netlify/functions/watchlist', {
+    fetch('/api/watchlist', {
       headers: {'Authorization': 'Bearer ' + user.token.access_token}
     }).then(function(r) { return r.ok ? r.json() : null; })
       .then(function(serverData) {
