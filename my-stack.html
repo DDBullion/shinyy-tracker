@@ -295,8 +295,68 @@ function loadStack() {
   }
   catch(e) { stack = []; }
 }
-function saveStack() {
+// ─── Auth token helper ────────────────────────────────────────────────────
+  function getAuthToken(user, cb) {
+    if (!user) return;
+    var tok = user.token && user.token.access_token;
+    if (!tok) return;
+    try {
+      var exp = JSON.parse(atob(tok.split('.')[1])).exp * 1000;
+      if (Date.now() < exp - 10000) { cb(tok); return; }
+    } catch(e) {}
+    netlifyIdentity.refresh()
+      .then(function(t) { if (t) cb(t); })
+      .catch(function() { cb(tok); });
+  }
+
+  // ─── Server sync ────────────────────────────────────────────────────────────────────
+  function syncStackFromServer(user) {
+    if (!user) return;
+    getAuthToken(user, function(token) {
+      fetch('/api/stack', { headers: {'Authorization': 'Bearer ' + token} })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(serverData) {
+          var guestStack = JSON.parse(localStorage.getItem('shinyy_stack_guest') || '[]');
+          loadStack();
+          var serverArr = Array.isArray(serverData) ? serverData : [];
+          var localIds = {};
+          stack.forEach(function(e) { localIds[e.id] = true; });
+          var merged = stack.slice();
+          serverArr.forEach(function(e) { if (!localIds[e.id]) merged.push(e); });
+          if (guestStack.length) {
+            var mergedIds = {};
+            merged.forEach(function(e) { mergedIds[e.id] = true; });
+            guestStack.forEach(function(e) { if (!mergedIds[e.id]) merged.push(e); });
+            localStorage.removeItem('shinyy_stack_guest');
+          }
+          stack = merged;
+          saveStack();
+          renderAll();
+        })
+        .catch(function() {
+          var guestStack = JSON.parse(localStorage.getItem('shinyy_stack_guest') || '[]');
+          loadStack();
+          if (guestStack.length) {
+            stack = guestStack.concat(stack);
+            saveStack();
+            localStorage.removeItem('shinyy_stack_guest');
+          }
+          renderAll();
+        });
+    });
+  }
+
+  function saveStack() {
   localStorage.setItem(storageKey(), JSON.stringify(stack));
+  if (currentUser) {
+    getAuthToken(currentUser, function(token) {
+      fetch('/api/stack', {
+        method: 'POST',
+        headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
+        body: JSON.stringify(stack)
+      }).catch(function() {});
+    });
+  }
 }
 
 // ─── Netlify Identity ──────────────────────────────────────────────────────────
@@ -311,15 +371,7 @@ if (window.netlifyIdentity) {
     currentUser = user;
     updateAuthUI(user);
     netlifyIdentity.close();
-    // Merge guest stack into user stack
-    var guestStack = JSON.parse(localStorage.getItem('shinyy_stack_guest') || '[]');
-    loadStack();
-    if (guestStack.length) {
-      stack = guestStack.concat(stack);
-      saveStack();
-      localStorage.removeItem('shinyy_stack_guest');
-    }
-    renderAll();
+    syncStackFromServer(user);
   });
   netlifyIdentity.on('logout', function() {
     currentUser = null;
