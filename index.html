@@ -1589,10 +1589,11 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     var link = document.getElementById('myStackNavLink');
     if (link) link.style.display = user ? 'inline-block' : 'none';
   }
-  document.addEventListener('DOMContentLoaded', injectMyStackLink);
+  // Script is at end of body — DOM ready, run immediately
+  injectMyStackLink();
   if (window.netlifyIdentity) {
-    netlifyIdentity.on('init', function(u) { injectMyStackLink(); setTimeout(function(){ showMyStack(u); }, 100); });
-    netlifyIdentity.on('login', function(u) { showMyStack(u); });
+    showMyStack(netlifyIdentity.currentUser());
+    netlifyIdentity.on('login', function(u) { injectMyStackLink(); showMyStack(u); });
     netlifyIdentity.on('logout', function() { showMyStack(null); });
   }
 })();
