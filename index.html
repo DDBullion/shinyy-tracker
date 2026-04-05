@@ -979,7 +979,7 @@ function renderGold() {
   var watchlist = {};
   function loadWatchlist() {
     var user = window.netlifyIdentity && netlifyIdentity.currentUser();
-    var key = 'shinyy_stack_' + (user ? user.email : 'guest');
+    var key = 'shinyy_watch_' + (user ? user.email : 'guest');
     try { watchlist = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { watchlist = {}; }
   }
   function getAuthToken(user, cb) {
@@ -997,7 +997,7 @@ function renderGold() {
     function saveWatchlist() {
     var user = window.netlifyIdentity && netlifyIdentity.currentUser();
     if (!user) return;
-    var key = 'shinyy_stack_' + user.email;
+    var key = 'shinyy_watch_' + user.email;
     var data = JSON.stringify(watchlist);
     localStorage.setItem(key, data);
     // Sync to server so stack persists across devices
@@ -1017,11 +1017,15 @@ function renderGold() {
         .then(function(r) { return r.ok ? r.json() : null; })
         .then(function(serverData) {
           if (!serverData) return;
-          var key = 'shinyy_stack_' + user.email;
-          var merged = Object.assign({}, serverData, watchlist);
+          var serverKeys = Object.keys(serverData);
+          var isValidWatchlist = serverKeys.length === 0 || serverKeys.every(function(k) { return isNaN(parseInt(k,10)) || k.indexOf('/') !== -1; });
+          if (!isValidWatchlist) serverData = {};
+          var localData;
+          try { localData = JSON.parse(localStorage.getItem('shinyy_watch_' + user.email) || '{}'); } catch(e) { localData = {}; }
+          var merged = Object.assign({}, serverData, localData);
           watchlist = merged;
           var mergedData = JSON.stringify(merged);
-          localStorage.setItem(key, mergedData);
+          localStorage.setItem('shinyy_watch_' + user.email, mergedData);
           // Push merged data back so server stays current
           fetch('/api/watchlist', {
             method: 'POST',
