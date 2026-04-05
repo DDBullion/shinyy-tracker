@@ -158,9 +158,13 @@ async function enrichProductUrls(allDeals, store) {
         const vendorRows = html.match(/<tr id="vendor_\d+"[\s\S]*?<\/tr>/gi) || [];
         const map = {};
         for (const row of vendorRows) {
-          const hM = row.match(/href="(https?:\/\/[^"]+)"[^>]*class="[^"]*dealer-link/);
+          const anchorM = row.match(/<a\b([^>]*)class="[^"]*dealer-link[^"]*"([^>]*)>/i);
+          if (!anchorM) continue;
+          const hM = (anchorM[1] + ' ' + anchorM[2]).match(/href="(https?:\/\/[^"]+)"/);
+          if (!hM) continue;
           const nM = row.match(/title="[^"]*from ([^"]+)"/);
-          if (hM && nM) map[nM[1].trim()] = hM[1];
+          const dealerName = nM ? nM[1].trim() : Object.keys(DEALER_URLS).find(d => row.includes(d));
+          if (dealerName) map[dealerName] = hM[1];
         }
         if (Object.keys(map).length) urlCache[fp] = map;
       } catch (e) {
