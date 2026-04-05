@@ -339,7 +339,8 @@
       <div><span class="sdot" id="sdot"></span><span id="stext">Fetching live price...</span></div>
     </div>
 
-    <div class="tabs" id="silverTabs">
+    <div id="prices-updated" style="text-align:center;font-size:0.72rem;color:#9aa;margin:0 0 6px;min-height:1em;"></div>
+        <div class="tabs" id="silverTabs">
       <div class="tab" onclick="setFilter('all')">All</div>
       <div class="tab active" onclick="setFilter('1oz')">1 oz</div>
       <div class="tab" onclick="setFilter('5oz')">5 oz</div>
@@ -638,7 +639,7 @@ function ebayQuick(q) {
 // SILVER DEALERS
 // Premiums verified March 23, 2026 · Spot ~$68.92
 // ═══════════════════════════════════════════════
-const SILVER_DEALERS = [
+let SILVER_DEALERS = [
   // ── Core Verified ──
   {size:'1oz',  name:'1oz Silver Rounds (Random Design)',    dealer:'SD Bullion',       prem:4.28,  oz:1,      ship:'Free @ $499', url:'https://sdbullion.com/1-oz-generic-silver-rounds', verified:true},
   {size:'10oz', name:'10oz SilverTowne Buffalo Bar',         dealer:'JM Bullion',       prem:3.75,  oz:10,     ship:'Free @ $499', url:'https://www.jmbullion.com/10-oz-silvertowne-buffalo-silver-bar/', verified:true},
@@ -752,7 +753,7 @@ const SILVER_DEALERS = [
 // Premiums in $/oz equiv, verified March 23, 2026 · Spot ~$4,452/oz
 // For gram items: display price = (goldSpot + premPerOz) × ozWeight
 // ═══════════════════════════════════════════════
-const GOLD_DEALERS = [
+let GOLD_DEALERS = [
   // ── Gram items (ozWeight = grams × 0.032151) ──
   {gsize:'gram', name:'1g Gold Bar',                       dealer:'JM Bullion',       premOz:1017, ozW:0.032151, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/1-gram-gold-bars/', verified:true, gramLabel:'1g'},
   {gsize:'gram', name:'1.5g Gold Bar',                     dealer:'JM Bullion',       premOz:950,  ozW:0.048227, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/', verified:true, gramLabel:'1.5g'},
@@ -1425,6 +1426,38 @@ async function doSoldSearch(){
   }catch(err){out.innerHTML='<div class="sold-popular-error">⚠️ '+err.message+'</div>';}
   finally{btn.disabled=false;btn.textContent='Search';}
 }
+
+
+// ── Live prices from Netlify Blobs (injected daily by update-prices function) ──
+async function loadLivePrices() {
+  try {
+    const res = await fetch('/.netlify/functions/get-prices');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || !data.silver || !data.gold) return;
+    if (data.silver.length >= 5) {
+      SILVER_DEALERS = data.silver;
+    }
+    if (data.gold.length >= 3) {
+      GOLD_DEALERS = data.gold.map(function(d) {
+        return { gsize: d.size, name: d.name, dealer: d.dealer,
+          premOz: d.prem, ozW: d.oz, ship: d.ship, url: d.url,
+          tag: d.tag, verified: d.verified };
+      });
+    }
+    if (data.updated) {
+      const mins = Math.round((Date.now() - new Date(data.updated)) / 60000);
+      const ago = mins < 2 ? 'just now' : mins < 60 ? mins + 'm ago' : Math.round(mins/60) + 'h ago';
+      const el = document.getElementById('prices-updated');
+      if (el) el.textContent = 'Prices updated ' + ago;
+    }
+    if (silverSpot) renderSilverDeals();
+    if (goldSpot) renderGoldDeals();
+  } catch(e) {
+    // Silently use hardcoded fallback data
+  }
+}
+loadLivePrices();
 
 function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch();}
 </script>
