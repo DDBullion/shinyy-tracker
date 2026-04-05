@@ -239,16 +239,15 @@
 .sold-product-name{font-size:0.82rem;font-weight:700;color:var(--txt);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 .sold-metal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .sold-metal-dot.silver{background:#aab4c8;} .sold-metal-dot.gold{background:#d4a833;}
-.sold-sale-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bdr);gap:8px;}
-.sold-sale-row:last-child{border-bottom:none;}
-.sold-sale-img{width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--sur2);}
-.sold-sale-img-placeholder{width:36px;height:36px;border-radius:6px;background:var(--sur2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.sold-sale-row{display:flex;align-items:center;justify-content:space-between;background:var(--sur);border-radius:14px;margin:0 12px 8px;padding:13px 14px;border:1px solid var(--bdr);gap:12px;text-decoration:none;color:inherit;box-shadow:rgba(0,0,0,.06) 0 1px 4px;transition:transform .15s,box-shadow .15s;animation:fadeUp .3s ease both;}
+.sold-sale-row:hover{transform:translateY(-1px);box-shadow:rgba(0,0,0,.1) 0 4px 16px;}
+.sold-sale-img{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--sur2);}
+.sold-sale-img-placeholder{width:44px;height:44px;border-radius:8px;background:var(--sur2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
 .sold-sale-info{flex:1;min-width:0;}
-.sold-sale-title{font-size:0.72rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
-.sold-sale-date{font-size:0.68rem;color:var(--mut);opacity:0.7;}
-.sold-sale-price{font-size:0.9rem;font-weight:700;color:var(--grn);white-space:nowrap;flex-shrink:0;}
-.sold-sale-link{font-size:0.68rem;color:var(--sil);text-decoration:none;opacity:0.8;transition:opacity 0.15s;}
-.sold-sale-link:hover{opacity:1;text-decoration:underline;}
+.sold-sale-title{font-size:.85rem;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sold-sale-date{font-size:.72rem;color:var(--mut);margin-top:2px;}
+.sold-sale-price{font-size:1.05rem;font-weight:700;color:var(--grn);white-space:nowrap;flex-shrink:0;}
+.sold-sale-link{font-size:.7rem;color:var(--sil);text-decoration:none;opacity:.8;display:block;text-align:right;margin-top:3px;}
 .sold-popular-loading{text-align:center;color:var(--mut);padding:32px 0;font-size:0.85rem;}
 .sold-popular-error{text-align:center;color:var(--orn);padding:16px;font-size:0.82rem;background:var(--sur);border-radius:10px;border:1px solid var(--bdr);margin-bottom:16px;}
 .sold-divider{border:none;border-top:1px solid var(--bdr);margin:20px 0;}
@@ -1436,8 +1435,8 @@ async function doSoldSearch(){
         const d=item.soldDate?new Date(item.soldDate):null;
         const ds=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
         const img=item.image?'<img class="sold-sale-img" src="'+item.image+'" alt="" loading="lazy" onerror="this.remove()">':'<div class="sold-sale-img-placeholder">🪙</div>';
-        return '<div class="sold-sale-row" style="padding:10px 0">'+img
-          +'<div class="sold-sale-info"><div class="sold-sale-title" style="max-width:240px" title="'+item.title+'">'+item.title.substring(0,60)+(item.title.length>60?'…':'')+'</div>'
+        return '<div class="sold-sale-row">'+img
+          +'<div class="sold-sale-info"><div class="sold-sale-title" title="'+item.title+'">'+item.title.substring(0,60)+(item.title.length>60?'…':'')+'</div>'
           +'<div class="sold-sale-date">'+ds+(item.condition?' · '+item.condition:'')+'</div></div>'
           +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">'
           +'<span class="sold-sale-price">$'+parseFloat(item.soldPrice).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
