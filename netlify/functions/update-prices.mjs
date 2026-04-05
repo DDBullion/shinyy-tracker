@@ -138,8 +138,8 @@ async function enrichProductUrls(allDeals, store) {
   const newPaths     = allPaths.filter(p => !urlCache[p]);
   console.log('  URL cache: ' + cachedCount + ' cached, ' + newPaths.length + ' new to fetch');
 
-  // Fetch up to 18 new product pages this run (keeps us under ~22s budget)
-  const toFetch = newPaths.slice(0, 18);
+  // Fetch up to 60 new product pages this run — still well within 26s budget
+  const toFetch = newPaths.slice(0, 60);
 
   const BATCH = 6; // 6 concurrent fetches × 4s timeout = ~4s per batch
   for (let i = 0; i < toFetch.length; i += BATCH) {
