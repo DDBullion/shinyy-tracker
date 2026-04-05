@@ -88,7 +88,7 @@ function parseDeals(html, page) {
       size: page.size, name: productName, dealer: dealerKey,
       prem: Math.round(prem * 100) / 100,
       price: Math.round(price * 100) / 100,
-      oz: page.oz, ship, url: (cells[0].match(/href="([^"]+)"/) || [])[1] || DEALER_URLS[dealerKey],
+      oz: page.oz, ship, url: ((s) => s ? (s.startsWith('http') ? s : 'https://www.findbullionprices.com' + s) : DEALER_URLS[dealerKey])((cells[0].match(/href="([^"]+)"/) || [])[1]),
       tag: getTag(productName), verified: true,
     });
   }
