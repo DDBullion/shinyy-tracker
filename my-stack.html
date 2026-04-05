@@ -337,30 +337,46 @@ function updateAuthUI(user) {
 
 // ─── Spot price fetch ──────────────────────────────────────────────────────────
 async function fetchSpot() {
+  let spotSrc = '';
+  // Source 1: Kitco REST proxy — returns both AG (silver) and AU (gold)
   try {
-    var r = await fetch('https://data-asg.goldprice.org/dbXRates/USD', { cache: 'no-store' });
-    var d = await r.json();
-    if (d && d.items && d.items[0]) {
-      spotGold   = d.items[0].xauPrice;
-      spotSilver = d.items[0].xagPrice;
-    }
-  } catch(e) {
+    const r = await fetch('https://www.kitco.com/api/kitco-rest-proxy/precious-metals', { cache: 'no-store' });
+    const d = await r.json();
+    const pm = d?.PreciousMetals?.PM || [];
+    const ag = pm.find(m => m.Symbol === 'AG');
+    const au = pm.find(m => m.Symbol === 'AU');
+    if (ag) spotSilver = parseFloat(ag.current_bid);
+    if (au) spotGold   = parseFloat(au.current_bid);
+    if (spotSilver || spotGold) spotSrc = 'kitco';
+  } catch {}
+
+  // Silver fallback: Fawaz open currency API
+  if (!spotSilver || spotSilver < 5 || spotSilver > 500) {
     try {
-      var r2 = await fetch('/.netlify/functions/get-prices');
-      var d2 = await r2.json();
-      var s1oz = (d2.silver || []).filter(function(x) { return x.oz === 1; }).sort(function(a,b) { return a.price - b.price; })[0];
-      if (s1oz) spotSilver = s1oz.price - s1oz.prem;
-      var g1oz = (d2.gold  || []).filter(function(x) { return x.oz === 1; }).sort(function(a,b) { return a.price - b.price; })[0];
-      if (g1oz) spotGold = g1oz.price - g1oz.prem;
-    } catch(e2) {}
+      const r2 = await fetch('https://latest.currency-api.pages.dev/v1/currencies/xag.json', { cache: 'no-store' });
+      const d2 = await r2.json();
+      const p = d2?.xag?.usd;
+      if (p) { spotSilver = parseFloat(p); spotSrc = spotSrc || 'fawaz'; }
+    } catch {}
   }
-  var status = document.getElementById('spotStatus');
+
+  // Gold fallback: estimate from cheapest 1oz gold deal minus premium
+  if (!spotGold) {
+    try {
+      const r3 = await fetch('/.netlify/functions/get-prices');
+      const d3 = await r3.json();
+      const g1oz = (d3.gold || []).filter(x => x.oz === 1).sort((a,b) => a.price - b.price)[0];
+      if (g1oz) { spotGold = g1oz.price - g1oz.prem; spotSrc = spotSrc || 'cache'; }
+    } catch {}
+  }
+
+  const status = document.getElementById('spotStatus');
   if (spotSilver && spotGold) {
-    status.textContent = 'Ag $' + spotSilver.toFixed(2) + '/oz · Au $' + spotGold.toFixed(0) + '/oz · via goldprice.org';
-    status.classList.add('text-indigo-200');
+    status.textContent = `Ag $${spotSilver.toFixed(2)}/oz · Au $${spotGold.toFixed(0)}/oz · via ${spotSrc}`;
+    status.className = status.className.replace(/text-yellow-\d+/g, '') + ' text-indigo-200';
   } else {
     status.textContent = '⚠ Spot price unavailable — values estimated';
-    status.classList.add('text-yellow-300');
+    status.className = status.className.replace(/text-indigo-\d+/g, '') + ' text-yellow-300';
   }
   renderSummary();
 }
