@@ -254,6 +254,11 @@
 .sold-popular-loading{text-align:center;color:var(--mut);padding:32px 0;font-size:0.85rem;}
 .sold-popular-error{text-align:center;color:var(--orn);padding:16px;font-size:0.82rem;background:var(--sur);border-radius:10px;border:1px solid var(--bdr);margin-bottom:16px;}
 .sold-divider{border:none;border-top:1px solid var(--bdr);margin:20px 0;}
+    /* Sign-out dropdown */
+    #signOutDropdown{position:fixed;top:38px;left:10px;z-index:10000;background:#fff;border:1px solid rgba(26,26,48,0.2);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:120px;overflow:hidden;}
+    #signOutBtn{display:block;width:100%;padding:9px 16px;background:none;border:none;cursor:pointer;font-size:.82rem;color:#1a1a30;text-align:left;font-weight:500;}
+    #signOutBtn:hover{background:#f0f0ff;}
+    @media(max-width:500px){#loginBtn{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
 </style>
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -290,7 +295,8 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <button id="loginBtn" onclick="netlifyIdentity.open()" style="position:fixed;top:10px;left:10px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:5px 14px;font-size:0.78rem;cursor:pointer;font-weight:500;">Sign In</button>
+  <button id="loginBtn" style="position:fixed;top:10px;left:10px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:5px 14px;font-size:0.78rem;cursor:pointer;font-weight:500;">Sign In</button>
+  <div id="signOutDropdown"><button id="signOutBtn" onclick="document.getElementById('signOutDropdown').style.display='none';netlifyIdentity.logout()">Sign Out</button></div>
 <script>document.body.firstChild&&document.body.firstChild.nodeType===3&&document.body.firstChild.textContent.trim()===">"&&document.body.removeChild(document.body.firstChild)</script>
 
 <!-- ── App Content ── -->
@@ -978,7 +984,36 @@ function renderGold() {
   function saveWatchlist() {
     var user = window.netlifyIdentity && netlifyIdentity.currentUser();
     if (!user) return;
-    localStorage.setItem('shinyy_watch_' + user.email, JSON.stringify(watchlist));
+    var key = 'shinyy_watch_' + user.email;
+    var data = JSON.stringify(watchlist);
+    localStorage.setItem(key, data);
+    // Sync to server so stack persists across devices
+    if (user.token && user.token.access_token) {
+      fetch('/.netlify/functions/watchlist', {
+        method: 'POST',
+        headers: {'Authorization': 'Bearer ' + user.token.access_token, 'Content-Type': 'application/json'},
+        body: data
+      }).catch(function() {});
+    }
+  }
+  // Load watchlist from server (called on login/init) to sync across devices
+  function syncWatchlistFromServer(user) {
+    if (!user || !user.token || !user.token.access_token) return;
+    fetch('/.netlify/functions/watchlist', {
+      headers: {'Authorization': 'Bearer ' + user.token.access_token}
+    }).then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(serverData) {
+        if (!serverData) return;
+        var key = 'shinyy_watch_' + user.email;
+        var merged = Object.assign({}, watchlist, serverData);
+        watchlist = merged;
+        localStorage.setItem(key, JSON.stringify(watchlist));
+        // Re-apply starred state to visible deal cards
+        document.querySelectorAll('a.deal').forEach(function(a) {
+          if (watchlist[a.getAttribute('href')]) a.classList.add('starred');
+          else a.classList.remove('starred');
+        });
+      }).catch(function() {});
   }
   function toggleWatch(btn) {
     var user = window.netlifyIdentity && netlifyIdentity.currentUser();
@@ -1531,6 +1566,27 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
 
   <script>
     // Netlify Identity — update button text based on login state
+    function toggleSignOutDropdown() {
+      var dd = document.getElementById('signOutDropdown');
+      if (!dd) return;
+      if (dd.style.display === 'none' || !dd.style.display) {
+        dd.style.display = 'block';
+        setTimeout(function() {
+          document.addEventListener('click', function _close(e) {
+            if (!dd.contains(e.target) && e.target.id !== 'loginBtn') {
+              dd.style.display = 'none';
+              document.removeEventListener('click', _close);
+            }
+          });
+        }, 0);
+      } else {
+        dd.style.display = 'none';
+      }
+    }
+    function hideSignOutDropdown() {
+      var dd = document.getElementById('signOutDropdown');
+      if (dd) dd.style.display = 'none';
+    }
     if (window.netlifyIdentity) {
       netlifyIdentity.on('init', function(user) {
         var btn = document.getElementById('loginBtn');
@@ -1539,9 +1595,10 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
           btn.textContent = user.user_metadata && user.user_metadata.full_name
             ? user.user_metadata.full_name.split(' ')[0]
             : user.email.split('@')[0];
-          btn.onclick = function() { netlifyIdentity.open('logout'); };
+          btn.onclick = function(e) { e.stopPropagation(); toggleSignOutDropdown(); };
         } else {
           netlifyIdentity.close();
+          btn.onclick = function() { netlifyIdentity.open(); };
         }
       });
       netlifyIdentity.on('login', function(user) {
@@ -1550,8 +1607,9 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
           btn.textContent = user.user_metadata && user.user_metadata.full_name
             ? user.user_metadata.full_name.split(' ')[0]
             : user.email.split('@')[0];
-          btn.onclick = function() { netlifyIdentity.open('logout'); };
+          btn.onclick = function(e) { e.stopPropagation(); toggleSignOutDropdown(); };
         }
+        hideSignOutDropdown();
         netlifyIdentity.close();
       });
       netlifyIdentity.on('logout', function() {
@@ -1560,6 +1618,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
           btn.textContent = 'Sign In';
           btn.onclick = function() { netlifyIdentity.open(); };
         }
+        hideSignOutDropdown();
       });
     }
   </script>
@@ -1585,9 +1644,15 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     link.style.fontSize = '13px';
     loginBtn.parentNode.insertBefore(link, loginBtn.nextSibling);
   }
+  function repositionMyStackLink() {
+    var link = document.getElementById('myStackNavLink');
+    var btn = document.getElementById('loginBtn');
+    if (link && btn) link.style.left = (10 + btn.offsetWidth + 8) + 'px';
+  }
   function showMyStack(user) {
     var link = document.getElementById('myStackNavLink');
     if (link) link.style.display = user ? 'inline-block' : 'none';
+    requestAnimationFrame(repositionMyStackLink);
   }
   // Two-path auth check:
   // 1. gotrue.currentUser() reads localStorage synchronously (works at page load)
@@ -1596,8 +1661,8 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
   if (window.netlifyIdentity) {
     var _u = netlifyIdentity.gotrue && netlifyIdentity.gotrue.currentUser();
     if (_u) { showMyStack(_u); }
-    netlifyIdentity.on('init', function(u) { showMyStack(u); });
-    netlifyIdentity.on('login', function(u) { injectMyStackLink(); showMyStack(u); });
+    netlifyIdentity.on('init', function(u) { showMyStack(u); if(u) syncWatchlistFromServer(u); });
+    netlifyIdentity.on('login', function(u) { injectMyStackLink(); showMyStack(u); syncWatchlistFromServer(u); });
     netlifyIdentity.on('logout', function() { showMyStack(null); });
   }
 })();
