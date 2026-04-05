@@ -1,6 +1,10 @@
 [build]
   functions = "netlify/functions"
 
+# update-prices runs daily at 6am to refresh cached FBP prices
+[functions."update-prices"]
+  schedule = "0 6 * * *"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
