@@ -4,16 +4,3 @@
 # update-prices runs daily at 6am to refresh cached FBP prices
 [functions."update-prices"]
   schedule = "0 6 * * *"
-
-# Let blog HTML files be served directly
-[[redirects]]
-  from = "/blog/*"
-  to = "/blog/:splat"
-  status = 200
-  force = false
-
-# SPA fallback for the main app
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
