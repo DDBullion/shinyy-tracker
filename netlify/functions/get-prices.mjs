@@ -2,6 +2,28 @@
 // v2 functions automatically receive Blobs context — no config needed.
 import { getStore } from '@netlify/blobs';
 
+// Fallback dealer URLs — used to rewrite any cached FBP product-page URLs
+const DEALER_URLS = {
+  'SD Bullion': 'https://sdbullion.com',
+  'APMEX': 'https://www.apmex.com',
+  'Money Metals Exchange': 'https://www.moneymetals.com',
+  'Monument Metals': 'https://www.monumentmetals.com',
+  'JM Bullion': 'https://www.jmbullion.com',
+  'Bullion Exchanges': 'https://www.bullionexchanges.com',
+  'BGASC': 'https://www.bgasc.com',
+  'Hero Bullion': 'https://www.herobullion.com',
+  'Provident Metals': 'https://www.providentmetals.com',
+  'Silver Gold Bull': 'https://www.silvergoldbull.com',
+  'Silver.com': 'https://www.silver.com',
+};
+
+function fixDeal(d) {
+  if (d.url && d.url.includes('findbullionprices.com')) {
+    d.url = DEALER_URLS[d.dealer] || d.url;
+  }
+  return d;
+}
+
 export default async (req) => {
   try {
     const store = getStore('prices');
@@ -12,7 +34,11 @@ export default async (req) => {
         { status: 404, headers: { 'Access-Control-Allow-Origin': '*' } }
       );
     }
-    return new Response(raw, {
+    // Rewrite any lingering FBP product-page URLs to real dealer homepages
+    const data = JSON.parse(raw);
+    if (data.silver) data.silver = data.silver.map(fixDeal);
+    if (data.gold)   data.gold   = data.gold.map(fixDeal);
+    return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
