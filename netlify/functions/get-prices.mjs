@@ -18,7 +18,8 @@ const DEALER_URLS = {
 };
 
 function fixDeal(d) {
-  if (d.url && d.url.includes('findbullionprices.com')) {
+  // Only rewrite if URL is actually on findbullionprices.com (not just utm_source param)
+  if (d.url && /^https?:\/\/(www\.)?findbullionprices\.com/i.test(d.url)) {
     d.url = DEALER_URLS[d.dealer] || d.url;
   }
   return d;
