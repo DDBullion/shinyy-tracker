@@ -284,8 +284,11 @@
     }
   }
   </script>
+
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
+  <button id="loginBtn" onclick="netlifyIdentity.open()" style="position:fixed;top:8px;left:8px;z-index:9999;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:6px;padding:5px 12px;font-size:0.78rem;cursor:pointer;backdrop-filter:blur(4px);">Sign In</button>
 <script>document.body.firstChild&&document.body.firstChild.nodeType===3&&document.body.firstChild.textContent.trim()===">"&&document.body.removeChild(document.body.firstChild)</script>
 
 <!-- ── App Content ── -->
@@ -1483,5 +1486,38 @@ function updatePageSEO(metal, filter) {
 
 function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch();}
 </script>
+
+  <script>
+    // Netlify Identity — update button text based on login state
+    if (window.netlifyIdentity) {
+      netlifyIdentity.on('init', function(user) {
+        var btn = document.getElementById('loginBtn');
+        if (!btn) return;
+        if (user) {
+          btn.textContent = user.user_metadata && user.user_metadata.full_name
+            ? user.user_metadata.full_name.split(' ')[0]
+            : user.email.split('@')[0];
+          btn.onclick = function() { netlifyIdentity.open('logout'); };
+        }
+      });
+      netlifyIdentity.on('login', function(user) {
+        var btn = document.getElementById('loginBtn');
+        if (btn) {
+          btn.textContent = user.user_metadata && user.user_metadata.full_name
+            ? user.user_metadata.full_name.split(' ')[0]
+            : user.email.split('@')[0];
+          btn.onclick = function() { netlifyIdentity.open('logout'); };
+        }
+        netlifyIdentity.close();
+      });
+      netlifyIdentity.on('logout', function() {
+        var btn = document.getElementById('loginBtn');
+        if (btn) {
+          btn.textContent = 'Sign In';
+          btn.onclick = function() { netlifyIdentity.open(); };
+        }
+      });
+    }
+  </script>
 </body>
 </html>
