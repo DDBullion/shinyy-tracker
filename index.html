@@ -517,6 +517,7 @@
 let currentMetal = 'silver';
 function setMetal(m) {
   currentMetal = m;
+  updatePageSEO && updatePageSEO(m, silverFilter);
   document.getElementById('pageSilver').classList.toggle('active', m === 'silver');
   document.getElementById('pageGold').classList.toggle('active', m === 'gold');
   document.getElementById('pageSold').classList.toggle('active', m === 'sold');
@@ -1164,6 +1165,7 @@ function clearGoldSearch() {
 
 // ── Filter setters ──
 function setFilter(f) {
+  updatePageSEO && updatePageSEO(currentMetal, f);
   silverFilter = f;
   document.querySelectorAll('#silverTabs .tab').forEach(t =>
     t.classList.toggle('active', t.getAttribute('onclick')?.includes("'"+f+"'"))
@@ -1428,16 +1430,14 @@ async function doSoldSearch(){
 }
 
 
-// ── Live prices from Netlify Blobs (injected daily by update-prices function) ──
+// ── Live prices from Netlify Blobs (refreshed daily by update-prices) ──
 async function loadLivePrices() {
   try {
     const res = await fetch('/.netlify/functions/get-prices');
     if (!res.ok) return;
     const data = await res.json();
     if (!data || !data.silver || !data.gold) return;
-    if (data.silver.length >= 5) {
-      SILVER_DEALERS = data.silver;
-    }
+    if (data.silver.length >= 5) SILVER_DEALERS = data.silver;
     if (data.gold.length >= 3) {
       GOLD_DEALERS = data.gold.map(function(d) {
         return { gsize: d.size, name: d.name, dealer: d.dealer,
@@ -1453,11 +1453,33 @@ async function loadLivePrices() {
     }
     if (silverSpot) renderSilverDeals();
     if (goldSpot) renderGoldDeals();
-  } catch(e) {
-    // Silently use hardcoded fallback data
-  }
+  } catch(e) { /* silently use hardcoded fallback */ }
 }
 loadLivePrices();
+
+
+// ── Dynamic SEO title per tab ──
+function updatePageSEO(metal, filter) {
+  const sizeTitles = {'1oz':'Best 1 oz','5oz':'Best 5 oz','10oz':'Best 10 oz','100oz':'Best 100 oz','kilo':'Best Silver Kilo'};
+  const coinTitles = {'eagle':'Best Silver Eagle','maple':'Best Silver Maple Leaf','buffalo':'Best Silver Buffalo Round','britannia':'Best Silver Britannia','krugerrand':'Best Krugerrand','kangaroo':'Best Silver Kangaroo','libertad':'Best Libertad','panda':'Best Panda'};
+  let title, desc;
+  if (metal === 'gold') {
+    title = 'Best Gold Prices Today | Shinyy Tracker';
+    desc = 'Compare gold bullion premiums over spot price. Find the cheapest gold coins and bars from top online dealers.';
+  } else if (coinTitles[filter]) {
+    title = coinTitles[filter] + ' Prices Today | Shinyy Tracker';
+    desc = 'Compare ' + coinTitles[filter].replace('Best ','') + ' prices across SD Bullion, APMEX, JM Bullion and more. Updated daily.';
+  } else if (sizeTitles[filter]) {
+    title = sizeTitles[filter] + (metal==='silver'?' Silver':' Gold') + ' Prices Today | Shinyy Tracker';
+    desc = 'Compare ' + (sizeTitles[filter].replace('Best ','')) + (metal==='silver'?' silver':' gold') + ' prices and premiums over spot. Updated daily from top bullion dealers.';
+  } else {
+    title = 'Best Silver Prices Today | Shinyy Tracker';
+    desc = 'Compare silver bullion premiums over spot from top dealers. Find the cheapest silver coins and bars online.';
+  }
+  document.title = title;
+  const dm = document.querySelector('meta[name="description"]');
+  if (dm) dm.setAttribute('content', desc);
+}
 
 function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch();}
 </script>
