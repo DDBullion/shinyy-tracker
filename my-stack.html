@@ -25,23 +25,20 @@
     .delete-btn:hover { background: #fee2e2; color: #dc2626; }
     .edit-btn:hover { background: #e0e7ff; color: #4338ca; }
     ::-webkit-scrollbar { height: 6px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-  @media(max-width:600px){#msLeftWrap{flex-wrap:wrap;}#msLeftWrap #userDisplay{flex-basis:100%;margin-top:2px;}}
-  </style>
-</head>
-<body class="min-h-screen">
-
-<!-- ═══════════════════════════  HEADER  ═══════════════════════════ -->
-<header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
-    <!-- Left: back link + sign in -->
-    <div class="flex items-center gap-3">
-      <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font<div id="msLeftWrap" class="flex items-center gap-3">     ← Tracker
-      </a>
-      <span class="text-gray-300">|</span>
-      <button id="loginBtn" onclick="netlifyIdentity.open()"
-        class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">
-        Sign In
-      </button>
+  </style<header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between" style="min-height:3.5rem;padding-top:0.4rem;padding-bottom:0.4rem;">
+    <!-- Left: back link + user -->
+    <div class="flex flex-col items-start" style="gap:2px;">
+      <div class="flex items-center gap-2">
+        <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+          ← Tracker
+        </a>
+        <span class="text-gray-300">|</span>
+        <button id="loginBtn" onclick="netlifyIdentity.open()"
+          class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">
+          Sign In
+        </button>
+      </div>
       <span id="userDisplay" class="text-sm font-medium text-indigo-600 hidden"></span>
     </div>
     <!-- Center: logo -->
@@ -53,6 +50,10 @@
     <!-- Right: add button -->
     <button onclick="openModal()"
       class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-1 transition-colors">
+      + Add Entry
+    </button>
+  </div>
+</header>-4 py-2 rounded-lg flex items-center gap-1 transition-colors">
       + Add Entry
     </button>
   </div>
