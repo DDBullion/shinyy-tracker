@@ -340,8 +340,8 @@
     </div>
 
     <div class="tabs" id="silverTabs">
-      <div class="tab active" onclick="setFilter('all')">All</div>
-      <div class="tab" onclick="setFilter('1oz')">1 oz</div>
+      <div class="tab" onclick="setFilter('all')">All</div>
+      <div class="tab active" onclick="setFilter('1oz')">1 oz</div>
       <div class="tab" onclick="setFilter('5oz')">5 oz</div>
       <div class="tab" onclick="setFilter('10oz')">10 oz</div>
       <div class="tab" onclick="setFilter('100oz')">100 oz</div>
@@ -849,7 +849,7 @@ const GOLD_DEALERS = [
 let silverSpot = null, prevSilverSpot = null;
 let goldSpot = null, prevGoldSpot = null;
 let spotSource = '';
-let silverFilter = 'all', goldFilter = 'all';
+let silverFilter = '1oz', goldFilter = 'all';
 let cdTimer = null, cdSec = 300;
 
 // ── timedFetch helper ──
