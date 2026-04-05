@@ -1,6 +1,6 @@
 // update-prices.mjs — Netlify Scheduled Function v2
 // Runs daily at 6am UTC, scrapes FindBullionPrices.com,
-// caches results to Netlify Blobs (v2 functions have context auto-injected).
+// caches results to Netlify Blobs.
 import { getStore } from '@netlify/blobs';
 
 export const config = { schedule: '0 6 * * *' };
@@ -40,16 +40,16 @@ const FBP_PAGES = [
 
 function getTag(name) {
   const n = name.toLowerCase();
-  if (n.includes('eagle'))                      return 'eagle';
-  if (n.includes('maple'))                      return 'maple';
-  if (n.includes('buffalo'))                    return 'buffalo';
-  if (n.includes('britannia'))                  return 'britannia';
-  if (n.includes('krugerrand'))                 return 'krugerrand';
+  if (n.includes('eagle'))    return 'eagle';
+  if (n.includes('maple'))    return 'maple';
+  if (n.includes('buffalo'))  return 'buffalo';
+  if (n.includes('britannia'))return 'britannia';
+  if (n.includes('krugerrand'))return 'krugerrand';
   if (n.includes('kangaroo') || n.includes('nugget')) return 'kangaroo';
-  if (n.includes('libertad'))                   return 'libertad';
-  if (n.includes('panda'))                      return 'panda';
-  if (n.includes('geiger'))                     return 'geiger';
-  if (n.includes('scottsdale'))                 return 'scottsdale';
+  if (n.includes('libertad')) return 'libertad';
+  if (n.includes('panda'))    return 'panda';
+  if (n.includes('geiger'))   return 'geiger';
+  if (n.includes('scottsdale'))return 'scottsdale';
   return '';
 }
 
@@ -97,114 +97,115 @@ function parseDeals(html, page) {
     const shipMatch = dealerCell.match(/Free\s+(?:Shipping\s+)?[@$][^\s]+(?:\s+\$[\d,]+)?/i);
     const ship = shipMatch ? shipMatch[0].replace(/\s+/g, ' ').trim() : '';
 
-    // Extract FBP product page URL from the first cell (e.g. /p/product-name/)
-    const fbpHrefMatch = cells[0].match(/href="(\/p\/[^"]+)"/);
-    const fbpPath = fbpHrefMatch ? fbpHrefMatch[1] : null;
+    // Extract the FBP product path (e.g. /p/product-name/) for URL enrichment
+    const fbpHrefM = cells[0].match(/href="(\/p\/[^"]+)"/);
+    const fbpPath  = fbpHrefM ? fbpHrefM[1] : null;
 
     results.push({
-      size:     page.size,
-      name:     productName,
-      dealer:   dealerKey,
-      prem:     Math.round(prem   * 100) / 100,
-      price:    Math.round(price  * 100) / 100,
-      oz:       page.oz,
+      size:  page.size,
+      name:  productName,
+      dealer: dealerKey,
+      prem:  Math.round(prem   * 100) / 100,
+      price: Math.round(price  * 100) / 100,
+      oz:    page.oz,
       ship,
-      url:      DEALER_URLS[dealerKey], // fallback — enriched below
-      fbpPath,                           // internal: used for enrichment
-      tag:      getTag(productName),
+      url:   DEALER_URLS[dealerKey], // replaced by enrichProductUrls()
+      fbpPath,
+      tag:   getTag(productName),
       verified: true,
     });
   }
   return results;
 }
 
-// Fetch FBP product pages and replace placeholder homepage URLs with real product URLs.
-// FBP product pages contain <tr id="vendor_N"> rows with direct dealer product hrefs.
+// Second pass: fetch each FBP product page and pull the real dealer product URL.
+// FBP product pages have <tr id="vendor_N"> rows with direct dealer hrefs:
+//   <a href="https://dealer.com/product" ... class="dealer-link">Dealer Name</a>
 async function enrichProductUrls(deals) {
-  // Collect unique FBP product paths
   const paths = [...new Set(deals.filter(d => d.fbpPath).map(d => d.fbpPath))];
-  console.log('  enriching ' + paths.length + ' product pages for direct dealer links…');
+  if (!paths.length) return;
+  console.log('  enriching ' + paths.length + ' product pages…');
 
-  const cache = {}; // fbpPath -> { dealerName: productUrl }
+  const cache = {}; // fbpPath -> { 'Dealer Name': 'https://...' }
 
-  // Fetch in small batches to avoid hammering FBP
-  const BATCH = 4;
+  // Fetch in batches of 8 with no delay — we want this fast
+  const BATCH = 8;
   for (let i = 0; i < paths.length; i += BATCH) {
-    await Promise.all(paths.slice(i, i + BATCH).map(async (fbpPath) => {
+    await Promise.all(paths.slice(i, i + BATCH).map(async (fp) => {
       try {
-        const r = await fetch('https://www.findbullionprices.com' + fbpPath, {
+        const r = await fetch('https://www.findbullionprices.com' + fp, {
           headers: HEADERS,
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(8000),
         });
         if (!r.ok) return;
         const html = await r.text();
 
-        // Each vendor row: <tr id="vendor_N" ...>
-        //   <a href="REAL_PRODUCT_URL" ... class="dealer-link"> Dealer Name ...
-        //   title="Shop for PRODUCT from DEALER_NAME"
+        // Match vendor rows: <tr id="vendor_N" ...> ... </tr>
         const vendorRows = html.match(/<tr id="vendor_\d+"[\s\S]*?<\/tr>/gi) || [];
         const map = {};
         for (const row of vendorRows) {
-          // href comes before class="dealer-link" in FBP's markup
-          const hrefM = row.match(/href="(https?:\/\/[^"]+)"[^>]*class="[^"]*dealer-link/);
-          const nameM = row.match(/title="[^"]*from ([^"]+)"/);
-          if (hrefM && nameM) {
-            map[nameM[1].trim()] = hrefM[1];
-          }
+          // href="REAL_URL" ... class="dealer-link" ... title="Shop for X from DEALER"
+          const hM = row.match(/href="(https?:\/\/[^"]+)"[^>]*class="[^"]*dealer-link/);
+          const nM = row.match(/title="[^"]*from ([^"]+)"/);
+          if (hM && nM) map[nM[1].trim()] = hM[1];
         }
-        cache[fbpPath] = map;
+        cache[fp] = map;
       } catch (e) {
-        console.warn('  enrich fail ' + fbpPath + ': ' + e.message);
+        console.warn('  enrich fail ' + fp + ': ' + e.message);
       }
     }));
-    if (i + BATCH < paths.length) await new Promise(r => setTimeout(r, 600));
+    // Small pause between batches to be polite
+    if (i + BATCH < paths.length) await new Promise(r => setTimeout(r, 250));
   }
 
-  // Apply enriched URLs back to deals
   let enriched = 0;
   for (const deal of deals) {
-    if (deal.fbpPath && cache[deal.fbpPath]) {
-      const productUrl = cache[deal.fbpPath][deal.dealer];
-      if (productUrl) { deal.url = productUrl; enriched++; }
+    if (deal.fbpPath && cache[deal.fbpPath]?.[deal.dealer]) {
+      deal.url = cache[deal.fbpPath][deal.dealer];
+      enriched++;
     }
-    delete deal.fbpPath; // remove internal field before storing
+    delete deal.fbpPath;
   }
-  console.log('  enriched ' + enriched + '/' + deals.length + ' deals with product URLs');
+  console.log('  enriched ' + enriched + '/' + deals.length + ' deals with direct product URLs');
 }
 
 export default async (req) => {
-  console.log('update-prices: starting scrape', new Date().toISOString());
+  console.log('update-prices: starting', new Date().toISOString());
   const store = getStore('prices');
   const allDeals = { silver: [], gold: [], updated: new Date().toISOString() };
-  let totalFetched = 0;
 
-  for (const page of FBP_PAGES) {
-    try {
+  // Fetch all 11 pages IN PARALLEL — much faster than sequential
+  const results = await Promise.allSettled(
+    FBP_PAGES.map(async (page) => {
       const resp = await fetch(page.url, {
         headers: HEADERS,
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(12000),
       });
-      if (!resp.ok) { console.warn('FBP fail: ' + page.url + ' ' + resp.status); continue; }
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const html  = await resp.text();
       const deals = parseDeals(html, page);
-      allDeals[page.metal].push(...deals);
-      totalFetched += deals.length;
       console.log('  ' + page.metal + ' ' + page.size + ': ' + deals.length + ' deals');
-      await new Promise(r => setTimeout(r, 800));
-    } catch (err) {
-      console.error('Error fetching ' + page.url + ': ' + err.message);
+      return { page, deals };
+    })
+  );
+
+  let totalFetched = 0;
+  for (const r of results) {
+    if (r.status === 'fulfilled') {
+      allDeals[r.value.page.metal].push(...r.value.deals);
+      totalFetched += r.value.deals.length;
+    } else {
+      console.warn('  page failed:', r.reason?.message);
     }
   }
 
   if (totalFetched >= 5) {
-    // Enrich each deal with the real product URL from the FBP product page
     await enrichProductUrls(allDeals.silver);
     await enrichProductUrls(allDeals.gold);
-
     await store.set('latest', JSON.stringify(allDeals));
     console.log('update-prices: saved ' + allDeals.silver.length + ' silver + ' + allDeals.gold.length + ' gold deals');
   } else {
-    console.warn('update-prices: too few deals (' + totalFetched + '), keeping existing cache');
+    console.warn('update-prices: too few deals (' + totalFetched + '), keeping cache');
   }
 
   return new Response('OK: ' + totalFetched + ' deals');
