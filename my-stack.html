@@ -284,7 +284,12 @@ function storageKey() {
   return currentUser ? 'shinyy_stack_' + currentUser.email : 'shinyy_stack_guest';
 }
 function loadStack() {
-  try { stack = JSON.parse(localStorage.getItem(storageKey()) || '[]'); }
+  try {
+    var raw = JSON.parse(localStorage.getItem(storageKey()) || '[]');
+    // Migration: if stored as object with numeric keys, convert back to array
+    if (!Array.isArray(raw) && raw && typeof raw === 'object') { raw = Object.values(raw); }
+    stack = raw;
+  }
   catch(e) { stack = []; }
 }
 function saveStack() {
