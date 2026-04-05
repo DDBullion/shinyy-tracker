@@ -84,11 +84,20 @@ function parseDeals(html, page) {
     if (isNaN(price) || price <= 0) continue;
     const shipMatch = dealerCell.match(/Free\s+(?:Shipping\s+)?[@$][^\s]+(?:\s+\$[\d,]+)?/i);
     const ship = shipMatch ? shipMatch[0].replace(/\s+/g, ' ').trim() : '';
+    // Fix: scan all hrefs in row for a direct dealer URL (not findbullionprices.com)
+    const url = (function() {
+      var hs = (row.match(/href="([^"]+)"/g) || []);
+      for (var i = 0; i < hs.length; i++) {
+        var u = hs[i].slice(6, -1);
+        if (u.startsWith('http') && !u.includes('findbullionprices.com')) return u;
+      }
+      return DEALER_URLS[dealerKey];
+    })();
     results.push({
       size: page.size, name: productName, dealer: dealerKey,
       prem: Math.round(prem * 100) / 100,
       price: Math.round(price * 100) / 100,
-      oz: page.oz, ship, url: ((s) => s ? (s.startsWith('http') ? s : 'https://www.findbullionprices.com' + s) : DEALER_URLS[dealerKey])((cells[0].match(/href="([^"]+)"/) || [])[1]),
+      oz: page.oz, ship, url,
       tag: getTag(productName), verified: true,
     });
   }
