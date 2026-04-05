@@ -1529,5 +1529,39 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
       });
     }
   </script>
+
+<!-- My Stack nav link (shown when signed in) -->
+<script>
+(function() {
+  function injectMyStackLink() {
+    if (document.getElementById('myStackNavLink')) return;
+    var loginBtn = document.getElementById('loginBtn');
+    if (!loginBtn) return;
+    var link = document.createElement('a');
+    link.id = 'myStackNavLink';
+    link.href = '/my-stack.html';
+    link.textContent = '\uD83D\uDCCA My Stack';
+    link.style.cssText = loginBtn.style.cssText;
+    // Position it to the right of loginBtn
+    var btnLeft = parseInt(loginBtn.style.left) || 10;
+    var btnWidth = loginBtn.offsetWidth || 80;
+    link.style.left = (btnLeft + btnWidth + 8) + 'px';
+    link.style.display = 'none';
+    link.style.textDecoration = 'none';
+    link.style.fontSize = '13px';
+    loginBtn.parentNode.insertBefore(link, loginBtn.nextSibling);
+  }
+  function showMyStack(user) {
+    var link = document.getElementById('myStackNavLink');
+    if (link) link.style.display = user ? 'inline-block' : 'none';
+  }
+  document.addEventListener('DOMContentLoaded', injectMyStackLink);
+  if (window.netlifyIdentity) {
+    netlifyIdentity.on('init', function(u) { injectMyStackLink(); setTimeout(function(){ showMyStack(u); }, 100); });
+    netlifyIdentity.on('login', function(u) { showMyStack(u); });
+    netlifyIdentity.on('logout', function() { showMyStack(null); });
+  }
+})();
+<\/script>
 </body>
 </html>
