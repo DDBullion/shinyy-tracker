@@ -286,8 +286,11 @@ function storageKey() {
 function loadStack() {
   try {
     var raw = JSON.parse(localStorage.getItem(storageKey()) || '[]');
-    // Migration: if stored as object with numeric keys, convert back to array
-    if (!Array.isArray(raw) && raw && typeof raw === 'object') { raw = Object.values(raw); }
+    // Migration: if stored as object with numeric keys (corrupted), convert back to array and re-save
+    if (!Array.isArray(raw) && raw && typeof raw === 'object') {
+      raw = Object.values(raw);
+      localStorage.setItem(storageKey(), JSON.stringify(raw));
+    }
     stack = raw;
   }
   catch(e) { stack = []; }
