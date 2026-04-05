@@ -25,6 +25,7 @@
     .delete-btn:hover { background: #fee2e2; color: #dc2626; }
     .edit-btn:hover { background: #e0e7ff; color: #4338ca; }
     ::-webkit-scrollbar { height: 6px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  @media(max-width:600px){#msLeftWrap{flex-wrap:wrap;}#msLeftWrap #userDisplay{flex-basis:100%;margin-top:2px;}}
   </style>
 </head>
 <body class="min-h-screen">
@@ -34,8 +35,7 @@
   <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
     <!-- Left: back link + sign in -->
     <div class="flex items-center gap-3">
-      <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
-        ← Tracker
+      <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font<div id="msLeftWrap" class="flex items-center gap-3">     ← Tracker
       </a>
       <span class="text-gray-300">|</span>
       <button id="loginBtn" onclick="netlifyIdentity.open()"
