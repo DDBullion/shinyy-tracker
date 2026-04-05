@@ -182,7 +182,6 @@
     .deal.high{border-left:4px solid var(--red);background:linear-gradient(to right,rgba(220,38,38,0.04),var(--sur) 60%);}
     .deal.oos{border-left:4px solid #bbb;opacity:0.55;}
     .oos-lbl{font-size:0.58rem;background:rgba(120,120,140,.15);color:#999;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:4px;vertical-align:middle;}
-    .ztag{background:rgba(220,38,38,.12);color:#b91c1c;}
     .smint-tag{background:rgba(180,83,9,.12);color:#b45309;}
     .gtag-style{background:rgba(91,94,246,.12);color:var(--acc);}
     .dl{flex:1;min-width:0;}
@@ -359,7 +358,6 @@
           <option value="scottsdale">🦁 Scottsdale</option>
           <option value="libertad">🇲🇽 Libertads</option>
           <option value="panda">🐼 Pandas</option>
-          <option value="zombucks">🧟 Zombucks</option>
           <option value="geiger">🇩🇪 Geiger</option>
           <option value="engelhard">⚗️ Engelhard</option>
           <option value="prospector">⛏️ Prospector</option>
@@ -675,27 +673,6 @@ const SILVER_DEALERS = [
   {size:'kilo', name:'1 Kilo Wall Street Silver Bar',        dealer:'Scottsdale Mint',  prem:2.78,  oz:32.15,  ship:'Varies',      url:'https://www.scottsdalemint.com/product/wall-street-mint-1-kilo-silver-bar/', tag:'scottsdale', verified:true},
 
   // ── Zombucks World (1oz rounds) ──
-  {size:'1oz',  name:'Zombucks World Libertattered',         dealer:'JM Bullion',      prem:12.69, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-zombucks-world-libertattered-silver-round/', tag:'zombucks', verified:true},
-  {size:'1oz',  name:'Zombucks World Zombull',               dealer:'JM Bullion',      prem:4.59,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-zombucks-world-zombull-silver-round/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Kangaruin',             dealer:'JM Bullion',      prem:4.69,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-zombucks-world-kangaruin-silver-round/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Kookaburied',           dealer:'JM Bullion',      prem:5.19,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-zombucks-world-kookaburied-silver-round/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Pandamonium',           dealer:'JM Bullion',      prem:2.02,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-zombucks-world-pandamonium-silver-round/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Mortuga',               dealer:'JM Bullion',      prem:4.69,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-zombucks-world-mortuga-silver-round/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Elegaunt',              dealer:'JM Bullion',      prem:4.79,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-zombucks-world-elegaunt-silver-round/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Britannidead',          dealer:'JM Bullion',      prem:4.89,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Libertad Muerto',       dealer:'JM Bullion',      prem:4.89,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Walking Deadman',       dealer:'JM Bullion',      prem:5.29,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Maple Haunted',         dealer:'JM Bullion',      prem:4.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Panda Dread',           dealer:'JM Bullion',      prem:5.49,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Nugget Ghoul',          dealer:'JM Bullion',      prem:5.49,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Vienna Zombie',         dealer:'JM Bullion',      prem:5.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Killerrand',            dealer:'JM Bullion',      prem:5.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Sukukumed',             dealer:'JM Bullion',      prem:5.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Colorized Libertattered',dealer:'JM Bullion',     prem:17.69, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Colorized Zombull',     dealer:'JM Bullion',      prem:19.69, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Colorized Kangaruin',   dealer:'JM Bullion',      prem:20.69, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Colorized Kookaburied', dealer:'JM Bullion',      prem:22.69, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
-  {size:'1oz',  name:'Zombucks World Colorized Pandamonium', dealer:'JM Bullion',      prem:25.69, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/zombucks/', tag:'zombucks', oos:true},
 
   // ── Silver Libertads (estimated premiums, Mar 24, 2026 · Spot ~$68.92) ──
   {size:'1oz',  name:'1oz Mexican Silver Libertad (Random Yr)',dealer:'JM Bullion',      prem:10.00, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/mexican-silver-libertad/', tag:'libertad'},
@@ -989,7 +966,6 @@ function renderSilverDeals() {
   let list = SILVER_DEALERS;
   if      (silverFilter === 'mm')         list = list.filter(d => d.mm);
   else if (silverFilter === 'scottsdale') list = list.filter(d => d.tag === 'scottsdale');
-  else if (silverFilter === 'zombucks')   list = list.filter(d => d.tag === 'zombucks');
   else if (silverFilter === 'geiger')     list = list.filter(d => d.tag === 'geiger');
   else if (silverFilter === 'libertad')   list = list.filter(d => d.tag === 'libertad');
   else if (silverFilter === 'panda')      list = list.filter(d => d.tag === 'panda');
@@ -1041,7 +1017,6 @@ function renderSilverDeals() {
     const stagger = `animation-delay:${Math.min(i,10)*0.04}s`;
     const ozLabel = d.size === 'misc' ? d.oz.toFixed(3)+'oz' : d.size;
     const mm   = d.mm   ? '<span class="stag mmtag">MM</span>' : '';
-    const ztag = d.tag === 'zombucks'   ? '<span class="stag ztag">🧟</span>' : '';
     const gtag = d.tag === 'geiger'     ? '<span class="stag">🇩🇪</span>' : '';
     const smtag= d.tag === 'scottsdale' ? '<span class="stag smint-tag">🦁</span>' : '';
     const ltag  = d.tag === 'libertad'   ? '<span class="stag" style="background:rgba(34,197,94,.2);color:#4ade80">🇲🇽</span>' : '';
@@ -1058,7 +1033,7 @@ function renderSilverDeals() {
     const prefix = d.oos ? '~' : '';
     html += `<a class="deal ${card}${featuredClass}" href="${d.url}" target="_blank" style="${stagger}">
       <div class="dl">
-        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${ztag}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?`<span class="btag">🏆 BEST ${sizeLabel}</span>`:''}${oosBadge}</div>
+        <div class="dn"><span class="stag">${sizeLabel}</span>${mm}${gtag}${smtag}${ltag}${ptag}${etag}${mtag}${buftag}${brttag}${krugtag}${kantag}${d.name}${best?`<span class="btag">🏆 BEST ${sizeLabel}</span>`:''}${oosBadge}</div>
         <div class="dm">${d.dealer}${vtag} · ${d.oos?'Check dealer for stock':'✈ '+d.ship}</div>
       </div>
       <div class="dr">
