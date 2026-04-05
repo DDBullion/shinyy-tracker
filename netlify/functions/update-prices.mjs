@@ -40,7 +40,7 @@ const FBP_PAGES = [
 
 function getTag(name) {
   const n = name.toLowerCase();
-  if (n.includes('eagle'))                    return 'eagle';
+  if (n.includes('eagle') && n.includes('american')) return 'eagle';
   if (n.includes('maple'))                    return 'maple';
   if (n.includes('buffalo'))                  return 'buffalo';
   if (n.includes('britannia'))                return 'britannia';
