@@ -982,39 +982,58 @@ function renderGold() {
     var key = 'shinyy_watch_' + (user ? user.email : 'guest');
     try { watchlist = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { watchlist = {}; }
   }
-  function saveWatchlist() {
+  function getAuthToken(user, cb) {
+    if (!user) return;
+    var tok = user.token && user.token.access_token;
+    if (!tok) return;
+    try {
+      var exp = JSON.parse(atob(tok.split('.')[1])).exp * 1000;
+      if (Date.now() < exp - 10000) { cb(tok); return; }
+    } catch(e) {}
+    netlifyIdentity.refresh()
+      .then(function(t) { if (t) cb(t); })
+      .catch(function() { cb(tok); });
+  }
+    function saveWatchlist() {
     var user = window.netlifyIdentity && netlifyIdentity.currentUser();
     if (!user) return;
     var key = 'shinyy_watch_' + user.email;
     var data = JSON.stringify(watchlist);
     localStorage.setItem(key, data);
     // Sync to server so stack persists across devices
-    if (user.token && user.token.access_token) {
+    getAuthToken(user, function(token) {
       fetch('/api/watchlist', {
         method: 'POST',
-        headers: {'Authorization': 'Bearer ' + user.token.access_token, 'Content-Type': 'application/json'},
+        headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
         body: data
       }).catch(function() {});
-    }
+    });
   }
   // Load watchlist from server (called on login/init) to sync across devices
   function syncWatchlistFromServer(user) {
-    if (!user || !user.token || !user.token.access_token) return;
-    fetch('/api/watchlist', {
-      headers: {'Authorization': 'Bearer ' + user.token.access_token}
-    }).then(function(r) { return r.ok ? r.json() : null; })
-      .then(function(serverData) {
-        if (!serverData) return;
-        var key = 'shinyy_watch_' + user.email;
-        var merged = Object.assign({}, serverData, watchlist);
-        watchlist = merged;
-        localStorage.setItem(key, JSON.stringify(watchlist));
-        // Re-apply starred state to visible deal cards
-        document.querySelectorAll('a.deal').forEach(function(a) {
-          if (watchlist[a.getAttribute('href')]) a.classList.add('starred');
-          else a.classList.remove('starred');
-        });
-      }).catch(function() {});
+    if (!user) return;
+    getAuthToken(user, function(token) {
+      fetch('/api/watchlist', { headers: {'Authorization': 'Bearer ' + token} })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(serverData) {
+          if (!serverData) return;
+          var key = 'shinyy_watch_' + user.email;
+          var merged = Object.assign({}, serverData, watchlist);
+          watchlist = merged;
+          var mergedData = JSON.stringify(merged);
+          localStorage.setItem(key, mergedData);
+          // Push merged data back so server stays current
+          fetch('/api/watchlist', {
+            method: 'POST',
+            headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
+            body: mergedData
+          }).catch(function() {});
+          document.querySelectorAll('a.deal').forEach(function(a) {
+            if (watchlist[a.getAttribute('href')]) a.classList.add('starred');
+            else a.classList.remove('starred');
+          });
+        }).catch(function() {});
+    });
   }
   function toggleWatch(btn) {
     var user = window.netlifyIdentity && netlifyIdentity.currentUser();
