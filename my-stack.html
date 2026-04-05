@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>My Stack | Shinyy Tracker</title>
+  <meta name="description" content="Track your personal silver and gold bullion stack. See your dollar cost average, total weight, and current value vs spot." />
+  <link rel="icon" href="/favicon.ico" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+    .metal-silver { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); }
+    .metal-gold   { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+    .badge-silver { background: #e2e8f0; color: #475569; }
+    .badge-gold   { background: #fef3c7; color: #92400e; }
+    .gain  { color: #16a34a; }
+    .loss  { color: #dc2626; }
+    .modal-bg { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+    input:focus, select:focus, textarea:focus { outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); border-color: #6366f1; }
+    .tab-active { border-bottom: 3px solid #6366f1; color: #6366f1; font-weight: 600; }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .slide-in { animation: slideIn 0.2s ease-out; }
+    tr:hover td { background: #f1f5f9; }
+    .delete-btn:hover { background: #fee2e2; color: #dc2626; }
+    .edit-btn:hover { background: #e0e7ff; color: #4338ca; }
+    ::-webkit-scrollbar { height: 6px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- ═══════════════════════════  HEADER  ═══════════════════════════ -->
+<header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+    <!-- Left: back link + sign in -->
+    <div class="flex items-center gap-3">
+      <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+        ← Tracker
+      </a>
+      <span class="text-gray-300">|</span>
+      <button id="loginBtn" onclick="netlifyIdentity.open()"
+        class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">
+        Sign In
+      </button>
+      <span id="userDisplay" class="text-sm font-medium text-indigo-600 hidden"></span>
+    </div>
+    <!-- Center: logo -->
+    <a href="/" class="absolute left-1/2 -translate-x-1/2">
+      <img src="/icons/icon-144x144.png" alt="Shinyy Tracker" class="h-8 w-8 rounded-lg" />
+    </a>
+    <!-- Right: add button -->
+    <button onclick="openModal()"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-1 transition-colors">
+      + Add Entry
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════  PAGE TITLE  ═══════════════════════════ -->
+<div class="max-w-7xl mx-auto px-4 pt-6 pb-2">
+  <h1 class="text-2xl font-bold text-gray-900">My Stack</h1>
+  <p class="text-sm text-gray-500 mt-1">Track your bullion purchases and see your dollar cost average vs current spot.</p>
+</div>
+
+<!-- ═══════════════════════════  SUMMARY CARDS  ═══════════════════════════ -->
+<div class="max-w-7xl mx-auto px-4 py-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+  <!-- Silver card -->
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 slide-in">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Silver Stack</span>
+      <span class="text-lg">🥈</span>
+    </div>
+    <div class="text-3xl font-bold text-gray-900" id="silverOz">0.00 oz</div>
+    <div class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+      <span class="text-gray-500">DCA</span>
+      <span class="font-semibold text-gray-800" id="silverDCA">—</span>
+      <span class="text-gray-500">Cost Basis</span>
+      <span class="font-semibold text-gray-800" id="silverCost">$0.00</span>
+      <span class="text-gray-500">Spot Value</span>
+      <span class="font-semibold text-gray-800" id="silverValue">—</span>
+      <span class="text-gray-500">Gain / Loss</span>
+      <span class="font-semibold" id="silverGL">—</span>
+    </div>
+  </div>
+
+  <!-- Gold card -->
+  <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 slide-in">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Gold Stack</span>
+      <span class="text-lg">🥇</span>
+    </div>
+    <div class="text-3xl font-bold text-gray-900" id="goldOz">0.00 oz</div>
+    <div class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+      <span class="text-gray-500">DCA</span>
+      <span class="font-semibold text-gray-800" id="goldDCA">—</span>
+      <span class="text-gray-500">Cost Basis</span>
+      <span class="font-semibold text-gray-800" id="goldCost">$0.00</span>
+      <span class="text-gray-500">Spot Value</span>
+      <span class="font-semibold text-gray-800" id="goldValue">—</span>
+      <span class="text-gray-500">Gain / Loss</span>
+      <span class="font-semibold" id="goldGL">—</span>
+    </div>
+  </div>
+
+  <!-- Total portfolio -->
+  <div class="bg-indigo-600 rounded-2xl p-5 shadow-sm slide-in text-white">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold text-indigo-200 uppercase tracking-wider">Total Portfolio</span>
+      <span class="text-lg">💰</span>
+    </div>
+    <div class="text-3xl font-bold" id="totalValue">$0.00</div>
+    <div class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+      <span class="text-indigo-200">Cost Basis</span>
+      <span class="font-semibold" id="totalCost">$0.00</span>
+      <span class="text-indigo-200">Gain / Loss</span>
+      <span class="font-semibold" id="totalGL">—</span>
+      <span class="text-indigo-200">Return</span>
+      <span class="font-semibold" id="totalReturn">—</span>
+    </div>
+    <div class="mt-3 text-xs text-indigo-300 flex items-center gap-1">
+      <span id="spotStatus">⏳ Loading spot prices…</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════  TABLE  ═══════════════════════════ -->
+<div class="max-w-7xl mx-auto px-4 pb-16">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Table header bar -->
+    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+      <span class="text-sm font-semibold text-gray-700" id="entryCount">0 entries</span>
+      <div class="flex gap-2">
+        <button onclick="exportCSV()"
+          class="text-xs text-gray-500 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-3 py-1 rounded-lg transition-colors">
+          ⬇ Export CSV
+        </button>
+        <button onclick="if(confirm('Clear all entries?')) clearAll()"
+          class="text-xs text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-200 px-3 py-1 rounded-lg transition-colors">
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <th class="px-4 py-3 w-20">Metal</th>
+            <th class="px-4 py-3">Item</th>
+            <th class="px-4 py-3">Where Bought</th>
+            <th class="px-4 py-3 text-right">Weight (oz)</th>
+            <th class="px-4 py-3 text-right">Total Paid</th>
+            <th class="px-4 py-3 text-right">$/oz Paid</th>
+            <th class="px-4 py-3">Date</th>
+            <th class="px-4 py-3 text-right">Spot Value</th>
+            <th class="px-4 py-3 text-right">Gain / Loss</th>
+            <th class="px-4 py-3 w-16"></th>
+          </tr>
+        </thead>
+        <tbody id="stackTable">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="py-16 text-center text-gray-400">
+      <div class="text-5xl mb-3">🪙</div>
+      <p class="font-semibold text-gray-600">Your stack is empty</p>
+      <p class="text-sm mt-1">Click <strong>+ Add Entry</strong> to log your first purchase.</p>
+      <button onclick="openModal()" class="mt-4 bg-indigo-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors">
+        + Add First Entry
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════  ADD/EDIT MODAL  ═══════════════════════════ -->
+<div id="modal" class="fixed inset-0 z-50 hidden modal-bg flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md slide-in" id="modalBox">
+    <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100">
+      <h2 class="text-lg font-bold text-gray-900" id="modalTitle">Add Entry</h2>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700 text-xl font-bold leading-none">✕</button>
+    </div>
+    <form onsubmit="saveEntry(event)" class="px-6 py-5 space-y-4">
+
+      <!-- Metal toggle -->
+      <div>
+        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Metal</label>
+        <div class="flex gap-2">
+          <button type="button" id="btnSilver" onclick="setMetal('silver')"
+            class="flex-1 py-2 rounded-xl text-sm font-semibold border-2 border-indigo-600 bg-indigo-600 text-white transition-all">
+            🥈 Silver
+          </button>
+          <button type="button" id="btnGold" onclick="setMetal('gold')"
+            class="flex-1 py-2 rounded-xl text-sm font-semibold border-2 border-gray-200 text-gray-500 transition-all hover:border-yellow-400">
+            🥇 Gold
+          </button>
+        </div>
+        <input type="hidden" id="metalInput" value="silver" />
+      </div>
+
+      <!-- Item name -->
+      <div>
+        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5" for="itemName">Item Name</label>
+        <input id="itemName" type="text" required placeholder="e.g. 1 oz American Silver Eagle"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 transition-all" />
+      </div>
+
+      <!-- Where bought -->
+      <div>
+        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5" for="whereBought">Where Bought</label>
+        <input id="whereBought" type="text" placeholder="e.g. Shinyy Tracker, APMEX, Local shop…"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 transition-all" />
+      </div>
+
+      <!-- Weight + Price row -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5" for="weightOz">Weight (oz)</label>
+          <input id="weightOz" type="number" step="0.001" min="0.001" required placeholder="1.000"
+            oninput="updateModalCalc()"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 transition-all" />
+            </div>
+        <div>
+          <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5" for="totalPaid">Total Paid ($)</label>
+          <input id="totalPaid" type="number" step="0.01" min="0.01" required placeholder="0.00"
+            oninput="updateModalCalc()"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 transition-all" />
+        </div>
+      </div>
+
+      <!-- Live $/oz preview -->
+      <div id="calcPreview" class="hidden bg-indigo-50 rounded-xl px-4 py-2.5 text-sm flex items-center justify-between">
+        <span class="text-indigo-600 font-medium">Your cost per oz:</span>
+        <span id="calcPerOz" class="font-bold text-indigo-700 text-base"></span>
+      </div>
+
+      <!-- Date -->
+      <div>
+        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5" for="purchaseDate">Purchase Date</label>
+        <input id="purchaseDate" type="date"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 transition-all" />
+      </div>
+
+      <!-- Notes (optional) -->
+      <div>
+        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5" for="notes">Notes <span class="font-normal text-gray-400">(optional)</span></label>
+        <input id="notes" type="text" placeholder="e.g. Tube of 20, gift, etc."
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 transition-all" />
+      </div>
+
+      <input type="hidden" id="editId" value="" />
+
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeModal()"
+          class="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-600 hover:bv-gray-50 transition-colors">
+          Cancel
+        </button>
+        <button type="submit"
+          class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+          Save Entry
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════  SCRIPTS  ═══════════════════════════ -->
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let stack = [];           // Array of entry objects
+let spotSilver = null;    // $/oz
+let spotGold   = null;    // $/oz
+let currentUser = null;
+
+// ─── Storage helpers ──────────────────────────────────────────────────────────
+function storageKey() {
+  return currentUser ? 'shinyy_stack_' + currentUser.email : 'shinyy_stack_guest';
+}
+function loadStack() {
+  try { stack = JSON.parse(localStorage.getItem(storageKey()) || '[]'); }
+  catch { stack = []; }
+}
+function saveStack() {
+  localStorage.setItem(storageKey(), JSON.stringify(stack));
+}
+
+// ─── Netlify Identity ──────────────────────────────────────────────────────────
+if (window.netlifyIdentity) {
+  netlifyIdentity.on('init', user => {
+    currentUser = user;
+    updateAuthUI(user);
+    loadStack();
+    renderAll();
+  });
+  netlifyIdentity.on('login', user => {
+    currentUser = user;
+    updateAuthUI(user);
+    netlifyIdentity.close();
+    // Merge guest stack into user stack
+    const guestStack = JSON.parse(localStorage.getItem('shinyy_stack_guest') || '[]');
+    loadStack();
+    if (guestStack.length) {
+      stack = [...guestStack, ...stack];
+      saveStack();
+      localStorage.removeItem('shinyy_stack_guest');
+    }
+    renderAll();
+  });
+  netlifyIdentity.on('logout', () => {
+    currentUser = null;
+    updateAuthUI(null);
+    loadStack();
+    renderAll();
+  });
+}
+function updateAuthUI(user) {
+  const btn = document.getElementById('loginBtn');
+  const disp = document.getElementById('userDisplay');
+  if (user) {
+    btn.classList.add('hidden');
+    disp.classList.remove('hidden');
+    const name = user.user_metadata?.full_name || user.email.split('@')[0];
+    disp.textContent = '👤 ' + name;
+    disp.onclick = () => netlifyIdentity.open('account');
+  } else {
+    btn.classList.remove('hidden');
+    disp.classList.add('hidden');
+  }
+}
+
+// ─── Spot price fetch ──────────────────────────────────────────────────────────
+[sync function fetchSpot() {
+  try {
+    // Use goldprice.org (same source as Kitco widget)
+    const r = await fetch('https://data-asg.goldprice.org/dbXRates/USD', { cache: 'no-store' });
+    const d = await r.json();
+    if (d && d.items && d.items[0]) {
+      spotGold   = d.items[0].xauPrice;
+      spotSilver = d.items[0].xagPrice;
+    }
+  } catch {
+    // fallback: try a secondary source
+    try {
+      const r2 = await fetch('/.netlify/functions/get-prices');
+      const d2 = await r2.json();
+      // Estimate spot from cheapest 1oz silver deal (rough approx)
+      const s1oz = (d2.silver || []).filter(d => d.oz === 1).sort((a,b) => a.price - b.price)[0];
+      if (s1oz) spotSilver = s1oz.price - s1oz.prem;
+      const g1oz = (d2.gold  || []).filter(d => d.oz === 1).sort((a,b) => a.price - b.price)[0];
+      if (g1oz) spotGold = g1oz.price - g1oz.prem;
+    } catch {}
+  }
+  const status = document.getElementById('spotStatus');
+  if (spotSilver && spotGold) {
+    status.textContent = `Ag $${spotSilver.toFixed(2)}/oz B�◷Au $${spotGold.toFixed(0)}/oz · via goldprice.org`;
+    status.classList.add('text-indigo-200');
+  } else {
+    status.textContent = '⚠ Spot price unavailable — values estimated';
+    status.classList.add('text-yellow-300');
+  }
+  renderSummary();
+}
+
+// ─── Rendering ────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderTable();
+  renderSummary();
+}
+
+function fmt(n, decimals = 2) {
+  if (n == null || isNaN(n)) return '—';
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+function fmtOz(n) {
+  if (n == null || isNaN(n)) return '0.000';
+  return n.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  return `${m}/${day}/${y}`;
+}
+function glClass(n) { return n >= 0 ? 'gain' : 'loss'; }
+function glSign(n)  { return n >= 0 ? '+' : ''; }
+
+function renderTable() {
+  const tbody = document.getElementById('stackTable');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('entryCount');
+  count.textContent = stack.length + ' entr' + (stack.length === 1 ? 'y' : 'ies');
+
+  if (!stack.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = stack.map((e, i) => {
+    const perOz = e.totalPaid / e.weightOz;
+    const spot  = e.metal === 'silver' ? spotSilver : spotGold;
+    const curr  = spot ? spot * e.weightOz : null;
+    const gl    = curr != null ? curr - e.totalPaid : null;
+    const glPct = gl != null && e.totalPaid ? (gl / e.totalPaid * 100) : null;
+    const badge = e.metal === 'silver'
+      ? '<span class="badge-silver px-2 py-0.5 rounded-full text-xs font-semibold">🥈 Ag</span>'
+      : '<span class="badge-gold   px-2 py-0.5 rounded-full text-xs font-semibold">🥇 Au</span>';
+    const glCell = gl != null
+      ? `<span class="${glClass(gl)}">${glSign(gl)}${fmt(gl)} <span class="text-xs">(${glSign(glPct)}${glPct.toFixed(1)}%)</span></span>`
+      : '<span class="text-gray-300">—</span>';
+    const valCell = curr != null ? fmt(curr) : '<span class="text-gray-300">—</span>';
+
+    return `<tr class="border-t border-gray-50 transition-colors" data-id="${e.id}">
+      <td class="px-4 py-3">${badge}</td>
+      <td class="px-4 py-3 font-medium text-gray-800 max-w-xs">
+        ${e.name}
+        ${e.notes ? `<div class="text-xs text-gray-400 mt-0.5">${e.notes}</div>` : ''}
+      </td>
+      <td class="px-4 py-3 text-gray-600">${e.whereBought || '<span class="text-gray-300">—</span>'}</td>
+      <td class="px-4 py-3 text-right font-mono text-gray-700">${fmtOz(e.weightOz)}</td>
+      <td class="px-4 py-3 text-right font-mono text-gray-700">${fmt(e.totalPaid)}</td>
+      <td class="px-4 py-3 text-right font-mono text-gray-600">${fmt(perOz)}</td>
+      <td class="px-4 py-3 text-gray-500 text-xs">${fmtDate(e.date)}</td>
+      <td class="px-4 py-3 text-right font-mono text-gray-700">${valCell}</td>
+      <td class="px-4 py-3 text-right font-semibold">${glCell}</td>
+      <td class="px-4 py-3 text-right">
+        <div class="flex items-center justify-end gap-1">
+          <button onclick="editEntry(${i})" class="edit-btn p-1.5 rounded-lg text-gray-400 transition-colors text-xs">✏️</button>
+          <button onclick="deleteEntry(${i})" class="delete-btn p-1.5 rounded-lg text-gray-400 transition-colors text-xs">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderSummary() {
+  // Silver
+  const silverEntries = stack.filter(e => e.metal === 'silver');
+  const silverOz   = silverEntries.reduce((s, e) => s + e.weightOz, 0);
+  const silverCost = silverEntries.reduce((s, e) => s + e.totalPaid, 0);
+  const silverDCA  = silverOz > 0 ? silverCost / silverOz : null;
+  const silverVal  = spotSilver && silverOz > 0 ? spotSilver * silverOz : null;
+  const silverGL   = silverVal != null ? silverVal - silverCost : null;
+  const silverGLPct= silverGL != null && silverCost > 0 ? silverGL / silverCost * 100 : null;
+
+  document.getElementById('silverOz').textContent  = fmtOz(silverOz) + ' oz';
+  document.getElementById('silverDCA').textContent = silverDCA != null ? fmt(silverDCA) + '/oz' : '—';
+  document.getElementById('silverCost').textContent= fmt(silverCost);
+  document.getElementById('silverValue').textContent = silverVal != null ? fmt(silverVal) : '—';
+  const sgl = document.getElementById('silverGL');
+  if (silverGL != null) {
+    sgl.textContent = glSign(silverGL) + fmt(silverGL).replace('$', '$') + (silverGLPct != null ? ` (${glSign(silverGLPct)}${silverGLPct.toFixed(1)}%)` : '');
+    sgl.className = 'font-semibold ' + glClass(silverGL);
+  } else { sgl.textContent = '—'; sgl.className = 'font-semibold text-gray-400'; }
+
+  // Gold
+  const goldEntries = stack.filter(e => e.metal === 'gold');
+  const goldOz   = goldEntries.reduce((s, e) => s + e.weightOz, 0);
+  const goldCost = goldEntries.reduce((s, e) => s + e.totalPaid, 0);
+  const goldDCA  = goldOz > 0 ? goldCost / goldOz : null;
+  const goldVal  = spotGold && goldOz > 0 ? spotGold * goldOz : null;
+  const goldGL   = goldVal != null ? goldVal - goldCost : null;
+  const goldGLPct= goldGL != null && goldCost > 0 ? goldGL / goldCost * 100 : null;
+
+  document.getElementById('goldOz').textContent  = fmtOz(goldOz) + ' oz';
+  document.getElementById('goldDCA').textContent = goldDCA != null ? fmt(goldDCA) + '/oz' : '—';
+  document.getElementById('goldCost').textContent= fmt(goldCost);
+  document.getElementById('goldValue').textContent = goldVal != null ? fmt(goldVal) : '—';
+  const ggl = document.getElementById('goldGL');
+  if (goldGL != null) {
+    ggl.textContent = glSign(goldGL) + fmt(goldGL).replace('$','$') + (goldGLPct != null ? ` (${glSign(goldGLPct)}${goldGLPct.toFixed(1)}%)` : '');
+    ggl.className = 'font-semibold ' + glClass(goldGL);
+  } else { ggl.textContent = '—'; ggl.className = 'font-semibold text-gray-400'; }
+
+  // Total
+  const totalCost = silverCost + goldCost;
+  const totalVal  = (silverVal ?? 0) + (goldVal ?? 0);
+  const totalValReal = (silverVal != null || goldVal != null) ? totalVal : null;
+  const totalGL   = totalValReal != null ? totalValReal - totalCost : null;
+  const totalGLPct= totalGL != null && totalCost > 0 ? totalGL / totalCost * 100 : null;
+
+  document.getElementById('totalValue').textContent = totalValReal != null ? fmt(totalValReal) : fmt(totalCost);
+  document.getElementById('totalCost').textContent = fmt(totalCost);
+  const tgl = document.getElementById('totalGL');
+  if (totalGL != null) {
+    tgl.textContent = glSign(totalGL) + fmt(totalGL).replace('$','$');
+    tgl.className = 'font-semibold ' + (totalGL >= 0 ? 'text-green-300' : 'text-red-300');
+  } else { tgl.textContent = '—'; tgl.className = 'font-semibold text-indigo-200'; }
+  const tr = document.getElementById('totalReturn');
+  if (totalGLPct != null) {
+    tr.textContent = glSign(totalGLPct) + totalGLPct.toFixed(2) + '%';
+    tr.className = 'font-semibold ' + (totalGLPct >= 0 ? 'text-green-300' : 'text-red-300');
+  } else { tr.textContent = '—'; tr.className = 'font-semibold text-indigo-200'; }
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function openModal(entry = null) {
+  const modal = document.getElementById('modal');
+  document.getElementById('modalTitle').textContent = entry ? 'Edit Entry' : 'Add Entry';
+  document.getElementById('editId').value = entry ? entry.id : '';
+  document.getElementById('itemName').value    = entry ? entry.name : '';
+  document.getElementById('whereBought').value = entry ? (entry.whereBought || '') : '';
+  document.getElementById('weightOz').value    = entry ? entry.weightOz : '';
+  document.getElementById('totalPaid').value   = entry ? entry.totalPaid : '';
+  document.getElementById('purchaseDate').value= entry ? (entry.date || '') : new Date().toISOString().slice(0,10);
+  document.getElementById('notes').value       = entry ? (entry.notes || '') : '';
+  setMetal(entry ? entry.metal : 'silver');
+  updateModalCalc();
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  setTimeout(() => document.getElementById('itemName').focus(), 100);
+}
+function closeModal() {
+  const modal = document.getElementById('modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+function setMetal(metal) {
+  document.getElementById('metalInput').value = metal;
+  const bs = document.getElementById('btnSilver');
+  const bg = document.getElementById('btnGold');
+  if (metal === 'silver') {
+    bs.className = 'flex-1 py-2 rounded-xl text-sm font-semibold border-2 border-indigo-600 bg-indigo-600 text-white transition-all';
+    bg.className = 'flex-1 py-2 rounded-xl text-sm font-semibold border-2 border-gray-200 text-gray-500 transition-all hover:border-yellow-400';
+  } else {
+    bg.className = 'flex-1 py-2 rounded-xl text-sm font-semibold border-2 border-yellow-400 bg-yellow-400 text-yellow-900 transition-all';
+    bs.className = 'flex-1 py-2 rounded-xl text-sm font-semibold border-2 border-gray-200 text-gray-500 transition-all hover:border-indigo-400';
+  }
+}
+
+function updateModalCalc() {
+  const w = parseFloat(document.getElementById('weightOz').value);
+  const p = parseFloat(document.getElementById('totalPaid').value);
+  const preview = document.getElementById('calcPreview');
+  if (w > 0 && p > 0) {
+    document.getElementById('calcPerOz').textContent = fmt(p / w) + '/oz';
+    preview.classList.remove('hidden');
+  } else {
+    preview.classList.add('hidden');
+  }
+}
+
+function saveEntry(e) {
+  e.preventDefault();
+  const editId = document.getElementById('editId').value;
+  const entry = {
+    id: editId || Date.now().toString(),
+    metal: document.getElementById('metalInput').value,
+    name: document.getElementById('itemName').value.trim(),
+    whereBought: document.getElementById('whereBought').value.trim(),
+    weightOz: parseFloat(document.getElementById('weightOz').value),
+    totalPaid: parseFloat(document.getElementById('totalPaid').value),
+    date: document.getElementById('purchaseDate').value,
+    notes: document.getElementById('notes').value.trim(),
+  };
+  if (editId) {
+    const idx = stack.findIndex(s => s.id === editId);
+    if (idx !== -1) stack[idx] = entry; else stack.push(entry);
+  } else {
+    stack.push(entry);
+  }
+  saveStack();
+  closeModal();
+  renderAll();
+}
+
+function editEntry(i) { openModal(stack[i]); }
+
+function deleteEntry(i) {
+  if (!confirm('Delete "' + stack[i].name + '"?')) return;
+  stack.splice(i, 1);
+  saveStack();
+  renderAll();
+}
+
+function clearAll() {
+  stack = [];
+  saveStack();
+  renderAll();
+}
+
+// ─── Export CSV ───────────────────────────────────────────────────────────────
+function exportCSV() {
+  const headers = ['Metal','Item','Where Bought','Weight (oz)','Total Paid','$/oz Paid','Date','Notes'];
+  const rows = stack.map(e => [
+    e.metal, e.name, e.whereBought, e.weightOz, e.totalPaid,
+    (e.totalPaid / e.weightOz).toFixed(4), e.date, e.notes
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => '"' + String(c||'').replace(/"/g,'""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'my-stack-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ─── Keyboard shortcut ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'n' && !['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) openModal();
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+loadStack();
+renderAll();
+fetchSpot();
+// Refresh spot every 5 minutes
+setInterval(fetchSpot, 5 * 60 * 1000);
+</script>
+
+</body>
+</html>
