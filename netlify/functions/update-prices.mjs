@@ -230,5 +230,25 @@ export default async (req) => {
     console.warn('update-prices: too few deals (' + totalFetched + '), keeping cache');
   }
 
+  // Debug mode: return enrichment details
+  const isDebug = req.url.includes('debug=1');
+  if (isDebug) {
+    const allPaths2 = [...new Set(
+      [...allDeals.silver, ...allDeals.gold]
+        .filter(d => d.fbpPath)
+        .map(d => d.fbpPath)
+    )];
+    const enrichedCount = [...allDeals.silver, ...allDeals.gold].filter(d => {
+      const hp = /^https?:\/\/(www\.)?(sdbullion|apmex|moneymetals|monumentmetals|jmbullion|bullionexchanges|bgasc|herobullion|providentmetals|silvergoldbull|silver)\.(com|net)\/?$/i;
+      return !hp.test(d.url);
+    }).length;
+    return new Response(JSON.stringify({
+      total: totalFetched,
+      allPaths: allPaths2.length,
+      samplePaths: allPaths2.slice(0,5),
+      enrichedDeals: enrichedCount,
+      sampleDeals: [...allDeals.silver,...allDeals.gold].slice(0,3).map(d => ({dealer:d.dealer,url:d.url,fbpPath:d.fbpPath||'deleted'}))
+    }), { headers: {'Content-Type':'application/json','Access-Control-Allow-Origin':'*'} });
+  }
   return new Response('OK: ' + totalFetched + ' deals');
 };
