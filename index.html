@@ -1540,6 +1540,8 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
             ? user.user_metadata.full_name.split(' ')[0]
             : user.email.split('@')[0];
           btn.onclick = function() { netlifyIdentity.open('logout'); };
+        } else {
+          netlifyIdentity.close();
         }
       });
       netlifyIdentity.on('login', function(user) {
