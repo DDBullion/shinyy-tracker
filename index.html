@@ -259,6 +259,7 @@
     #signOutBtn{display:block;width:100%;padding:9px 16px;background:none;border:none;cursor:pointer;font-size:.82rem;color:#1a1a30;text-align:left;font-weight:500;}
     #signOutBtn:hover{background:#f0f0ff;}
     @media(max-width:500px){#loginBtn{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
+@media(max-width:600px){.hlogo{width:160px;}.hspacer{width:100px;}}
 </style>
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -1005,7 +1006,7 @@ function renderGold() {
       .then(function(serverData) {
         if (!serverData) return;
         var key = 'shinyy_watch_' + user.email;
-        var merged = Object.assign({}, watchlist, serverData);
+        var merged = Object.assign({}, serverData, watchlist);
         watchlist = merged;
         localStorage.setItem(key, JSON.stringify(watchlist));
         // Re-apply starred state to visible deal cards
@@ -1619,6 +1620,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
           btn.onclick = function() { netlifyIdentity.open(); };
         }
         hideSignOutDropdown();
+          netlifyIdentity.close();
       });
     }
   </script>
@@ -1635,10 +1637,9 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     link.href = '/my-stack.html';
     link.textContent = '\uD83D\uDCCA My Stack';
     link.style.cssText = loginBtn.style.cssText;
-    // Position it to the right of loginBtn
-    var btnLeft = parseInt(loginBtn.style.left) || 10;
-    var btnWidth = loginBtn.offsetWidth || 80;
-    link.style.left = (btnLeft + btnWidth + 8) + 'px';
+    // Position it below loginBtn
+    link.style.left = '10px';
+    link.style.top = (10 + loginBtn.offsetHeight + 4) + 'px';
     link.style.display = 'none';
     link.style.textDecoration = 'none';
     link.style.fontSize = '13px';
@@ -1647,7 +1648,10 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
   function repositionMyStackLink() {
     var link = document.getElementById('myStackNavLink');
     var btn = document.getElementById('loginBtn');
-    if (link && btn) link.style.left = (10 + btn.offsetWidth + 8) + 'px';
+    if (link && btn) {
+      link.style.left = '10px';
+      link.style.top = (10 + btn.offsetHeight + 4) + 'px';
+    }
   }
   function showMyStack(user) {
     var link = document.getElementById('myStackNavLink');
