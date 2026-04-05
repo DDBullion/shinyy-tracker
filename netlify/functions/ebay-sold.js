@@ -11,14 +11,12 @@ function addAffiliate(url) {
 function parseSoldListings(html) {
   const results = [];
   const seen = new Set();
-  // Anchor on sold date marker
   const soldDateRegex = /su-styled-text positive[^>]*>([^<]+)/g;
   let soldMatch;
   while ((soldMatch = soldDateRegex.exec(html)) !== null && results.length < 5) {
     const soldDateRaw = soldMatch[1].replace(/\s+/g,' ').trim();
     if (!soldDateRaw.match(/\w+\s+\d/)) continue;
     const soldPos = soldMatch.index;
-    // Look backwards up to 8000 chars for the LAST item URL before this sold date
     const backBlock = html.substring(Math.max(0, soldPos - 8000), soldPos);
     const urlRegex = new RegExp('href=https://(?:www\\.)?ebay\\.com/itm/(\\d+)', 'g');
     let urlMatch, lastUrlMatch = null;
@@ -27,27 +25,34 @@ function parseSoldListings(html) {
     const listingId = lastUrlMatch[1];
     if (seen.has(listingId)) continue;
     seen.add(listingId);
-    // Look forward from sold date for price
     const fwdBlock = html.substring(soldPos, soldPos + 5000);
     const priceMatch = fwdBlock.match(/s-card__price[^>]*>\$?([\d,]+\.\d{2})/);
     if (!priceMatch) continue;
-    // Title and image in full window
     const fullBlock = html.substring(Math.max(0, soldPos - 8000), soldPos + 5000);
-    // Title: use alt="" on the item image (appears just before sold date)
+    // Anchor image+title to s-card__image element (src before alt in eBay HTML)
+    const cardImgMatch = fullBlock.match(/s-card__image[^>]*src=(https:\/\/i\.ebayimg\.com[^\s>]+)[^>]*alt="([^"]{5,200})"/) ||
+                         fullBlock.match(/s-card__image[^>]*alt="([^"]{5,200})"[^>]*src=(https:\/\/i\.ebayimg\.com[^\s>]+)/);
     let title = 'Sold Item';
-    const titleMatch = fullBlock.match(/alt="([^"]{10,150})"/);
-    if (titleMatch) {
-      title = titleMatch[1].replace(/&amp;/g,'&').replace(/&quot;/g,'"')
-        .replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
+    let imageUrl = '';
+    if (cardImgMatch) {
+      // Determine which group is src vs alt based on match order
+      const firstAttr = cardImgMatch[0].indexOf('src=') < cardImgMatch[0].indexOf('alt=') ? 'src' : 'alt';
+      if (firstAttr === 'src') { imageUrl = cardImgMatch[1]; title = cardImgMatch[2]; }
+      else { title = cardImgMatch[1]; imageUrl = cardImgMatch[2]; }
+      title = title.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
     }
-    // Image: eBay uses unquoted src= attribute
-    const imgMatch = fullBlock.match(/src=(https:\/\/i\.ebayimg\.com[^\s>]+)/);
+    // Skip eBay promotional/store content — not real sold listings
+    if (/\b(visit|selling has never|never been easier|shop ebay|ebay live|ebay store|bid now|buy it now only)\b/i.test(title)) continue;
+    // Require title to look like a real coin/bullion item
+    const looksReal = /\b(19|20)\d{2}\b/.test(title) ||
+      /\b(oz|silver|gold|coin|eagle|maple|bar|round|morgan|dollar|bullion|mint|pcgs|ngc|ms\d|pf\d|sp\d|troy|grain|gram)\b/i.test(title);
+    if (!looksReal) continue;
     results.push({
       title,
       soldPrice: parseFloat((priceMatch[1]||'0').replace(/,/g,'')).toFixed(2),
       currency: 'USD',
       soldDate: soldDateRaw,
-      image: imgMatch ? imgMatch[1] : '',
+      image: imageUrl,
       url: addAffiliate('https://www.ebay.com/itm/' + listingId),
     });
   }
@@ -79,16 +84,10 @@ exports.handler = async function (event) {
     const scraperKey = process.env.SCRAPERAPI_KEY;
     if (!scraperKey) throw new Error('SCRAPERAPI_KEY not configured');
     const ebayUrl = 'https://www.ebay.com/sch/i.html?' + new URLSearchParams({
-      _nkw: query,
-      LH_Complete: '1',
-      LH_Sold: '1',
-      _sop: '13',
-      _ipg: '10',
+      _nkw: query, LH_Complete: '1', LH_Sold: '1', _sop: '13', _ipg: '10',
     });
     const scraperUrl = 'https://api.scraperapi.com?' + new URLSearchParams({
-      api_key: scraperKey,
-      url: ebayUrl,
-      country_code: 'us',
+      api_key: scraperKey, url: ebayUrl, country_code: 'us',
     });
     const res = await fetch(scraperUrl);
     if (!res.ok) throw new Error('ScraperAPI returned HTTP ' + res.status);
