@@ -1528,7 +1528,7 @@ fetchSpot();
         html += '<a class="deal '+cls+best+'" href="'+d.url+'" target="_blank" rel="noopener noreferrer">';
         html += '<div class="dl"><div class="dn"><span class="stag">'+d.size+'</span> '+d.name+bestBadge+'</div>';
         html += '<div class="dm">'+d.dealer+verif+ship+'</div></div>';
-        html += '<div class="dr"><div>★'+d.price.toFixed(2)+'<span style="font-size:.8em;opacity:.8">/fv</span></div>';
+        html += '<div class="dr"><div class="dp o">'+d.price.toFixed(2)+'<span style="font-size:0.6rem;font-weight:500;color:var(--mut)">/fv</span></div>';
         html += '<div class="dspot">'+spotLine+'</div></div>';
         html += '</a>';
     });
