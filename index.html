@@ -617,6 +617,7 @@ function setMetal(m) {
   if (m === 'silver') document.getElementById('headerSub').textContent = '🥈 Silver · Live Every 5 Min';
   else if (m === 'gold') document.getElementById('headerSub').textContent = '🥇 Gold · Live Every 5 Min';
   else if (m === 'ebay') document.getElementById('headerSub').textContent = '🛒 eBay Live Listings';
+  else if (m === 'junk') document.getElementById('headerSub').textContent = '🪙 90% Silver · Daily Pricing';
   else document.getElementById('headerSub').textContent = '🔍 Last 3 Sold on eBay';
   if (m === 'silver' && silverSpot) renderSilver();
   if (m === 'gold' && goldSpot) renderGold();
@@ -1061,6 +1062,8 @@ function renderJunk() {
       const junkPrice = (silverSpotRaw * 0.715).toFixed(2);
       junkSpotValEl.textContent = '$' + junkPrice;
       if (junkBadgeEl) { junkBadgeEl.textContent = 'LIVE'; junkBadgeEl.classList.remove('badge-load'); junkBadgeEl.classList.add('badge-live'); }
+      const _jSt1 = document.getElementById('junkStext'); if (_jSt1) _jSt1.textContent = 'Live · via kitco.com';
+      if (typeof resetCountdown === 'function') resetCountdown();
     } else if (junkSpotValEl) {
       var _junkPoll = setInterval(function() {
         var _sp = parseFloat(localStorage.getItem('silver_spot'));
@@ -1068,6 +1071,8 @@ function renderJunk() {
           clearInterval(_junkPoll);
           junkSpotValEl.textContent = '$' + (_sp * 0.715).toFixed(2);
           if (junkBadgeEl) { junkBadgeEl.textContent = 'LIVE'; junkBadgeEl.classList.remove('badge-load'); junkBadgeEl.classList.add('badge-live'); }
+          const _jSt2 = document.getElementById('junkStext'); if (_jSt2) _jSt2.textContent = 'Live · via kitco.com';
+          if (typeof resetCountdown === 'function') resetCountdown();
         }
       }, 500);
     }
@@ -1486,6 +1491,11 @@ function updateCountdownDisplay() {
   const gb = document.getElementById('goldCdBar');
   if (gc) { gc.textContent = txt; gc.style.color = col || 'var(--gold)'; }
   if (gb) { gb.style.width = (cdSec/300*100) + '%'; gb.style.background = col || 'var(--gold)'; }
+  // Junk countdown
+  const jc = document.getElementById('junkCountdown');
+  const jb = document.getElementById('junkCdBar');
+  if (jc) { jc.textContent = txt; jc.style.color = col || 'var(--acc)'; }
+  if (jb) { jb.style.width = (cdSec/300*100) + '%'; jb.style.background = col || 'var(--acc)'; }
 }
 
 // ── Lifecycle ──
