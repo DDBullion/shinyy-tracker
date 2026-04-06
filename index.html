@@ -1802,9 +1802,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
 (function() {
   function injectMyStackLink() {
     if (document.getElementById('myStackNavLink')) return;
-    var loginBtn = document.g
-              <span class="text-gray-300 hidden sm:inline">|</span>
-              <a href="/spot-watch.html" id="spotWatchNav" class="text-sm text-amber-500 hover:text-amber-700 font-semibold hidden">⭐ Spot Watch</a>etElementById('loginBtn');
+    var loginBtn = document.getElementById('loginBtn');
     if (!loginBtn) return;
     var link = document.createElement('a');
     link.id = 'myStackNavLink';
