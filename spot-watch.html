@@ -111,6 +111,19 @@
     return currentUser ? 'shinyy_watch_' + currentUser.email : null;
   }
 
+  // Convert {url: dealObj} map OR [{url,...}] array to array format
+  function toWatchArray(data) {
+    if (!data) return [];
+    if (Array.isArray(data)) return data.filter(function(d) { return d && d.url; });
+    if (typeof data === 'object') {
+      return Object.keys(data).map(function(url) {
+        var d = data[url];
+        return (d && typeof d === 'object') ? Object.assign({ url: url }, d) : null;
+      }).filter(Boolean);
+    }
+    return [];
+  }
+
   // ─── Auth token helper ───────────────────────────────────────────────────────
   function getAuthToken(user, cb) {
     if (!user) return;
@@ -139,8 +152,8 @@
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(serverData) {
         var key = watchKey();
-        var localData = key ? JSON.parse(localStorage.getItem(key) || '[]') : [];
-        var serverArr = Array.isArray(serverData) ? serverData : [];
+      var localData = toWatchArray(key ? JSON.parse(localStorage.getItem(key) || 'null') : null);
+      var serverArr = toWatchArray(serverData);
 
         // Merge: prefer server, supplement with local unique items
         var merged = serverArr.slice();
@@ -155,7 +168,7 @@
       .catch(function() {
         // Fallback to localStorage
         var key = watchKey();
-        watchlist = key ? JSON.parse(localStorage.getItem(key) || '[]') : [];
+      watchlist = toWatchArray(key ? JSON.parse(localStorage.getItem(key) || 'null') : null);
         renderWatchlist();
       });
     });
