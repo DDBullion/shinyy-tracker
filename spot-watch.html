@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Spot Watch | Shinyy Tracker</title>
+  <meta name="description" content="Your starred deals — tracked across all devices. Watch for price drops on your favorite bullion." />
+  <link rel="icon" href="/favicon.ico" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+    .badge-silver { background: #e2e8f0; color: #475569; }
+    .badge-gold   { background: #fef3c7; color: #92400e; }
+    .badge-junk   { background: #f1f5f9; color: #64748b; }
+    .card-silver  { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
+    .card-gold    { background: linear-gradient(135deg, #fffbeb 0%, #fde68a 100%); }
+    .card-junk    { background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%); }
+    @keyframes slideIn { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .slide-in { animation: slideIn 0.2s ease-out; }
+    .unstar-btn:hover { background: #fef9c3; color: #d97706; }
+    .star-active { color: #f59e0b; }
+  </style>
+
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between" style="min-height:3.5rem;padding-top:0.4rem;padding-bottom:0.4rem;">
+      <!-- Left: back link + user -->
+      <div class="flex flex-col items-start" style="gap:2px;">
+        <div class="flex items-center gap-2">
+          <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+            ← Tracker
+          </a>
+          <span class="text-gray-300">|</span>
+          <button id="loginBtn" onclick="netlifyIdentity.open()" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">
+            Sign In
+          </button>
+        </div>
+        <span id="userDisplay" class="text-sm font-medium text-indigo-600 hidden"></span>
+        <a href="/my-stack.html" id="myStackNavWatch" class="text-xs text-indigo-500 hover:text-indigo-700 font-medium hidden">📚 My Stack</a>
+      </div>
+      <!-- Center: logo -->
+      <a href="/" class="absolute left-1/2 -translate-x-1/2">
+        <img src="/icons/icon-144x144.png" alt="Shinyy Tracker" class="h-8 w-8 rounded-lg"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span style="display:none" class="h-8 w-8 rounded-lg bg-indigo-600 items-center justify-center text-white text-lg">🪙</span>
+      </a>
+      <!-- Right: active Spot Watch label -->
+      <div class="flex items-center gap-1 text-sm font-semibold text-amber-500">
+        ⭐ Spot Watch
+      </div>
+    </div>
+  </header>
+</head>
+<body>
+
+<!-- ═══════════════════════════ LOGIN GATE ═══════════════════════════ -->
+<div id="loginGate" class="hidden max-w-lg mx-auto mt-20 px-4 text-center slide-in">
+  <div class="text-6xl mb-4">⭐</div>
+  <h2 class="text-2xl font-bold text-gray-900 mb-2">Sign in to see your Spot Watch</h2>
+  <p class="text-gray-500 mb-6">Your starred deals are synced to your account — accessible on any device.</p>
+  <button onclick="netlifyIdentity.open()"
+    class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors">
+    Sign In / Create Account
+  </button>
+</div>
+
+<!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+<div id="mainContent" class="hidden">
+
+  <!-- Page title -->
+  <div class="max-w-7xl mx-auto px-4 pt-6 pb-2">
+    <h1 class="text-2xl font-bold text-gray-900">⭐ Spot Watch</h1>
+    <p class="text-sm text-gray-500 mt-1">Your starred deals — synced across all your devices.</p>
+  </div>
+
+  <!-- Deal grid -->
+  <div class="max-w-7xl mx-auto px-4 pb-16">
+
+    <!-- Loading state -->
+    <div id="loadingState" class="py-16 text-center text-gray-400">
+      <div class="text-4xl mb-3 animate-pulse">⭐</div>
+      <p class="font-semibold text-gray-500">Loading your watchlist…</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="hidden py-16 text-center text-gray-400 slide-in">
+      <div class="text-5xl mb-3">🔍</div>
+      <p class="font-semibold text-gray-600">No starred deals yet</p>
+      <p class="text-sm mt-1 text-gray-400">Star deals on the main tracker to watch them here.</p>
+      <a href="/" class="mt-4 inline-block bg-indigo-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors">
+        ← Browse Deals
+      </a>
+    </div>
+
+    <!-- Deal cards grid -->
+    <div id="dealGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+      <!-- Cards injected by JS -->
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SCRIPTS ═══════════════════════════ -->
+<script>
+  // ─── State ──────────────────────────────────────────────────────────────────
+  var watchlist = [];
+  var currentUser = null;
+
+  // ─── Storage key ────────────────────────────────────────────────────────────
+  function watchKey() {
+    return currentUser ? 'shinyy_watch_' + currentUser.email : null;
+  }
+
+  // ─── Auth token helper ───────────────────────────────────────────────────────
+  function getAuthToken(user, cb) {
+    if (!user) return;
+    var tok = user.token && user.token.access_token;
+    if (!tok) return;
+    try {
+      var exp = JSON.parse(atob(tok.split('.')[1])).exp * 1000;
+      if (Date.now() < exp - 10000) { cb(tok); return; }
+    } catch(e) {}
+    netlifyIdentity.refresh()
+      .then(function(t) { if (t) cb(t); })
+      .catch(function() { cb(tok); });
+  }
+
+  // ─── Load watchlist from server ──────────────────────────────────────────────
+  function syncWatchlistFromServer(user) {
+    if (!user) return;
+    document.getElementById('loadingState').classList.remove('hidden');
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('dealGrid').classList.add('hidden');
+
+    getAuthToken(user, function(token) {
+      fetch('/api/watchlist', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(serverData) {
+        var key = watchKey();
+        var localData = key ? JSON.parse(localStorage.getItem(key) || '[]') : [];
+        var serverArr = Array.isArray(serverData) ? serverData : [];
+
+        // Merge: prefer server, supplement with local unique items
+        var merged = serverArr.slice();
+        var serverUrls = {};
+        serverArr.forEach(function(d) { if (d.url) serverUrls[d.url] = true; });
+        localData.forEach(function(d) { if (d.url && !serverUrls[d.url]) merged.push(d); });
+
+        watchlist = merged;
+        if (key) localStorage.setItem(key, JSON.stringify(watchlist));
+        renderWatchlist();
+      })
+      .catch(function() {
+        // Fallback to localStorage
+        var key = watchKey();
+        watchlist = key ? JSON.parse(localStorage.getItem(key) || '[]') : [];
+        renderWatchlist();
+      });
+    });
+  }
+
+  // ─── Save watchlist to server ────────────────────────────────────────────────
+  function saveWatchlist() {
+    var key = watchKey();
+    if (key) localStorage.setItem(key, JSON.stringify(watchlist));
+    if (currentUser) {
+      getAuthToken(currentUser, function(token) {
+        fetch('/api/watchlist', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(watchlist)
+        }).catch(function() {});
+      });
+    }
+  }
+
+  // ─── Remove a deal from watchlist ────────────────────────────────────────────
+  function unstar(url) {
+    watchlist = watchlist.filter(function(d) { return d.url !== url; });
+    saveWatchlist();
+    renderWatchlist();
+  }
+
+  // ─── Render deal cards ───────────────────────────────────────────────────────
+  function renderWatchlist() {
+    document.getElementById('loadingState').classList.add('hidden');
+
+    if (!watchlist.length) {
+      document.getElementById('emptyState').classList.remove('hidden');
+      document.getElementById('dealGrid').classList.add('hidden');
+      return;
+    }
+
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('dealGrid').classList.remove('hidden');
+
+    var grid = document.getElementById('dealGrid');
+    grid.innerHTML = watchlist.map(function(deal) {
+      var metal = (deal.metal || '').toLowerCase();
+      var isGold = metal === 'gold';
+      var isJunk = metal === 'junk' || (deal.tag || '').toLowerCase().includes('junk');
+      var cardClass = isGold ? 'card-gold' : (isJunk ? 'card-junk' : 'card-silver');
+      var badgeClass = isGold ? 'badge-gold' : (isJunk ? 'badge-junk' : 'badge-silver');
+      var metalEmoji = isGold ? '🥇' : (isJunk ? '🪙' : '🥈');
+      var metalLabel = isGold ? 'Gold' : (isJunk ? 'Junk' : 'Silver');
+
+      var priceDisplay = '—';
+      if (deal.pricePerOz != null && !isNaN(deal.pricePerOz)) {
+        priceDisplay = '$' + parseFloat(deal.pricePerOz).toFixed(2) + '/oz';
+      }
+
+      var dealName = deal.name || 'Unnamed Deal';
+      var dealer = deal.dealer || '';
+      var tag = deal.tag || '';
+      var buyUrl = deal.url || '#';
+
+      var escapedUrl = buyUrl.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+      return '<div class="' + cardClass + ' rounded-2xl p-5 shadow-sm border border-gray-100 slide-in relative">' +
+        '<div class="flex items-start justify-between mb-3">' +
+          '<span class="' + badgeClass + ' px-2.5 py-1 rounded-full text-xs font-semibold">' + metalEmoji + ' ' + metalLabel + '</span>' +
+          '<button onclick="unstar(\'' + escapedUrl + '\')" class="unstar-btn p-1.5 rounded-lg text-amber-400 transition-colors text-base" title="Remove from Spot Watch">' +
+            '⭐' +
+          '</button>' +
+        '</div>' +
+        (dealer ? '<div class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">' + dealer + '</div>' : '') +
+        '<div class="text-sm font-semibold text-gray-900 mb-1 leading-snug">' + dealName + '</div>' +
+        (tag ? '<div class="text-xs text-gray-400 mb-3">' + tag + '</div>' : '<div class="mb-3"></div>') +
+        '<div class="flex items-center justify-between">' +
+          '<span class="text-xl font-bold text-gray-900">' + priceDisplay + '</span>' +
+          '<a href="' + buyUrl + '" target="_blank" rel="noopener" ' +
+            'class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors">' +
+            'Buy →' +
+          '</a>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ─── Auth UI ─────────────────────────────────────────────────────────────────
+  function updateAuthUI(user) {
+    var loginBtn = document.getElementById('loginBtn');
+    var userDisp = document.getElementById('userDisplay');
+    var myStackNav = document.getElementById('myStackNavWatch');
+    var loginGate = document.getElementById('loginGate');
+    var mainContent = document.getElementById('mainContent');
+
+    if (user) {
+      loginBtn.classList.add('hidden');
+      if (myStackNav) myStackNav.classList.remove('hidden');
+      userDisp.classList.remove('hidden');
+      var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+      userDisp.textContent = '👤 ' + name;
+      userDisp.onclick = function() { netlifyIdentity.open('account'); };
+      loginGate.classList.add('hidden');
+      mainContent.classList.remove('hidden');
+    } else {
+      loginBtn.classList.remove('hidden');
+      if (myStackNav) myStackNav.classList.add('hidden');
+      userDisp.classList.add('hidden');
+      loginGate.classList.remove('hidden');
+      mainContent.classList.add('hidden');
+    }
+  }
+
+  // ─── Netlify Identity ────────────────────────────────────────────────────────
+  if (window.netlifyIdentity) {
+    netlifyIdentity.on('init', function(user) {
+      currentUser = user;
+      updateAuthUI(user);
+      if (user) syncWatchlistFromServer(user);
+    });
+    netlifyIdentity.on('login', function(user) {
+      currentUser = user;
+      updateAuthUI(user);
+      netlifyIdentity.close();
+      syncWatchlistFromServer(user);
+    });
+    netlifyIdentity.on('logout', function() {
+      currentUser = null;
+      watchlist = [];
+      updateAuthUI(null);
+    });
+  }
+</script>
+
+</body>
+</html>
