@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Spot Watch | Shinyy Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+    .badge-silver { background: #e2e8f0; color: #475569; }
+    .badge-gold   { background: #fef3c7; color: #92400e; }
+    .badge-junk   { background: #f1f5f9; color: #64748b; }
+    .gain { color: #16a34a; }
+    .loss { color: #dc2626; }
+    .unstar-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #f59e0b; padding: 0; transition: color 0.15s; }
+    .unstar-btn:hover { color: #dc2626; }
+    .deal-card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 1rem; display: flex; flex-direction: column; gap: 0.4rem; transition: box-shadow 0.2s; }
+    .deal-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .skeleton { background: #e2e8f0; border-radius: 8px; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  </style>
+</head>
+<body>
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between" style="min-height:3.5rem;padding-top:0.4rem;padding-bottom:0.4rem;">
+      <div class="flex flex-col items-start" style="gap:2px;">
+        <div class="flex items-center gap-2">
+          <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">← Tracker</a>
+          <span class="text-gray-300">|</span>
+          <a href="/my-stack.html" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">My Stack</a>
+          <span class="text-gray-300">|</span>
+          <button id="loginBtn" onclick="netlifyIdentity.open()" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">Sign In</button>
+        </div>
+        <span id="userDisplay" class="text-sm font-medium text-indigo-600 hidden"></span>
+      </div>
+      <a href="/" class="absolute left-1/2 -translate-x-1/2">
+        <img src="/icons/icon-144x144.png" alt="Shinyy Tracker" class="h-8 w-8 rounded-lg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <span style="display:none" class="h-8 w-8 rounded-lg bg-indigo-600 items-center justify-center text-white text-lg">🪙</span>
+      </a>
+      <span class="text-amber-500 font-bold text-sm hidden sm:inline">⭐ Spot Watch</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-6">
+    <div id="notLoggedIn" class="hidden text-center py-16">
+      <div class="text-5xl mb-4">⭐</div>
+      <h2 class="text-xl font-bold text-gray-700 mb-2">Sign in to view your Spot Watch</h2>
+      <p class="text-gray-500 mb-6">Star deals on the tracker to save them here. Your list syncs across all your devices.</p>
+      <button onclick="netlifyIdentity.open()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors">Sign In</button>
+    </div>
+    <div id="loadingState" class="hidden">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="skeleton h-28"></div><div class="skeleton h-28"></div>
+        <div class="skeleton h-28"></div><div class="skeleton h-28"></div>
+      </div>
+    </div>
+    <div id="emptyState" class="hidden text-center py-16">
+      <div class="text-5xl mb-4">🔍</div>
+      <h2 class="text-xl font-bold text-gray-700 mb-2">No favorites yet</h2>
+      <p class="text-gray-500 mb-6">Head to the tracker and tap ⭐ on any deal to save it here.</p>
+      <a href="/" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors inline-block">Browse Deals</a>
+    </div>
+    <div id="watchlistContent" class="hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-bold text-gray-800">⭐ Spot Watch</h1>
+        <span id="itemCount" class="text-sm text-gray-500"></span>
+      </div>
+      <div id="spotBar" class="bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-2 mb-5 flex gap-6 text-sm text-gray-600 flex-wrap">
+        <span>🥈 Silver: <strong id="silverSpotDisp">—</strong></span>
+        <span>🥇 Gold: <strong id="goldSpotDisp">—</strong></span>
+      </div>
+      <div id="dealGrid" class="grid gap-4 sm:grid-cols-2"></div>
+    </div>
+  </main>
+
+  <script>
+  var currentUser = null;
+
+  function getAuthToken(user, cb) {
+    if (!user) return;
+    var tok = user.token && user.token.access_token;
+    if (!tok) return;
+    try {
+      var exp = JSON.parse(atob(tok.split('.')[1])).exp * 1000;
+      if (Date.now() < exp - 10000) { cb(tok); return; }
+    } catch(e) {}
+    netlifyIdentity.refresh().then(function(t) { if (t) cb(t); }).catch(function() {});
+  }
+
+  function showUser(user) {
+    currentUser = user;
+    var name = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : user.email;
+    document.getElementById('userDisplay').textContent = name;
+    document.getElementById('userDisplay').classList.remove('hidden');
+    document.getElementById('loginBtn').classList.add('hidden');
+    init();
+  }
+
+  function hideUser() {
+    currentUser = null;
+    document.getElementById('userDisplay').classList.add('hidden');
+    document.getElementById('loginBtn').classList.remove('hidden');
+    showState('notLoggedIn');
+  }
+
+  netlifyIdentity.on('init',   function(u) { if (u) showUser(u); else showState('notLoggedIn'); });
+  netlifyIdentity.on('login',  function(u) { netlifyIdentity.close(); showUser(u); });
+  netlifyIdentity.on('logout', function()  { hideUser(); });
+
+  function showState(id) {
+    ['notLoggedIn','loadingState','emptyState','watchlistContent'].forEach(function(s) {
+      document.getElementById(s).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function loadSpotPrices() {
+    try {
+      var s = parseFloat(localStorage.getItem('silver_spot')) || 0;
+      var g = parseFloat(localStorage.getItem('gold_spot'))   || 0;
+      var fmt = function(n) { return '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+      if (s) document.getElementById('silverSpotDisp').textContent = fmt(s);
+      if (g) document.getElementById('goldSpotDisp').textContent   = fmt(g);
+    } catch(e) {}
+  }
+
+  function unstar(url) {
+    if (!currentUser) return;
+    var card = document.querySelector('.deal-card[data-url="' + url.replace(/"/g,'&quot;') + '"]');
+    if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; }
+    getAuthToken(currentUser, function(token) {
+      fetch('/api/watchlist', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(function(r) { return r.ok ? r.json() : {}; })
+        .then(function(wl) {
+          delete wl[url];
+          return fetch('/api/watchlist', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify(wl)
+          }).then(function() { return wl; });
+        })
+        .then(function(wl) {
+          try {
+            var key = 'shinyy_watch_' + currentUser.email;
+            localStorage.setItem(key, JSON.stringify(wl));
+          } catch(e) {}
+          if (card) card.remove();
+          updateCount();
+        })
+        .catch(function() { if (card) { card.style.opacity=''; card.style.pointerEvents=''; } });
+    });
+  }
+
+  function updateCount() {
+    var n = document.getElementById('dealGrid').children.length;
+    document.getElementById('itemCount').textContent = n + ' item' + (n !== 1 ? 's' : '');
+    if (n === 0) showState('emptyState');
+  }
+
+  function renderCard(url, data) {
+    var metal   = (data.metal || 'silver').toLowerCase();
+    var isGold  = metal === 'gold';
+    var isJunk  = metal === 'junk' || (data.tag && data.tag.toLowerCase().includes('junk'));
+    var badgeCls = isGold ? 'badge-gold' : isJunk ? 'badge-junk' : 'badge-silver';
+    var badgeTxt = isGold ? '🥇 Gold' : isJunk ? '🪙 90% Silver' : '🥈 Silver';
+    var name    = data.name    || url;
+    var price   = data.price   ? parseFloat(data.price)   : null;
+    var premium = data.premium !== undefined && data.premium !== '' ? parseFloat(data.premium) : null;
+    var dealer  = data.dealer  || '';
+    var tag     = data.tag     || '';
+
+    var premHtml = '';
+    if (premium !== null && !isNaN(premium)) {
+      var cls = premium >= 0 ? 'gain' : 'loss';
+      premHtml = '<span class="' + cls + ' text-sm font-semibold">' + (premium >= 0 ? '+' : '') + premium.toFixed(1) + '% over spot</span>';
+    }
+    var priceHtml = price ? '<span class="text-lg font-bold text-gray-800">$' + price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span>' : '';
+
+    var safeUrl = url.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var card = document.createElement('div');
+    card.className = 'deal-card';
+    card.setAttribute('data-url', url);
+    card.innerHTML =
+      '<div class="flex items-start justify-between gap-2">' +
+        '<div class="flex items-center gap-2 flex-wrap">' +
+          '<span class="' + badgeCls + ' text-xs font-bold px-2 py-0.5 rounded-full">' + badgeTxt + '</span>' +
+          (tag && !isJunk ? '<span class="text-xs text-gray-500 px-1.5 py-0.5 bg-gray-100 rounded-full">' + tag + '</span>' : '') +
+        '</div>' +
+        '<button class="unstar-btn" title="Remove from Spot Watch" onclick="unstar('' + safeUrl + '')">★</button>' +
+      '</div>' +
+      '<a href="' + url + '" target="_blank" rel="noopener" class="font-semibold text-gray-800 hover:text-indigo-600 leading-snug">' + name + '</a>' +
+      '<div class="flex items-center gap-3 flex-wrap">' + priceHtml + premHtml + '</div>' +
+      (dealer ? '<span class="text-xs text-gray-400">' + dealer + '</span>' : '') +
+      '<a href="' + url + '" target="_blank" rel="noopener" class="mt-1 text-center bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">View Deal →</a>';
+    return card;
+  }
+
+  function init() {
+    showState('loadingState');
+    loadSpotPrices();
+    getAuthToken(currentUser, function(token) {
+      fetch('/api/watchlist', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(function(r) { return r.ok ? r.json() : {}; })
+        .then(function(wl) {
+          try {
+            var key = 'shinyy_watch_' + currentUser.email;
+            var local = JSON.parse(localStorage.getItem(key) || '{}');
+            Object.assign(wl, local);
+          } catch(e) {}
+          var urls = Object.keys(wl);
+          if (!urls.length) { showState('emptyState'); return; }
+          fetch('/api/get-prices')
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(live) {
+              var lookup = {};
+              if (live) {
+                var all = [].concat(live.silver||[]).concat(live.gold||[]).concat(live.junk||[]);
+                all.forEach(function(d) { if (d.url) lookup[d.url] = d; });
+              }
+              var grid = document.getElementById('dealGrid');
+              grid.innerHTML = '';
+              urls.forEach(function(url) {
+                var stored = wl[url];
+                var data = (stored && typeof stored === 'object') ? Object.assign({}, stored) : { name: url, metal: 'silver' };
+                var live2 = lookup[url];
+                if (live2) {
+                  if (live2.name)    data.name    = live2.name;
+                  if (live2.price)   data.price   = live2.price;
+                  if (live2.premium !== undefined) data.premium = live2.premium;
+                  if (live2.dealer)  data.dealer  = live2.dealer;
+                  if (live2.tag)     data.tag     = live2.tag;
+                  if (live2.metal)   data.metal   = live2.metal;
+                  else if (live2.mm) data.metal   = 'silver';
+                }
+                grid.appendChild(renderCard(url, data));
+              });
+              updateCount();
+              showState('watchlistContent');
+            })
+            .catch(function() {
+              var grid = document.getElementById('dealGrid');
+              grid.innerHTML = '';
+              urls.forEach(function(url) {
+                var stored = wl[url];
+                var data = (stored && typeof stored === 'object') ? stored : { name: url, metal: 'silver' };
+                grid.appendChild(renderCard(url, data));
+              });
+              updateCount();
+              showState('watchlistContent');
+            });
+        })
+        .catch(function() { showState('emptyState'); });
+    });
+  }
+  </script>
+</body>
+</html>
