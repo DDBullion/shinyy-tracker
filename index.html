@@ -1052,6 +1052,14 @@ function renderGold() {
       const ts = localStorage.getItem('silver_spot_ts');
       if (ts) spEl.textContent = 'Updated: ' + new Date(parseInt(ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     }
+    const junkSpotValEl = document.getElementById('junkSpotVal');
+    const junkBadgeEl = document.getElementById('junkBadge');
+    const silverSpotRaw = parseFloat(localStorage.getItem('silver_spot'));
+    if (junkSpotValEl && !isNaN(silverSpotRaw)) {
+      const junkPrice = (silverSpotRaw * 0.715).toFixed(2);
+      junkSpotValEl.textContent = '$' + junkPrice;
+      if (junkBadgeEl) { junkBadgeEl.textContent = 'LIVE'; junkBadgeEl.classList.remove('badge-load'); junkBadgeEl.classList.add('badge-live'); }
+    }
     renderJunkDeals();
   }
 
@@ -1816,6 +1824,18 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     link.style.textDecoration = 'none';
     link.style.fontSize = '13px';
     loginBtn.parentNode.insertBefore(link, loginBtn.nextSibling);
+    if (!document.getElementById('spotWatchNav')) {
+      var sw = document.createElement('a');
+      sw.id = 'spotWatchNav';
+      sw.href = '/spot-watch.html';
+      sw.textContent = '⭐ Spot Watch';
+      sw.style.cssText = loginBtn.style.cssText;
+      sw.style.left = '10px';
+      sw.style.display = 'none';
+      sw.style.textDecoration = 'none';
+      sw.style.fontSize = '13px';
+      loginBtn.parentNode.insertBefore(sw, link.nextSibling);
+    }
   }
   function repositionMyStackLink() {
     var link = document.getElementById('myStackNavLink');
@@ -1825,10 +1845,21 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
       link.style.top = (10 + btn.offsetHeight + 4) + 'px';
     }
   }
+  function repositionSpotWatch() {
+    var sw = document.getElementById('spotWatchNav');
+    var ms = document.getElementById('myStackNavLink');
+    if (sw && ms) {
+      sw.style.left = ms.style.left;
+      sw.style.top = (ms.offsetTop + ms.offsetHeight + 4) + 'px';
+    }
+  }
   function showMyStack(user) {
     var link = document.getElementById('myStackNavLink');
     if (link) link.style.display = user ? 'inline-block' : 'none';
     requestAnimationFrame(repositionMyStackLink);
+    var sw = document.getElementById('spotWatchNav');
+    if (sw) sw.style.display = user ? 'inline' : 'none';
+    if (user) requestAnimationFrame(repositionSpotWatch);
   }
   // Two-path auth check:
   // 1. gotrue.currentUser() reads localStorage synchronously (works at page load)
