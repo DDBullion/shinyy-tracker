@@ -1046,7 +1046,10 @@ function renderGold() {
   } else {
     b.className = 'spot-badge badge-live'; b.textContent = '● Live';
   }
-  function renderJunk() {
+  renderGoldDeals();
+}
+
+function renderJunk() {
     const spEl = document.getElementById('junkSpotTime');
     if (spEl) {
       const ts = localStorage.getItem('silver_spot_ts');
@@ -1071,9 +1074,6 @@ function renderGold() {
     }
     renderJunkDeals();
   }
-
-  renderGoldDeals();
-}
 
 // ── Render Silver Deals ──
 // ── Watchlist ──
