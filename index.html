@@ -260,7 +260,7 @@
     #signOutBtn:hover{background:#f0f0ff;}
     @media(max-width:500px){#loginBtn{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
 @media(max-width:600px){.hlogo{width:160px;}.hspacer{width:100px;}#loginBtn{top:8px !important;left:8px !important;font-size:0.7rem !important;padding:4px 8px !important;max-width:85px !important;}#myStackNavLink{top:8px !important;left:auto !important;right:108px !important;font-size:0.7rem !important;padding:4px 8px !important;}#spotWatchNav{top:8px !important;left:auto !important;right:8px !important;font-size:0.7rem !important;padding:4px 8px !important;}}
-</style>
+#junkTabs,#junkDDWrap,#junkSearchWrap{display:none;}</style>
   <!-- Structured Data -->
   <script type="application/ld+json">
   {
@@ -1500,121 +1500,31 @@ fetchSpot();
     loadWatchlist();
     let list = JUNK_DEALERS;
     if (!list || !list.length) {
-      const el = document.getElementById('junkDeals');
-      if (el) el.innerHTML = '<p style="text-align:center;color:#888;padding:24px">No data yet — prices update daily at 6am UTC.</p>';
-      return;
+        const el = document.getElementById('junkDeals');
+        if (el) el.innerHTML = '<p style="text-align:center;color:#888;padding:24px">No data yet — prices update daily</p>';
+        return;
     }
-    if (tag !== undefined) window._junkTag = tag;
-    const activeTag = window._junkTag || '';
-    // Filter by tag
-    let filtered = activeTag ? list.filter(d => (d.tag||'').toLowerCase() === activeTag.toLowerCase()) : list;
-    // Sort by price ascending
-    filtered = filtered.slice().sort((a,b) => parseFloat(a.price||9999) - parseFloat(b.price||9999));
-    // Update tab chips active state
-    const tabsEl = document.getElementById('junkTabs');
-    if (tabsEl) tabsEl.querySelectorAll('.tag-chip').forEach(c => {
-      c.classList.toggle('active', c.textContent.trim().toLowerCase() === (activeTag||'all').toLowerCase() || (!activeTag && c.textContent.trim() === 'All'));
-    });
+    let filtered = list.slice().sort(function(a,b){ return parseFloat(a.price||9999)-parseFloat(b.price||9999); });
+    const spot = parseFloat((document.getElementById('junkSpotVal')||{textContent:''}).textContent.replace(/[^0-9.]/g,''))||0;
     let html = '';
-    filtered.forEach((d, i) => {
-      const isWatched = watchlist && watchlist[d.url] ? ' starred' : '';
-      const dealerUrl = d.url || '#';
-      const prem = d.prem !== undefined ? parseFloat(d.prem) : null;
-      const premStr = prem !== null ? (prem >= 0 ? '+' : '') + prem.toFixed(1) + '% over spot' : '';
-      const premColor = prem === null ? '' : prem <= 5 ? 'color:#16a34a' : prem <= 15 ? 'color:#ca8a04' : 'color:#dc2626';
-      html += `<div class="deal-card" style="animation-delay:${i*40}ms">
-  <a href="${dealerUrl}" target="_blank" rel="noopener" style="text-decoration:none;display:block">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:.7em;font-weight:600;color:#78350f;background:#fef3c7;border-radius:4px;padding:1px 6px;display:inline-block;margin-bottom:4px">🪙 JUNK SILVER</div>
-        ${d.tag ? `<span style="font-size:.68em;color:#6b7280;margin-left:4px">${d.tag.toUpperCase()}</span>` : ''}
-        <div style="font-weight:600;font-size:.95em;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name||'Unknown'}</div>
-        <div style="font-size:.78em;color:#6b7280">${d.dealer||''}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        <div style="font-size:1.1em;font-weight:700;color:#92400e">$${parseFloat(d.price||0).toFixed(2)}</div>
-        ${premStr ? `<div style="font-size:.72em;${premColor}">${premStr}</div>` : ''}
-      </div>
-    </div>
-  </a>
-  <button class="star-btn${isWatched}" data-name="${(d.name||'').replace(/"/g,'&quot;')}" data-tag="${d.tag||''}" data-metal="junk" data-price="${d.price||''}" data-premium="${d.prem||''}" data-dealer="${d.dealer||''}" onclick="toggleWatch(event,this,'${dealerUrl}')" title="Watch this deal">⭐</button>
-</div>`;
+    filtered.forEach(function(d,i) {
+        const prem = parseFloat(d.prem)||0;
+        const cls = prem<=2?'good':prem<=8?'fair':'high';
+        const best = i===0?' featured-deal':'';
+        const verif = d.verified?'✓':'';
+        const ship = d.ship?' ✈':'';
+        const spotLine = spot>0?'Spot $'+spot.toFixed(2)+'/fv · +'+prem.toFixed(1)+'% markup':'+'+prem.toFixed(1)+'% over spot';
+        const bestBadge = i===0?' <span class="btag">🏆 BEST '+d.size+'</span>':'';
+        html += '<a class="deal '+cls+best+'" href="'+d.url+'" target="_blank" rel="noopener noreferrer">';
+        html += '<div class="dl"><div class="dn"><span class="stag">'+d.size+'</span> '+d.name+bestBadge+'</div>';
+        html += '<div class="dm">'+d.dealer+verif+ship+'</div></div>';
+        html += '<div class="dr"><div>★'+d.price.toFixed(2)+'<span style="font-size:.8em;opacity:.8">/fv</span></div>';
+        html += '<div class="dspot">'+spotLine+'</div></div>';
+        html += '</a>';
     });
     const el = document.getElementById('junkDeals');
-    if (el) el.innerHTML = html || '<p style="text-align:center;color:#888;padding:24px">No deals found.</p>';
-  }
-
-  function filterJunk(tag) { renderJunkDeals(tag); }
-
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(r => console.log('SW registered'))
-      .catch(e => console.log('SW error', e));
-  });
+    if (el) el.innerHTML = html;
 }
-</script>
-
-  <!-- FOOTER -->
-  <footer id="site-footer" style="background:#1a1a2e;color:#ccc;padding:48px 24px 24px;margin-top:40px;border-top:1px solid #2a2a4a;font-family:inherit;">
-    <div style="max-width:1100px;margin:0 auto;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:36px;margin-bottom:36px;">
-
-        <!-- About -->
-        <div id="about">
-          <h3 style="color:#fff;font-size:1rem;font-weight:700;margin:0 0 12px;letter-spacing:.05em;text-transform:uppercase;">About Shinyy Tracker</h3>
-          <p style="font-size:.875rem;line-height:1.7;margin:0 0 10px;">Shinyy Tracker is a free, independent tool for precious metals buyers. We track live silver and gold prices from top online dealers, show real premiums over spot, and surface eBay sold listings so you always know the true market value before you buy.</p>
-          <p style="font-size:.875rem;line-height:1.7;margin:0;">We are not affiliated with any dealer. Our goal is simple: help you find the best deal on silver and gold.</p>
-        </div>
-
-        <!-- Contact -->
-        <div id="contact">
-          <h3 style="color:#fff;font-size:1rem;font-weight:700;margin:0 0 12px;letter-spacing:.05em;text-transform:uppercase;">Contact</h3>
-          <p style="font-size:.875rem;line-height:1.7;margin:0 0 8px;">Have a question, found a pricing error, or want to partner with us?</p>
-          <p style="font-size:.875rem;margin:0;">🌐 <a href="mailto:info@shinyytracker.com" style="color:#7c7cff;text-decoration:none;">shinyytracker.com</a></p>
-          <p style="font-size:.875rem;margin:0;">📧 <a href="mailto:info@shinyytracker.com" style="color:#7c7cff;text-decoration:none;">info@shinyytracker.com</a></p>
-        </div>
-
-        <!-- Privacy Policy -->
-        <div id="privacy">
-          <h3 style="color:#fff;font-size:1rem;font-weight:700;margin:0 0 12px;letter-spacing:.05em;text-transform:uppercase;">Privacy Policy</h3>
-          <p style="font-size:.875rem;line-height:1.7;margin:0 0 8px;"><strong style="color:#fff;">Data Collection:</strong> Shinyy Tracker does not collect, store, or sell personal information. We do not require an account to use the site.</p>
-          <p style="font-size:.875rem;line-height:1.7;margin:0 0 8px;"><strong style="color:#fff;">Third-Party Links:</strong> This site contains links to third-party dealer websites. We are not responsible for the content or privacy practices of those sites.</p>
-          <p style="font-size:.875rem;line-height:1.7;margin:0 0 8px;"><strong style="color:#fff;">Affiliate Disclosure:</strong> Some links on this site may be affiliate links. If you click through and make a purchase, we may earn a small commission at no extra cost to you. This helps keep the site free.</p>
-          <p style="font-size:.875rem;line-height:1.7;margin:0 0 8px;"><strong style="color:#fff;">Cookies:</strong> We may use cookies or local storage to remember your preferences (such as your selected metal or view). No tracking or advertising cookies are used.</p>
-          <p style="font-size:.875rem;line-height:1.7;margin:0;"><strong style="color:#fff;">eBay Data:</strong> Last Sold prices are sourced via the eBay Finding API and reflect publicly available completed listing data.</p>
-        </div>
-
-        <div id="guides">
-          <h3 style="color:#fff;font-size:1rem;font-weight:700;margin:0 0 12px;letter-spacing:.05em;text-transform:uppercase;">Guides</h3>
-          <ul style="list-style:none;padding:0;margin:0;">
-            <li style="margin-bottom:8px;"><a href="/blog/silver-eagle-prices-today.html" style="color:#7c7cff;text-decoration:none;">Silver Eagle Prices Today</a></li>
-            <li style="margin-bottom:8px;"><a href="/blog/best-1oz-silver-prices.html" style="color:#7c7cff;text-decoration:none;">Best 1oz Silver Prices</a></li>
-            <li><a href="/blog/gold-premium-tracker.html" style="color:#7c7cff;text-decoration:none;">Gold Premium Tracker</a></li>
-          </ul>
-        </div>
-
-      </div>
-      <div style="border-top:1px solid #2a2a4a;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;">
-        <p style="font-size:.8rem;margin:0;color:#666;">© 2026 Shinyy Tracker. All rights reserved. Prices are for informational purposes only and may not reflect current dealer pricing.</p>
-                <p style="font-size:.8rem;margin:4px 0 0;color:#666;">Questions? Email us: <a href="mailto:info@shinyytracker.com" style="color:#7c7cff;text-decoration:none;">info@shinyytracker.com</a></p>
-        <nav style="display:flex;gap:16px;">
-          <a href="#about" style="font-size:.8rem;color:#7c7cff;text-decoration:none;">About</a>
-          <a href="#contact" style="font-size:.8rem;color:#7c7cff;text-decoration:none;">Contact</a>
-          <a href="#privacy" style="font-size:.8rem;color:#7c7cff;text-decoration:none;">Privacy Policy</a>
-          <a href="#guides" style="font-size:.8rem;color:#7c7cff;text-decoration:none;">Guides</a>
-        </nav>
-      </div>
-    </div>
-  </footer>
-
-<script>
-// ── Popular Sold Feature ─────────────────────────────────────────────
-const SOLD_CACHE_KEY = 'shinyy_sold_popular_v1';
-const SOLD_CACHE_TTL = 4 * 60 * 60 * 1000;
 function getSoldCache(){try{const r=localStorage.getItem(SOLD_CACHE_KEY);if(!r)return null;const p=JSON.parse(r);if(Date.now()-p.ts>SOLD_CACHE_TTL)return null;return p;}catch{return null;}}
 function setSoldCache(d){try{localStorage.setItem(SOLD_CACHE_KEY,JSON.stringify({ts:Date.now(),data:d}));}catch{}}
 function soldAge(ts){if(!ts)return '';const m=Math.round((Date.now()-ts)/60000);if(m<2)return 'just updated';if(m<60)return 'updated '+m+'m ago';return 'updated '+Math.floor(m/60)+'h ago';}
