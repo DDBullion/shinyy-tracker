@@ -132,6 +132,49 @@ function parseDeals(html, page) {
 // Only NEW fbpPaths (not yet in cache) are fetched — max 18 per run.
 // This keeps HTTP trigger runs well under the 26s timeout while
 // gradually building a complete cache across multiple runs.
+// Parse FBP product pages (junk/90% silver) — different structure from closest-to-spot pages.
+// Columns: Dealer | (qty) | Price Each | Credit Price | Dealer Premium | Buy
+function parseJunkProductPage(html, page) {
+  const results = [];
+  const trRegex = /<tr\s+id="vendor_\d+"[\s\S]*?<\/tr>/gi;
+  const rows = html.match(trRegex) || [];
+  for (const row of rows) {
+    const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+    const cells = [];
+    let m;
+    while ((m = tdRegex.exec(row)) !== null) cells.push(m[1]);
+    if (cells.length < 5) continue;
+    const dealerKey = Object.keys(DEALER_URLS).find(d => stripHtml(cells[0]).trim().startsWith(d));
+    if (!dealerKey) continue;
+    // td[2] = cash "Price Each"
+    const priceMatch = stripHtml(cells[2]).replace(/,/g, '').match(/[\d.]+/);
+    if (!priceMatch) continue;
+    const price = parseFloat(priceMatch[0]);
+    if (isNaN(price) || price <= 0) continue;
+    // td[4] = "Dealer Premium" contains "Y.YY% prem"
+    const premPctMatch = stripHtml(cells[4]).match(/([\d.]+)%\s*prem/i);
+    if (!premPctMatch) continue;
+    const prem = parseFloat(premPctMatch[1]);
+    if (isNaN(prem) || prem < 0) continue;
+    // Buy URL — first https link in the row
+    const hrefMatch = row.match(/href="(https?:\/\/[^"]+)"/);
+    const url = hrefMatch ? hrefMatch[1] : DEALER_URLS[dealerKey];
+    results.push({
+      size: page.size,
+      name: page.size + ' 90% Silver',
+      dealer: dealerKey,
+      prem: Math.round(prem * 100) / 100,
+      price: Math.round(price * 100) / 100,
+      oz: page.oz,
+      ship: '',
+      url,
+      tag: page.tag,
+      verified: true,
+    });
+  }
+  return results;
+}
+
 async function enrichProductUrls(allDeals, store) {
   const allPaths = [...new Set(
     [...allDeals.silver, ...allDeals.gold, ...allDeals.junk]
@@ -221,7 +264,7 @@ export default async (req) => {
       });
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const html  = await resp.text();
-      const deals = parseDeals(html, page);
+      const deals = page.metal === 'junk' ? parseJunkProductPage(html, page) : parseDeals(html, page);
       console.log('  ' + page.metal + ' ' + page.size + ': ' + deals.length + ' deals');
       return { page, deals };
     })
