@@ -37,11 +37,11 @@ const FBP_PAGES = [
   { url: 'https://www.findbullionprices.com/gold/closest-to-spot.php?category=gold&type=&weight=1',       metal: 'gold', size: '1oz',     oz: 1 },
   { url: 'https://www.findbullionprices.com/gold/closest-to-spot.php?category=gold&type=&weight=32.15',   metal: 'gold', size: 'kilo',    oz: 32.15 },
   // 90% Constitutional / Junk Silver
-  { url: 'https://www.findbullionprices.com/p/1-Face-Value-90-Percent-Junk-Silver-Coins/', metal: 'junk' },
-  { url: 'https://www.findbullionprices.com/p/Junk-Silver-10-Dollar-Face-Value/', metal: 'junk' },
-  { url: 'https://www.findbullionprices.com/p/5-face-value-90-percent-silver-dimes/', metal: 'junk' },
-  { url: 'https://www.findbullionprices.com/p/90-junk-silver-coins-100-face-value-bag/', metal: 'junk' },
-  { url: 'https://www.findbullionprices.com/p/100-face-value-90-percent-junk-silver-half-dollars/', metal: 'junk' },
+  { url: 'https://www.findbullionprices.com/p/1-Face-Value-90-Percent-Junk-Silver-Coins/', metal: 'junk', size: '$1 fv', oz: 0.7234, tag: '$1 fv' },
+  { url: 'https://www.findbullionprices.com/p/Junk-Silver-10-Dollar-Face-Value/', metal: 'junk', size: '$10 fv', oz: 7.234, tag: '$10 fv' },
+  { url: 'https://www.findbullionprices.com/p/5-face-value-90-percent-silver-dimes/', metal: 'junk', size: '$5 fv', oz: 3.617, tag: '$5 fv' },
+  { url: 'https://www.findbullionprices.com/p/90-junk-silver-coins-100-face-value-bag/', metal: 'junk', size: '$100 fv', oz: 72.34, tag: '$100 fv' },
+  { url: 'https://www.findbullionprices.com/p/100-face-value-90-percent-junk-silver-half-dollars/', metal: 'junk', size: '$100 fv halves', oz: 72.34, tag: '$100 fv halves' },
 ];
 
 function getTag(name) {
@@ -84,7 +84,7 @@ function parseDeals(html, page) {
     while ((m = tdRegex.exec(row)) !== null) cells.push(m[1]);
     if (cells.length < 4) continue;
 
-    const productName = stripHtml(cells[0]);
+    const productName = stripHtml(cells[0]) || page.size || '';
     const dealerCell  = stripHtml(cells[1]);
     const premCell    = stripHtml(cells[2]);
     const priceCell   = stripHtml(cells[3]);
@@ -95,7 +95,7 @@ function parseDeals(html, page) {
     const dealerKey = Object.keys(DEALER_URLS).find(d => dealerCell.startsWith(d));
     if (!dealerKey) continue;
 
-    if (/tube|roll|lot|bag|face value|junk|fractional|cull|milky|tarnish|scruffy|damaged|circulated/i.test(productName)) continue;
+    if (page.metal !== 'junk' && /tube|roll|lot|bag|face value|junk|fractional|cull|milky|tarnish|scruffy|damaged|circulated/i.test(productName)) continue;
 
     const premMatch = premCell.match(/^[\d.]+/);
     if (!premMatch) continue;
@@ -121,7 +121,7 @@ function parseDeals(html, page) {
       oz: page.oz, ship,
       url: DEALER_URLS[dealerKey], // replaced by enrichProductUrls()
       fbpPath, // internal — deleted after enrichment
-      tag: getTag(productName),
+      tag: page.tag || getTag(productName),
       verified: true,
     });
   }
@@ -134,7 +134,7 @@ function parseDeals(html, page) {
 // gradually building a complete cache across multiple runs.
 async function enrichProductUrls(allDeals, store) {
   const allPaths = [...new Set(
-    [...allDeals.silver, ...allDeals.gold]
+    [...allDeals.silver, ...allDeals.gold, ...allDeals.junk]
       .filter(d => d.fbpPath)
       .map(d => d.fbpPath)
   )];
@@ -189,14 +189,14 @@ async function enrichProductUrls(allDeals, store) {
 
   // Apply enriched URLs to every deal (silver + gold combined)
   let enriched = 0;
-  for (const deal of [...allDeals.silver, ...allDeals.gold]) {
+  for (const deal of [...allDeals.silver, ...allDeals.gold, ...allDeals.junk]) {
     if (deal.fbpPath && urlCache[deal.fbpPath]?.[deal.dealer]) {
       deal.url = urlCache[deal.fbpPath][deal.dealer];
       enriched++;
     }
     delete deal.fbpPath; // remove internal field before storing to blob
   }
-  console.log('  enriched ' + enriched + '/' + (allDeals.silver.length + allDeals.gold.length) + ' deals with product URLs');
+  console.log('  enriched ' + enriched + '/' + (allDeals.silver.length + allDeals.gold.length + allDeals.junk.length) + ' deals with product URLs');
 
   // Persist updated URL cache for next run
   try {
@@ -210,7 +210,7 @@ async function enrichProductUrls(allDeals, store) {
 export default async (req) => {
   console.log('update-prices: starting', new Date().toISOString());
   const store = getStore('prices');
-  const allDeals = { silver: [], gold: [], updated: new Date().toISOString() };
+  const allDeals = { silver: [], gold: [], junk: [], updated: new Date().toISOString() };
 
   // Fetch all 11 FBP pages in parallel — ~3s total instead of ~9s sequential
   const results = await Promise.allSettled(
@@ -242,7 +242,7 @@ export default async (req) => {
     await enrichProductUrls(allDeals, store);
 
     await store.set('latest', JSON.stringify(allDeals));
-    console.log('update-prices: saved ' + allDeals.silver.length + ' silver + ' + allDeals.gold.length + ' gold deals');
+    console.log('update-prices: saved ' + allDeals.silver.length + ' silver + ' + allDeals.gold.length + ' gold + ' + allDeals.junk.length + ' junk deals');
   } else {
     console.warn('update-prices: too few deals (' + totalFetched + '), keeping cache');
   }
