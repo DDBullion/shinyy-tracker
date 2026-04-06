@@ -36,6 +36,12 @@ const FBP_PAGES = [
   { url: 'https://www.findbullionprices.com/gold/closest-to-spot.php?category=gold&type=&weight=.50',     metal: 'gold', size: 'half',    oz: 0.5 },
   { url: 'https://www.findbullionprices.com/gold/closest-to-spot.php?category=gold&type=&weight=1',       metal: 'gold', size: '1oz',     oz: 1 },
   { url: 'https://www.findbullionprices.com/gold/closest-to-spot.php?category=gold&type=&weight=32.15',   metal: 'gold', size: 'kilo',    oz: 32.15 },
+  // 90% Constitutional / Junk Silver
+  { url: 'https://www.findbullionprices.com/p/1-Face-Value-90-Percent-Junk-Silver-Coins/', metal: 'junk' },
+  { url: 'https://www.findbullionprices.com/p/Junk-Silver-10-Dollar-Face-Value/', metal: 'junk' },
+  { url: 'https://www.findbullionprices.com/p/5-face-value-90-percent-silver-dimes/', metal: 'junk' },
+  { url: 'https://www.findbullionprices.com/p/90-junk-silver-coins-100-face-value-bag/', metal: 'junk' },
+  { url: 'https://www.findbullionprices.com/p/100-face-value-90-percent-junk-silver-half-dollars/', metal: 'junk' },
 ];
 
 function getTag(name) {
@@ -50,6 +56,13 @@ function getTag(name) {
   if (n.includes('panda'))                    return 'panda';
   if (n.includes('geiger'))                   return 'geiger';
   if (n.includes('scottsdale'))               return 'scottsdale';
+    if (n.includes('dime')) return 'dimes';
+  if (n.includes('half')) return 'halves';
+  if (n.includes('quarter')) return 'quarters';
+  if (n.includes('1000')) return '$1000 fv';
+  if (n.includes('100')) return '$100 fv';
+  if (n.includes('10 dollar')) return '$10 fv';
+  if (n.includes('5 face')) return '$5 fv';
   return '';
 }
 
