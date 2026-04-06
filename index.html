@@ -316,9 +316,9 @@
     <!-- Top-level metal tabs -->
     <div class="metal-tabs">
       <div class="metal-tab active-silver" id="tabSilver" onclick="setMetal('silver')">🥈 Silver</div>
+      <div class="metal-tab" id="tabJunk" onclick="setMetal('junk')">🪙 90% Silver</div>
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
       <div class="metal-tab" id="tabSold" onclick="setMetal('sold');loadPopularSold()">🔍 Last Sold</div>
-      <div class="metal-tab" id="tabJunk" onclick="setMetal('junk')">🪙 90% Silver</div>
       <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
     </div>
   </div>
@@ -352,7 +352,6 @@
       <div><span class="sdot" id="sdot"></span><span id="stext">Fetching live price...</span></div>
     </div>
 
-    <div id="prices-updated" style="text-align:center;font-size:0.72rem;color:#9aa;margin:0 0 6px;min-height:1em;"></div>
         <div class="tabs" id="silverTabs">
       <div class="tab" onclick="setFilter('all')">All</div>
       <div class="tab active" onclick="setFilter('1oz')">1 oz</div>
