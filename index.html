@@ -318,6 +318,7 @@
       <div class="metal-tab active-silver" id="tabSilver" onclick="setMetal('silver')">🥈 Silver</div>
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
       <div class="metal-tab" id="tabSold" onclick="setMetal('sold');loadPopularSold()">🔍 Last Sold</div>
+      <div class="metal-tab" id="tabJunk" onclick="setMetal('junk')">🪙 90% Silver</div>
       <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
     </div>
   </div>
@@ -524,7 +525,76 @@
   </div>
 </div><!-- end #appContent -->
 
-<script>
+<div class="page" id="pageJunk">
+
+    <div class="spot-wrap">
+      <div class="spot-card junk-card">
+        <div>
+          <div class="spot-lbl">Junk Spot Price</div>
+          <div class="spot-val junk-val" id="junkSpotVal">—</div>
+          <div class="spot-sub">per troy ounce · via Kitco</div>
+        </div>
+        <div style="text-align:right">
+          <div class="spot-badge badge-load" id="junkBadge">Loading...</div>
+          <div class="spot-time" id="junkSpotTime"></div>
+          <div class="tgt junk-tgt">Live junk pricing</div>
+          <div class="cd-wrap">
+            <div class="cd-label">Next update</div>
+            <div class="cd-time" id="junkCountdown" style="color:var(--junk)">—:——</div>
+            <div class="cd-bar-bg"><div class="cd-bar-fg" id="junkCdBar" style="width:100%;background:var(--junk)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sbar">
+      <div><span class="sdot" id="junkSdot"></span><span id="junkStext">Fetching live junk price...</span></div>
+    </div>
+
+    <div class="tabs" id="junkTabs">
+      <div class="tab junk-active" onclick="setJunkFilter('all')">All</div>
+      <div class="tab" onclick="setJunkFilter('gram')">Gram</div>
+      <div class="tab" onclick="setJunkFilter('tenth')">1/10 oz</div>
+      <div class="tab" onclick="setJunkFilter('quarter')">1/4 oz</div>
+      <div class="tab" onclick="setJunkFilter('half')">1/2 oz</div>
+      <div class="tab" onclick="setJunkFilter('1oz')">1 oz</div>
+      <div class="tab" onclick="setJunkFilter('kilo')">Kilo</div>
+      <div class="coin-dd-wrap" id="junkDDWrap">
+        <select class="coin-dropdown" id="junkCoinDD" onchange="setJunkCoinFilter(this.value)">
+          <option value="">🪙 Coin Type</option>
+          <option value="eagle">🇺🇸 Eagles</option>
+          <option value="maple">🍁 Maples</option>
+          <option value="buffalo">🦬 Buffalos</option>
+          <option value="britannia">🇬🇧 Britannias</option>
+          <option value="krugerrand">🦌 Krugerrands</option>
+          <option value="kangaroo">🦘 Kangaroos</option>
+          <option value="libertad">🇲🇽 Libertads</option>
+          <option value="panda">🐼 Pandas</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="search-wrap" id="junkSearchWrap">
+      <input type="search" id="junkSearchInput" class="search-bar junk-focus" placeholder="🔍 Search all junk products, dealers..." oninput="onJunkSearch(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button class="search-clear" onclick="clearJunkSearch()">✕</button>
+    </div>
+    <div id="junkDeals"><div class="loading-msg">Fetching live junk prices...</div></div>
+
+    <div class="fnote" style="border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.05);color:#fcd34d;">💡 <b>All-In</b> includes 3.5% CC fee. Junk premiums verified March 23, 2026 · Spot ~$4,452/oz. Gram items display per-gram price.</div>
+    <div class="donate-wrap">
+      <a class="donate-btn" href="https://www.paypal.com/donate?business=Dominic.dellaripa%40gmail.com&item_name=Shinyy+Tracker&currency_code=USD" target="_blank" rel="noopener">
+        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
+        Support Shinyy Tracker
+      </a>
+      <div class="donate-sub">Enjoying the tracker? A small donation keeps it free & running 🙏</div>
+    </div>
+    <div class="safe"></div>
+  </div>
+
+  <!-- ════════════════════════════════════
+       LAST SOLD PAGE
+       ════════════════════════════════════ -->
+  <script>
 // ── Metal toggle ──
 let currentMetal = 'silver';
 function setMetal(m) {
@@ -534,20 +604,24 @@ function setMetal(m) {
   document.getElementById('pageGold').classList.toggle('active', m === 'gold');
   document.getElementById('pageSold').classList.toggle('active', m === 'sold');
   document.getElementById('pageEbay').classList.toggle('active', m === 'ebay');
+  document.getElementById('pageJunk').classList.toggle('active', m === 'junk');
   const ts = document.getElementById('tabSilver');
   const tg = document.getElementById('tabGold');
   const td = document.getElementById('tabSold');
   const te = document.getElementById('tabEbay');
+  const tj = document.getElementById('tabJunk');
   ts.className = 'metal-tab' + (m === 'silver' ? ' active-silver' : '');
   tg.className = 'metal-tab' + (m === 'gold' ? ' active-gold' : '');
   td.className = 'metal-tab' + (m === 'sold' ? ' active-sold' : '');
   if (te) te.className = 'metal-tab' + (m === 'ebay' ? ' active-ebay' : '');
+  tj.className = 'metal-tab' + (m === 'junk' ? ' active-junk' : '');
   if (m === 'silver') document.getElementById('headerSub').textContent = '🥈 Silver · Live Every 5 Min';
   else if (m === 'gold') document.getElementById('headerSub').textContent = '🥇 Gold · Live Every 5 Min';
   else if (m === 'ebay') document.getElementById('headerSub').textContent = '🛒 eBay Live Listings';
   else document.getElementById('headerSub').textContent = '🔍 Last 3 Sold on eBay';
   if (m === 'silver' && silverSpot) renderSilver();
   if (m === 'gold' && goldSpot) renderGold();
+  if (m === 'junk') renderJunk();
 }
 
 // ── Last 3 Sold ──
@@ -858,6 +932,7 @@ let GOLD_DEALERS = [
   {gsize:'kilo', name:'1 Kilo 9999 Fine Gold Cast Bar',    dealer:'Scottsdale Mint',  premOz:30.78, ozW:32.151,  ship:'Varies',      url:'https://www.scottsdalemint.com/product/scottsdale-mint-1-kilo-9999-fine-gold-cast-bar/', tag:'scottsdale', verified:true},
   {gsize:'kilo', name:'1 Kilo Gold Bar (All Kilo)',         dealer:'Scottsdale Mint',  premOz:38,    ozW:32.151,  ship:'Varies',      url:'https://www.scottsdalemint.com/product/scottsdale-gold-1-kilo-gold-bar/', tag:'scottsdale', verified:true},
 ];
+let JUNK_DEALERS = [];
 
 // ── State ──
 let silverSpot = null, prevSilverSpot = null;
@@ -971,6 +1046,15 @@ function renderGold() {
   } else {
     b.className = 'spot-badge badge-live'; b.textContent = '● Live';
   }
+  function renderJunk() {
+    const spEl = document.getElementById('junkSpotTime');
+    if (spEl) {
+      const ts = localStorage.getItem('silver_spot_ts');
+      if (ts) spEl.textContent = 'Updated: ' + new Date(parseInt(ts)).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    }
+    renderJunkDeals();
+  }
+
   renderGoldDeals();
 }
 
@@ -1396,6 +1480,56 @@ if (navigator.standalone || matchMedia('(display-mode: standalone)').matches) {
 }
 
 fetchSpot();
+  function renderJunkDeals(tag) {
+    loadWatchlist();
+    let list = JUNK_DEALERS;
+    if (!list || !list.length) {
+      const el = document.getElementById('junkDeals');
+      if (el) el.innerHTML = '<p style="text-align:center;color:#888;padding:24px">No data yet — prices update daily at 6am UTC.</p>';
+      return;
+    }
+    if (tag !== undefined) window._junkTag = tag;
+    const activeTag = window._junkTag || '';
+    // Filter by tag
+    let filtered = activeTag ? list.filter(d => (d.tag||'').toLowerCase() === activeTag.toLowerCase()) : list;
+    // Sort by price ascending
+    filtered = filtered.slice().sort((a,b) => parseFloat(a.price||9999) - parseFloat(b.price||9999));
+    // Update tab chips active state
+    const tabsEl = document.getElementById('junkTabs');
+    if (tabsEl) tabsEl.querySelectorAll('.tag-chip').forEach(c => {
+      c.classList.toggle('active', c.textContent.trim().toLowerCase() === (activeTag||'all').toLowerCase() || (!activeTag && c.textContent.trim() === 'All'));
+    });
+    let html = '';
+    filtered.forEach((d, i) => {
+      const isWatched = watchlist && watchlist[d.url] ? ' starred' : '';
+      const dealerUrl = d.url || '#';
+      const prem = d.prem !== undefined ? parseFloat(d.prem) : null;
+      const premStr = prem !== null ? (prem >= 0 ? '+' : '') + prem.toFixed(1) + '% over spot' : '';
+      const premColor = prem === null ? '' : prem <= 5 ? 'color:#16a34a' : prem <= 15 ? 'color:#ca8a04' : 'color:#dc2626';
+      html += `<div class="deal-card" style="animation-delay:${i*40}ms">
+  <a href="${dealerUrl}" target="_blank" rel="noopener" style="text-decoration:none;display:block">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.7em;font-weight:600;color:#78350f;background:#fef3c7;border-radius:4px;padding:1px 6px;display:inline-block;margin-bottom:4px">🪙 JUNK SILVER</div>
+        ${d.tag ? `<span style="font-size:.68em;color:#6b7280;margin-left:4px">${d.tag.toUpperCase()}</span>` : ''}
+        <div style="font-weight:600;font-size:.95em;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name||'Unknown'}</div>
+        <div style="font-size:.78em;color:#6b7280">${d.dealer||''}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:1.1em;font-weight:700;color:#92400e">$${parseFloat(d.price||0).toFixed(2)}</div>
+        ${premStr ? `<div style="font-size:.72em;${premColor}">${premStr}</div>` : ''}
+      </div>
+    </div>
+  </a>
+  <button class="star-btn${isWatched}" data-name="${(d.name||'').replace(/"/g,'&quot;')}" data-tag="${d.tag||''}" data-metal="junk" data-price="${d.price||''}" data-premium="${d.prem||''}" data-dealer="${d.dealer||''}" onclick="toggleWatch(event,this,'${dealerUrl}')" title="Watch this deal">⭐</button>
+</div>`;
+    });
+    const el = document.getElementById('junkDeals');
+    if (el) el.innerHTML = html || '<p style="text-align:center;color:#888;padding:24px">No deals found.</p>';
+  }
+
+  function filterJunk(tag) { renderJunkDeals(tag); }
+
 </script>
 
 <script>
@@ -1560,6 +1694,7 @@ async function loadLivePrices() {
           premOz: d.prem, ozW: d.oz, ship: d.ship, url: d.url,
           tag: d.tag, verified: d.verified };
       });
+        if (data.junk && data.junk.length >= 1) JUNK_DEALERS = data.junk;
     }
     if (data.updated) {
       const mins = Math.round((Date.now() - new Date(data.updated)) / 60000);
