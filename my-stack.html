@@ -41,6 +41,7 @@
         </button>
       </div>
       <span id="userDisplay" class="text-sm font-medium text-indigo-600 hidden"></span>
+           <a href="/spot-watch.html" id="spotWatchNavStack" class="text-xs text-amber-500 hover:text-amber-700 font-medium hidden">⭐ Spot Watch</a>
     </div>
     <!-- Center: logo -->
     <a href="/" class="absolute left-1/2 -translate-x-1/2">
@@ -383,6 +384,7 @@ function updateAuthUI(user) {
   var disp = document.getElementById('userDisplay');
   if (user) {
     btn.classList.add('hidden');
+        var sw=document.getElementById('spotWatchNavStack'); if(sw) sw.classList.remove('hidden');
     disp.classList.remove('hidden');
     var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
     disp.textContent = '👤 ' + name;
@@ -390,6 +392,7 @@ function updateAuthUI(user) {
   } else {
     btn.classList.remove('hidden');
     disp.classList.add('hidden');
+        var sw2=document.getElementById('spotWatchNavStack'); if(sw2) sw2.classList.add('hidden');
   }
 }
 
