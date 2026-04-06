@@ -1059,6 +1059,15 @@ function renderGold() {
       const junkPrice = (silverSpotRaw * 0.715).toFixed(2);
       junkSpotValEl.textContent = '$' + junkPrice;
       if (junkBadgeEl) { junkBadgeEl.textContent = 'LIVE'; junkBadgeEl.classList.remove('badge-load'); junkBadgeEl.classList.add('badge-live'); }
+    } else if (junkSpotValEl) {
+      var _junkPoll = setInterval(function() {
+        var _sp = parseFloat(localStorage.getItem('silver_spot'));
+        if (!isNaN(_sp)) {
+          clearInterval(_junkPoll);
+          junkSpotValEl.textContent = '$' + (_sp * 0.715).toFixed(2);
+          if (junkBadgeEl) { junkBadgeEl.textContent = 'LIVE'; junkBadgeEl.classList.remove('badge-load'); junkBadgeEl.classList.add('badge-live'); }
+        }
+      }, 500);
     }
     renderJunkDeals();
   }
