@@ -1710,8 +1710,8 @@ async function loadLivePrices() {
           premOz: d.prem, ozW: d.oz, ship: d.ship, url: d.url,
           tag: d.tag, verified: d.verified };
       });
-        if (data.junk && data.junk.length >= 1) JUNK_DEALERS = data.junk;
     }
+    if (data.junk && data.junk.length >= 1) JUNK_DEALERS = data.junk;
     if (data.updated) {
       const mins = Math.round((Date.now() - new Date(data.updated)) / 60000);
       const ago = mins < 2 ? 'just now' : mins < 60 ? mins + 'm ago' : Math.round(mins/60) + 'h ago';
