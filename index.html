@@ -2345,7 +2345,7 @@ async function loadComments(pid) {
   else cr.data.forEach(function(c){
     html+='<div class="fc-item"><div class="fc-meta"><span class="fc-author">'+escHtml(c.display_name||'Anonymous')+'</span><span class="fc-time">'+getTimeAgo(c.created_at)+'</span></div>';
     html+='<div class="fc-text">'+escHtml(c.content)+'</div>';
-    html+='<button class="fc-like'+(likedC[c.id]?' liked':'')+'" onclick="toggleCommentLike('+c.id+','+pid+')'+(likedC[c.id]?'❤️':'🤍')+' '+(c.likes_count||0)+'</button></div>';
+    html+='<button class="fc-like'+(likedC[c.id]?' liked':'')+'" onclick="toggleCommentLike('+c.id+','+pid+')'+(likedC[c.id]?'\u2764\uFE0F':'\uD83D\uDC4D')+' '+(c.likes_count||0)+'</button></div>';
   });
   html+='</div>';
   if (user) html+='<div class="fc-add"><input type="text" id="fc_'+pid+'" placeholder="Add a comment..." class="fc-input" onkeydown="if(event.key==='Enter')addComment('+pid+')"><button class="fc-submit" onclick="addComment('+pid+')">Post</button></div>';
