@@ -2426,8 +2426,8 @@ function renderForumPost(p, likedIds, userId) {
   }
   html += '</div>';
   html += '<div class="fp-footer">';
-  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike('+p.id+')'+(isLiked?'❤️':'\uD83E\uDD0D')+' '+(p.likes_count||0)+'</button>';
-  html += '<button class="forum-comment-btn" onclick="toggleComments('+p.id+')">\uD83D\uDCAC '+(p.comments_count||0)+'</button>';
+  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike(\''+p.id+'\')">'+(isLiked?'❤️':'\uD83E\uDD0D')+' '+(p.likes_count||0)+'</button>';
+  html += '<button class="forum-comment-btn" onclick="toggleComments(\''+p.id+'\')">\uD83D\uDCAC '+(p.comments_count||0)+'</button>';
   html += '</div>';
   html += '<div class="fp-comments" id="fcomments_'+p.id+'" style="display:none"></div>';
   html += '</div>';
