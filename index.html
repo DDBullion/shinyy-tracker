@@ -2052,6 +2052,12 @@ function loadMyStack() {
   initSupabase();
   var user = getUser();
   if (!user) {
+    var _ni = window.netlifyIdentity;
+    if (_ni && _ni.store && _ni.store.user === undefined) {
+      _ni.on('init', function() { if (window.currentMetal === 'mystack') loadMyStack(); });
+      _ni.on('login', function() { if (window.currentMetal === 'mystack') loadMyStack(); });
+      return;
+    }
     var c = document.getElementById('stackContent');
     if (c) c.innerHTML = '<div class="stack-login-msg"><p>Sign in to track your precious metals stack</p></div>';
     return;
