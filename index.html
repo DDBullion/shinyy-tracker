@@ -360,6 +360,53 @@
     .fc-input:focus{border-color:#6366f1;}
     .fc-submit{padding:7px 14px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;}
     .fc-signin{font-size:0.82rem;color:var(--mut);text-align:center;padding:8px;}
+
+/* ── My Stack Redesign ── */
+.ms-page-wrap{max-width:920px;margin:0 auto;padding:16px;}
+.ms-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.ms-hdr-left h2{font-size:1.4rem;font-weight:700;color:#1e293b;margin:0;}
+.ms-hdr-left p{font-size:0.82rem;color:var(--mut);margin:4px 0 0;}
+.ms-add-btn{padding:9px 18px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;white-space:nowrap;}
+.ms-add-btn:hover{background:#4f46e5;}
+.ms-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px;}
+.ms-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.ms-card-total{grid-column:1/-1;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border:none;}
+.ms-card-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px;}
+.ms-card-total .ms-card-title{color:rgba(255,255,255,.75);}
+.ms-card-big{font-size:1.5rem;font-weight:800;color:#1e293b;margin-bottom:8px;}
+.ms-card-total .ms-card-big{color:#fff;}
+.ms-card-rows{display:flex;flex-direction:column;gap:4px;}
+.ms-card-row{display:flex;justify-content:space-between;font-size:0.78rem;}
+.ms-card-row .label{color:var(--mut);}
+.ms-card-row .val{font-weight:600;color:#334155;}
+.ms-card-total .ms-card-row .label{color:rgba(255,255,255,.7);}
+.ms-card-total .ms-card-row .val{color:#fff;}
+.ms-gl-pos{color:#16a34a!important;}
+.ms-gl-neg{color:#dc2626!important;}
+.ms-card-total .ms-gl-pos{color:#86efac!important;}
+.ms-card-total .ms-gl-neg{color:#fca5a5!important;}
+.ms-actions-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.ms-count{font-size:0.82rem;color:var(--mut);font-weight:600;}
+.ms-act-btn{padding:6px 14px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;}
+.ms-act-btn:hover{background:#f8fafc;}
+.ms-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #e2e8f0;background:#fff;margin-bottom:24px;}
+.ms-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+.ms-table th{padding:10px 12px;background:#f8fafc;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);text-align:left;white-space:nowrap;border-bottom:1px solid #e2e8f0;}
+.ms-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;white-space:nowrap;}
+.ms-table tr:last-child td{border-bottom:none;}
+.ms-table tr:hover td{background:#f8fafc;}
+.ms-metal-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;text-transform:capitalize;}
+.ms-badge-silver{background:#f1f5f9;color:#475569;}
+.ms-badge-gold{background:#fef3c7;color:#92400e;}
+.ms-badge-platinum{background:#e0f2fe;color:#0369a1;}
+.ms-badge-palladium{background:#f3e8ff;color:#6b21a8;}
+.ms-gl-cell{font-weight:700;}
+.ms-row-btns{display:flex;gap:5px;}
+.ms-row-btn{padding:3px 8px;border-radius:5px;border:none;font-size:0.72rem;font-weight:600;cursor:pointer;}
+.ms-row-btn-sell{background:#fef3c7;color:#92400e;}
+.ms-row-btn-share{background:#ede9fe;color:#5b21b6;}
+.ms-row-btn-del{background:#fee2e2;color:#991b1b;}
+.ms-empty{text-align:center;padding:40px;color:var(--mut);font-size:0.9rem;}
 </style>
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -1921,30 +1968,22 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
 
 <!-- ══ MY STACK PAGE ══ -->
 <div id="pageMyStack" class="page">
-  <div class="stack-wrap">
-    <div class="stack-metal-tabs">
-      <button class="s-tab s-tab-active" id="sTab_silver"    onclick="setStackMetal('silver')">🪙 Silver</button>
-      <button class="s-tab" id="sTab_gold"      onclick="setStackMetal('gold')">🪙 Gold</button>
-      <button class="s-tab" id="sTab_platinum"  onclick="setStackMetal('platinum')">⬜ Platinum</button>
-      <button class="s-tab" id="sTab_palladium" onclick="setStackMetal('palladium')">🔷 Palladium</button>
-    </div>
-    <div id="stackContent" class="stack-content">
-      <div class="stack-login-msg">Sign in to track your stack</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ FORUM PAGE ══ -->
-<div id="pageForum" class="page">
-  <div class="forum-wrap">
-    <div class="forum-filters">
-      <button class="ff-btn ff-active" id="ff_recent" onclick="setForumFilter('recent')">🕒 Recent</button>
-      <button class="ff-btn" id="ff_hot"    onclick="setForumFilter('hot')">🔥 Hot</button>
-      <button class="ff-btn" id="ff_cold"   onclick="setForumFilter('cold')">🧊 Cold</button>
-      <input type="text" class="ff-search" placeholder="🔍 Search..." oninput="forumSearchInput(this.value)">
-    </div>
-    <div id="forumFeed" class="forum-feed">
-      <div class="forum-loading">Loading posts...</div>
+  <div class="ms-page-wrap">
+    <div class="stack-login-msg" id="msLoginMsg"><p>Sign in to track your precious metals stack</p></div>
+    <div id="msContent" style="display:none">
+      <div class="ms-hdr">
+        <div class="ms-hdr-left"><h2>My Stack</h2><p>Track your precious metals portfolio</p></div>
+        <button class="ms-add-btn" onclick="openAddStackModal(currentStackMetal)">+ Add Entry</button>
+      </div>
+      <div class="ms-cards-grid" id="msCardsGrid"></div>
+      <div class="ms-actions-row">
+        <span class="ms-count" id="msEntryCount"></span>
+        <button class="ms-act-btn" onclick="exportStackCSV()">Export CSV</button>
+      </div>
+      <div class="ms-table-wrap"><table class="ms-table" id="msTable">
+        <thead><tr><th>Metal</th><th>Item</th><th>Dealer</th><th>Qty (oz)</th><th>$/oz Paid</th><th>Total Paid</th><th>Date</th><th>Spot Value</th><th>Gain / Loss</th><th>Actions</th></tr></thead>
+        <tbody id="msTableBody"></tbody>
+      </table></div>
     </div>
   </div>
 </div>
@@ -1954,7 +1993,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
   <div class="modal-box">
     <div class="modal-header"><h3>Add to My Stack</h3><button onclick="closeModal('addStackModal')" class="modal-close">✕</button></div>
     <form id="addStackForm" onsubmit="event.preventDefault();submitAddStack()">
-      <input type="hidden" id="addStackMetal" name="metal">
+      <div class="form-field"><label>Metal</label><select id="addStackMetal" name="metal" class="form-input"><option value="silver">🪙 Silver</option><option value="gold">🪙 Gold</option><option value="platinum">⚪ Platinum</option><option value="palladium">🔷 Palladium</option></select></div>
       <div class="form-field"><label>Item Name</label><input name="item_name" required placeholder="e.g. 1 oz Silver Eagle" class="form-input"></div>
       <div class="form-row">
         <div class="form-field"><label>Quantity (oz)</label><input name="quantity" type="number" step="0.001" min="0.001" required placeholder="1.000" class="form-input"></div>
@@ -1967,8 +2006,8 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
       <div class="form-field"><label>Notes (optional)</label><input name="notes" placeholder="Optional notes" class="form-input"></div>
       <div class="form-share">
         <p class="share-label">Share to Community Forum?</p>
-        <label class="share-opt"><input type="radio" name="shareType" value="private" checked> 🔒 Keep Private</label>
-        <label class="share-opt"><input type="radio" name="shareType" value="name"> 👤 Share with My Name</label>
+        <label class="share-opt"><input type="radio" name="shareType" value="private"> 🔒 Keep Private</label>
+        <label class="share-opt"><input type="radio" name="shareType" value="name" checked> 👤 Share with My Name</label>
         <label class="share-opt"><input type="radio" name="shareType" value="anon"> 🕶️ Share Anonymously</label>
       </div>
       <div class="modal-actions">
@@ -2058,101 +2097,144 @@ function loadMyStack() {
       _ni.on('login', function() { if (window.currentMetal === 'mystack') loadMyStack(); });
       return;
     }
-    var c = document.getElementById('stackContent');
-    if (c) c.innerHTML = '<div class="stack-login-msg"><p>Sign in to track your precious metals stack</p></div>';
+    var lm = document.getElementById('msLoginMsg');
+    var mc = document.getElementById('msContent');
+    if (lm) lm.style.display = '';
+    if (mc) mc.style.display = 'none';
     return;
   }
-  renderStackMetal(currentStackMetal);
+  var lm = document.getElementById('msLoginMsg');
+  var mc = document.getElementById('msContent');
+  if (lm) lm.style.display = 'none';
+  if (mc) mc.style.display = '';
+  renderMyStack();
 }
 
 function setStackMetal(m) {
   currentStackMetal = m;
-  ['silver','gold','platinum','palladium'].forEach(function(x) {
-    var t = document.getElementById('sTab_' + x);
-    if (t) t.classList.toggle('s-tab-active', x === m);
-  });
-  renderStackMetal(m);
 }
 
-async function renderStackMetal(metal) {
+async function renderMyStack() {
   initSupabase();
   var user = getUser();
   if (!user || !_sb) return;
-  var content = document.getElementById('stackContent');
-  if (!content) return;
-  content.innerHTML = '<div class="stack-loading">Loading...</div>';
+  var cardsEl = document.getElementById('msCardsGrid');
+  var tbodyEl = document.getElementById('msTableBody');
+  var countEl = document.getElementById('msEntryCount');
+  if (!cardsEl || !tbodyEl) return;
+  cardsEl.innerHTML = '<div style="padding:20px;color:var(--mut)">Loading…</div>';
+  tbodyEl.innerHTML = '';
   try {
-    var q1 = await _sb.from('stack_entries').select('*').eq('user_id', user.id).eq('metal', metal).is('sold_price', null).order('created_at', {ascending: false});
-    var q2 = await _sb.from('stack_entries').select('*').eq('user_id', user.id).eq('metal', metal).not('sold_price', 'is', null).order('sold_date', {ascending: false});
-    renderStackContent(q1.data||[], q2.data||[], metal);
-  } catch(e) {
-    content.innerHTML = '<div class="stack-error">Error loading stack</div>';
+    var res = await _sb.from('stack_entries').select('*').eq('user_id', user.id).is('sold_price', null).order('date_purchased', {ascending: false});
+    var entries = res.data || [];
+    window._msEntMap = {};
+    entries.forEach(function(e) { window._msEntMap[e.id] = e; });
+    var spotS  = parseFloat(localStorage.getItem('silver_spot'))    || 0;
+    var spotG  = parseFloat(localStorage.getItem('gold_spot'))      || 0;
+    var spotPt = parseFloat(localStorage.getItem('platinum_spot'))  || 0;
+    var spotPd = parseFloat(localStorage.getItem('palladium_spot')) || 0;
+    var spots = { silver: spotS, gold: spotG, platinum: spotPt, palladium: spotPd };
+    var metals = ['silver', 'gold', 'platinum', 'palladium'];
+    var summary = {};
+    metals.forEach(function(m) { summary[m] = { oz: 0, cost: 0, value: 0 }; });
+    entries.forEach(function(e) {
+      var s = summary[e.metal]; if (!s) return;
+      var qty = parseFloat(e.quantity) || 0;
+      var pp  = parseFloat(e.price_paid) || 0;
+      s.oz    += qty;
+      s.cost  += pp * qty;
+      s.value += qty * (spots[e.metal] || 0);
+    });
+    var mLabel = { silver: '🪙 Silver Stack', gold: '🪙 Gold Stack', platinum: '⚪ Platinum Stack', palladium: '🔷 Palladium Stack' };
+    var cardsHtml = '';
+    metals.forEach(function(m) {
+      var s = summary[m];
+      var dca = s.oz > 0 ? s.cost / s.oz : 0;
+      var gl  = s.value - s.cost;
+      var glCls = gl >= 0 ? 'ms-gl-pos' : 'ms-gl-neg';
+      cardsHtml += '<div class="ms-card">';
+      cardsHtml += '<div class="ms-card-title">' + mLabel[m] + '</div>';
+      cardsHtml += '<div class="ms-card-big">' + s.oz.toFixed(3) + ' oz</div>';
+      cardsHtml += '<div class="ms-card-rows">';
+      cardsHtml += '<div class="ms-card-row"><span class="label">DCA</span><span class="val">' + fmtUSD(dca) + '/oz</span></div>';
+      cardsHtml += '<div class="ms-card-row"><span class="label">Cost Basis</span><span class="val">' + fmtUSD(s.cost) + '</span></div>';
+      if (spots[m] > 0) {
+        cardsHtml += '<div class="ms-card-row"><span class="label">Spot Value</span><span class="val">' + fmtUSD(s.value) + '</span></div>';
+        cardsHtml += '<div class="ms-card-row"><span class="label">Gain / Loss</span><span class="val ' + glCls + '">' + (gl>=0?'+':'')+fmtUSD(gl) + '</span></div>';
+      }
+      cardsHtml += '</div></div>';
+    });
+    var totalCost  = metals.reduce(function(a,m){return a+summary[m].cost; },0);
+    var totalValue = metals.reduce(function(a,m){return a+summary[m].value;},0);
+    var totalGL  = totalValue - totalCost;
+    var totalRet = totalCost > 0 ? totalGL/totalCost*100 : 0;
+    var tGlCls = totalGL >= 0 ? 'ms-gl-pos' : 'ms-gl-neg';
+    cardsHtml += '<div class="ms-card ms-card-total">';
+    cardsHtml += '<div class="ms-card-title">Total Portfolio</div>';
+    cardsHtml += '<div class="ms-card-big">' + fmtUSD(totalValue) + '</div>';
+    cardsHtml += '<div class="ms-card-rows">';
+    cardsHtml += '<div class="ms-card-row"><span class="label">Cost Basis</span><span class="val">' + fmtUSD(totalCost) + '</span></div>';
+    cardsHtml += '<div class="ms-card-row"><span class="label">Gain / Loss</span><span class="val ' + tGlCls + '">' + (totalGL>=0?'+':'')+fmtUSD(totalGL) + '</span></div>';
+    cardsHtml += '<div class="ms-card-row"><span class="label">Return</span><span class="val ' + tGlCls + '">' + (totalRet>=0?'+':'')+totalRet.toFixed(2) + '%</span></div>';
+    cardsHtml += '</div></div>';
+    cardsEl.innerHTML = cardsHtml;
+    if (countEl) countEl.textContent = entries.length + (entries.length===1?' entry':' entries');
+    var mBadge = { silver:'ms-badge-silver', gold:'ms-badge-gold', platinum:'ms-badge-platinum', palladium:'ms-badge-palladium' };
+    var mEm = { silver:'🪙', gold:'🪙', platinum:'⚪', palladium:'🔷' };
+    var tbody = '';
+    if (entries.length === 0) {
+      tbody = '<tr><td colspan="10" class="ms-empty">No entries yet — click + Add Entry to start!</td></tr>';
+    } else {
+      entries.forEach(function(e) {
+        var qty   = parseFloat(e.quantity)   || 0;
+        var pp    = parseFloat(e.price_paid) || 0;
+        var total = qty * pp;
+        var spot  = spots[e.metal] || 0;
+        var sVal  = qty * spot;
+        var gl    = spot > 0 ? sVal - total : null;
+        var glStr = gl!==null ? ((gl>=0?'+':'')+fmtUSD(gl)) : '—';
+        var glCls = gl!==null ? (gl>=0?'ms-gl-pos':'ms-gl-neg') : '';
+        var eid   = JSON.stringify(String(e.id));
+        tbody += '<tr>';
+        tbody += '<td><span class="ms-metal-badge ' + (mBadge[e.metal]||'ms-badge-silver') + '">' + (mEm[e.metal]||'')+' '+escHtml(e.metal)+'</span></td>';
+        tbody += '<td>' + escHtml(e.item_name) + '</td>';
+        tbody += '<td>' + escHtml(e.dealer||'—') + '</td>';
+        tbody += '<td>' + qty.toFixed(3) + '</td>';
+        tbody += '<td>' + fmtUSD(pp) + '</td>';
+        tbody += '<td>' + fmtUSD(total) + '</td>';
+        tbody += '<td>' + escHtml(e.date_purchased||'—') + '</td>';
+        tbody += '<td>' + (spot>0?fmtUSD(sVal):'—') + '</td>';
+        tbody += '<td class="ms-gl-cell ' + glCls + '">' + glStr + '</td>';
+        tbody += '<td><div class="ms-row-btns">';
+        tbody += '<button class="ms-row-btn ms-row-btn-sell" onclick="openSellModal(' + eid + ',' + pp + ')">Sell</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-share" onclick="openShareModal(window._msEntMap[' + eid + '])">Share</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-del" onclick="deleteStackEntry(' + eid + ')">Del</button>';
+        tbody += '</div></td></tr>';
+      });
+    }
+    tbodyEl.innerHTML = tbody;
+  } catch(ex) {
+    console.error('renderMyStack error:', ex);
+    cardsEl.innerHTML = '<div class="ms-empty">Error loading stack — check console.</div>';
   }
 }
 
-function renderStackContent(entries, sold, metal) {
-  var spotPrice = metal==='silver' ? (parseFloat(localStorage.getItem('silver_spot'))||0) :
-                  metal==='gold'   ? (parseFloat(localStorage.getItem('gold_spot'))||0) : 0;
-  var html = '';
-  if (entries.length > 0) {
-    var tPaid = entries.reduce(function(s,e){return s+(parseFloat(e.price_paid)*parseFloat(e.quantity));},0);
-    var tQty  = entries.reduce(function(s,e){return s+parseFloat(e.quantity);},0);
-    var tVal  = spotPrice > 0 ? spotPrice * tQty : 0;
-    var tPL   = tVal - tPaid;
-    var tPct  = tPaid > 0 ? (tPL/tPaid*100) : 0;
-    html += '<div class="stack-summary">';
-    html += '<div class="stack-stat"><div class="ss-label">Invested</div><div class="ss-val">'+fmtUSD(tPaid)+'</div></div>';
-    if (spotPrice > 0) {
-      html += '<div class="stack-stat"><div class="ss-label">Value</div><div class="ss-val">'+fmtUSD(tVal)+'</div></div>';
-      var plCls = tPL>=0?'pl-up':'pl-down', plSign=tPL>=0?'+':'';
-      html += '<div class="stack-stat"><div class="ss-label">P&amp;L</div><div class="ss-val '+plCls+'">'+plSign+fmtUSD(tPL)+'<br><span style="font-size:.8em">'+plSign+tPct.toFixed(1)+'%</span></div></div>';
-    }
-    html += '<div class="stack-stat"><div class="ss-label">Total oz</div><div class="ss-val">'+tQty.toFixed(3)+'</div></div>';
-    html += '</div>';
-  }
-  html += '<div class="stack-section-header"><span>Holdings ('+entries.length+')</span><button class="add-stack-btn" onclick="openAddStackModal(\''+metal+'\')">+ Add</button></div>';
-  if (entries.length === 0) {
-    html += '<div class="stack-empty">No '+metal+' in your stack yet. <a onclick="openAddStackModal(\''+metal+'\')" style="cursor:pointer;color:#6366f1;text-decoration:underline">Add your first entry</a></div>';
-  } else {
-    html += '<div class="stack-entries">';
-    entries.forEach(function(e) {
-      var tot = parseFloat(e.price_paid)*parseFloat(e.quantity);
-      var cVal = spotPrice>0 ? spotPrice*parseFloat(e.quantity) : null;
-      var pl = cVal!==null ? cVal-tot : null;
-      var plP = (pl!==null&&tot>0) ? (pl/tot*100) : null;
-      html += '<div class="stack-entry-card">';
-      html += '<div class="sec-top"><div class="sec-name">'+escHtml(e.item_name)+'</div><div class="sec-price">'+fmtUSD(parseFloat(e.price_paid))+'/oz</div></div>';
-      html += '<div class="sec-details"><span>'+parseFloat(e.quantity).toFixed(3)+' oz</span><span>Total: '+fmtUSD(tot)+'</span>';
-      if (e.dealer) html += '<span>'+escHtml(e.dealer)+'</span>';
-      if (e.date_purchased) html += '<span>'+e.date_purchased+'</span>';
-      html += '</div>';
-      if (pl!==null) { var pc=pl>=0?'pl-up':'pl-down',ps=pl>=0?'+':''; html += '<div class="sec-pl '+pc+'">'+ps+fmtUSD(pl)+' ('+ps+plP.toFixed(1)+'%)</div>'; }
-      html += '<div class="sec-actions">';
-      html += '<button class="sec-btn sec-sell" onclick="openSellModal('+e.id+','+parseFloat(e.price_paid)+')">Mark Sold</button>';
-      html += '<button class="sec-btn sec-share" onclick="openShareModal('+JSON.stringify(e).split('').map(function(c){return c==='<'?'\u003c':c==='>'?'\u003e':c;}).join('')+')">Share</button>';
-      html += '<button class="sec-btn sec-del" onclick="deleteStackEntry('+e.id+')✕</button>';
-      html += '</div></div>';
-    });
-    html += '</div>';
-  }
-  if (sold.length > 0) {
-    var tProfit = sold.reduce(function(s,e){return s+((parseFloat(e.sold_price)-parseFloat(e.price_paid))*parseFloat(e.quantity));},0);
-    var pc2=tProfit>=0?'pl-up':'pl-down';
-    html += '<div class="stack-section-header sold-header"><span>Sold ('+sold.length+')</span><span class="'+pc2+'">'+(tProfit>=0?'+':'')+fmtUSD(tProfit)+' realized</span></div>';
-    html += '<div class="stack-entries sold-entries">';
-    sold.forEach(function(e) {
-      var pl2=(parseFloat(e.sold_price)-parseFloat(e.price_paid))*parseFloat(e.quantity);
-      var plP2=parseFloat(e.price_paid)>0?((parseFloat(e.sold_price)-parseFloat(e.price_paid))/parseFloat(e.price_paid)*100):0;
-      var pc3=pl2>=0?'pl-up':'pl-down',ps3=pl2>=0?'+':'';
-      html += '<div class="stack-entry-card sold-card">';
-      html += '<div class="sec-top"><div class="sec-name">'+escHtml(e.item_name)+' <span class="sold-badge">SOLD</span></div><div class="sec-price">'+fmtUSD(parseFloat(e.sold_price))+'/oz</div></div>';
-      html += '<div class="sec-details"><span>Paid: '+fmtUSD(parseFloat(e.price_paid))+'/oz</span><span>'+parseFloat(e.quantity).toFixed(3)+' oz</span>';
-      if (e.sold_date) html += '<span>Sold '+e.sold_date+'</span>';
-      html += '</div><div class="sec-pl '+pc3+'">'+ps3+fmtUSD(pl2)+' ('+ps3+plP2.toFixed(1)+'%)</div></div>';
-    });
-    html += '</div>';
-  }
-  document.getElementById('stackContent').innerHTML = html;
+function exportStackCSV() {
+  var rows = document.querySelectorAll('#msTableBody tr');
+  if (!rows || !rows.length) return;
+  var lines2 = ['"Metal","Item","Dealer","Qty (oz)","$/oz Paid","Total Paid","Date"'];
+  rows.forEach(function(r) {
+    var cells = r.querySelectorAll('td');
+    if (cells.length < 7) return;
+    var row = [];
+    for (var i=0;i<7;i++) row.push('"' + (cells[i]?cells[i].textContent.trim().replace(/"/g,'""'): '') + '"');
+    lines2.push(row.join(','));
+  });
+  var blob = new Blob([lines2.join('\n')], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'my-stack.csv';
+  a.click();
 }
 
 async function addStackEntry(data) {
@@ -2165,7 +2247,7 @@ async function addStackEntry(data) {
   if (!r.error && r.data) {
     if (data.shareType==='name'||data.shareType==='anon') await shareEntryToForum(r.data, data.shareType==='anon'?null:user.firstName, 'buy');
     closeModal('addStackModal');
-    renderStackMetal(data.metal);
+    renderMyStack();
   } else { alert('Error: '+(r.error&&r.error.message)); }
 }
 
@@ -2174,7 +2256,7 @@ async function deleteStackEntry(id) {
   initSupabase();
   if (!_sb) return;
   await _sb.from('stack_entries').delete().eq('id', id);
-  renderStackMetal(currentStackMetal);
+  renderMyStack();
 }
 
 var _sellId = null;
@@ -2202,7 +2284,7 @@ async function confirmSell() {
   var shareAnon  = document.getElementById('sellShareAnon')&&document.getElementById('sellShareAnon').checked;
   if (r.data && (shareForum||shareAnon)) await shareEntryToForum(Object.assign({},r.data,{sold_price:sp,sold_date:sd}), shareAnon?null:user.firstName, 'sell');
   closeModal('sellModal');
-  renderStackMetal(currentStackMetal);
+  renderMyStack();
 }
 
 var _shareEntry = null;
@@ -2221,7 +2303,7 @@ async function confirmShare(type) {
   await shareEntryToForum(_shareEntry, type==='anon'?null:user.firstName, 'buy');
   await _sb.from('stack_entries').update({posted_to_forum:true,is_anonymous:type==='anon'}).eq('id',_shareEntry.id);
   closeModal('shareModal');
-  renderStackMetal(currentStackMetal);
+  renderMyStack();
 }
 
 async function shareEntryToForum(entry, displayName, postType) {
