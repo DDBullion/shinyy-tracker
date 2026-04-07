@@ -509,7 +509,7 @@
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
       <div class="metal-tab" id="tabSold" onclick="setMetal('sold');loadPopularSold()">🔍 Last Sold</div>
       <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
-       <div class="metal-tab" id="tabMyStack" onclick="setMetal('mystack')">📦 My Stack</div>
+       <div class="metal-tab" id="tabMyStack" onclick="setMetal('mystack')">🪙 My Stack</div>
        <div class="metal-tab" id="tabForum" onclick="setMetal('forum')">✨ Shiny Feed</div>
     </div>
   </div>
@@ -1136,6 +1136,7 @@ let JUNK_DEALERS = [];
 // ── State ──
 let silverSpot = null, prevSilverSpot = null;
 let goldSpot = null, prevGoldSpot = null;
+let platinumSpot = null, palladiumSpot = null;
 let spotSource = '';
 let silverFilter = '1oz', goldFilter = 'all';
 let cdTimer = null, cdSec = 300;
@@ -1153,7 +1154,7 @@ async function fetchSpot() {
   setStatus('loading');
   document.getElementById('rbtn').textContent = '↻ ...';
 
-  let agPrice = null, auPrice = null, src = '';
+  let agPrice = null, auPrice = null, ptPrice = null, paPrice = null, src = '';
 
   // Source 1: Kitco — returns both AG and AU
   try {
@@ -1164,6 +1165,10 @@ async function fetchSpot() {
     const au   = pm.find(m => m.Symbol === 'AU');
     if (ag) agPrice = parseFloat(ag.current_bid);
     if (au) auPrice = parseFloat(au.current_bid);
+    const pt   = pm.find(m => m.Symbol === 'PT');
+    const pa   = pm.find(m => m.Symbol === 'PA');
+    if (pt) ptPrice = parseFloat(pt.current_bid);
+    if (pa) paPrice = parseFloat(pa.current_bid);
     if (agPrice || auPrice) src = 'kitco';
   } catch(e) { /* fallback */ }
 
@@ -1197,6 +1202,23 @@ async function fetchSpot() {
   } else {
     const c = parseFloat(localStorage.getItem('gold_spot'));
     if (c && !goldSpot) goldSpot = c;
+  }
+
+  if (ptPrice && ptPrice > 100) {
+    platinumSpot = ptPrice;
+    localStorage.setItem('platinum_spot', ptPrice);
+    localStorage.setItem('platinum_spot_ts', Date.now());
+  } else {
+    const cPt = parseFloat(localStorage.getItem('platinum_spot'));
+    if (cPt && !platinumSpot) platinumSpot = cPt;
+  }
+  if (paPrice && paPrice > 100) {
+    palladiumSpot = paPrice;
+    localStorage.setItem('palladium_spot', paPrice);
+    localStorage.setItem('palladium_spot_ts', Date.now());
+  } else {
+    const cPa = parseFloat(localStorage.getItem('palladium_spot'));
+    if (cPa && !palladiumSpot) palladiumSpot = cPa;
   }
 
   spotSource = src;
