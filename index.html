@@ -2220,9 +2220,9 @@ async function renderMyStack() {
         tbody += '<td>' + (spot>0?fmtUSD(sVal):'—') + '</td>';
         tbody += '<td class="ms-gl-cell ' + glCls + '">' + glStr + '</td>';
         tbody += '<td><div class="ms-row-btns">';
-        tbody += '<button class="ms-row-btn ms-row-btn-sell" onclick="openSellModal(\'' + eid + '\',' + pp + ')">Sell</button>';
-        tbody += '<button class="ms-row-btn ms-row-btn-share" onclick="openShareModal(window._msEntMap[\'' + eid + '\'])">Share</button>';
-        tbody += '<button class="ms-row-btn ms-row-btn-del" onclick="deleteStackEntry(\'' + eid + '\')">Del</button><button class="ms-row-btn ms-row-btn-edit" onclick="openEditStackModal(\'' + eid + '\')">Edit</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-sell" data-eid="' + eid + '" data-pp="' + pp + '" onclick="var b=this;openSellModal(b.dataset.eid,parseFloat(b.dataset.pp))">Sell</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-share" data-eid="' + eid + '" onclick="var b=this;openShareModal(window._msEntMap[b.dataset.eid])">Share</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-del" data-eid="' + eid + '" onclick="var b=this;deleteStackEntry(b.dataset.eid)">Del</button><button class="ms-row-btn ms-row-btn-edit" data-eid="' + eid + '" onclick="var b=this;openEditStackModal(b.dataset.eid)">Edit</button>';
         tbody += '</div></td></tr>';
       });
     }
