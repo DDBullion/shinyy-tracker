@@ -1166,7 +1166,7 @@ async function fetchSpot() {
     if (ag) agPrice = parseFloat(ag.current_bid);
     if (au) auPrice = parseFloat(au.current_bid);
     const pt   = pm.find(m => m.Symbol === 'PT');
-    const pa   = pm.find(m => m.Symbol === 'PA');
+    const pa   = pm.find(m => m.Symbol === 'PD');
     if (pt) ptPrice = parseFloat(pt.current_bid);
     if (pa) paPrice = parseFloat(pa.current_bid);
     if (agPrice || auPrice) src = 'kitco';
