@@ -97,7 +97,7 @@ function parseDeals(html, page) {
 
     if (page.metal !== 'junk' && /tube|roll|lot|bag|face value|junk|fractional|cull|milky|tarnish|scruffy|damaged|circulated/i.test(productName)) continue;
 
-    const premMatch = premCell.match(/^[\d.]+/);
+    const premMatch = premCell.replace(/[$,]/g, '').match(/^[-\d.]+/);
     if (!premMatch) continue;
     const prem = parseFloat(premMatch[0]);
     if (isNaN(prem) || prem < 0) continue;
