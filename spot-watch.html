@@ -272,7 +272,6 @@
 
     if (user) {
       loginBtn.classList.add('hidden');
-      if (myStackNav) myStackNav.classList.remove('hidden');
       userDisp.classList.remove('hidden');
       var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
       userDisp.textContent = '👤 ' + name;
@@ -281,7 +280,6 @@
       mainContent.classList.remove('hidden');
     } else {
       loginBtn.classList.remove('hidden');
-      if (myStackNav) myStackNav.classList.add('hidden');
       userDisp.classList.add('hidden');
       loginGate.classList.remove('hidden');
       mainContent.classList.add('hidden');
