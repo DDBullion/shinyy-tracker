@@ -2104,9 +2104,9 @@ function renderStackContent(entries, sold, metal) {
     html += '<div class="stack-stat"><div class="ss-label">Total oz</div><div class="ss-val">'+tQty.toFixed(3)+'</div></div>';
     html += '</div>';
   }
-  html += '<div class="stack-section-header"><span>Holdings ('+entries.length+')</span><button class="add-stack-btn" onclick="openAddStackModal(''+metal+'')">+ Add</button></div>';
+  html += '<div class="stack-section-header"><span>Holdings ('+entries.length+')</span><button class="add-stack-btn" onclick="openAddStackModal(\''+metal+'\')">+ Add</button></div>';
   if (entries.length === 0) {
-    html += '<div class="stack-empty">No '+metal+' in your stack yet. <a onclick="openAddStackModal(''+metal+'')" style="cursor:pointer;color:#6366f1;text-decoration:underline">Add your first entry</a></div>';
+    html += '<div class="stack-empty">No '+metal+' in your stack yet. <a onclick="openAddStackModal(\''+metal+'\')" style="cursor:pointer;color:#6366f1;text-decoration:underline">Add your first entry</a></div>';
   } else {
     html += '<div class="stack-entries">';
     entries.forEach(function(e) {
