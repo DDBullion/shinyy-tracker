@@ -161,7 +161,7 @@
         serverArr.forEach(function(d) { if (d.url) serverUrls[d.url] = true; });
         localData.forEach(function(d) { if (d.url && !serverUrls[d.url]) merged.push(d); });
 
-        watchlist = merged;
+        var seen = {}; watchlist = merged.filter(function(d) { if (!d.url || seen[d.url]) return false; seen[d.url] = true; return true; });
         if (key) localStorage.setItem(key, JSON.stringify(watchlist));
         renderWatchlist();
       })
@@ -223,8 +223,97 @@
       var metalLabel = isGold ? 'Gold' : (isJunk ? 'Junk' : 'Silver');
 
       var priceDisplay = '—';
-      if (deal.pricePerOz != null && !isNaN(deal.pricePerOz)) {
-        priceDisplay = '$' + parseFloat(deal.pricePerOz).toFixed(2) + '/oz';
+      var priceVal = (deal.price != null && !isNaN(parseFloat(deal.price))) ? parseFloat(deal.price) : null;
+      if (priceVal !== null) {
+        priceDisplay = '
+
+      var dealName = deal.name || 'Unnamed Deal';
+      var dealer = deal.dealer || '';
+      var tag = deal.tag || '';
+      var buyUrl = deal.url || '#';
+
+      var escapedUrl = buyUrl.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+      return '<div class="' + cardClass + ' rounded-2xl p-5 shadow-sm border border-gray-100 slide-in relative">' +
+        '<div class="flex items-start justify-between mb-3">' +
+          '<span class="' + badgeClass + ' px-2.5 py-1 rounded-full text-xs font-semibold">' + metalEmoji + ' ' + metalLabel + '</span>' +
+          '<button onclick="unstar(\'' + escapedUrl + '\')" class="unstar-btn p-1.5 rounded-lg text-amber-400 transition-colors text-base" title="Remove from Spot Watch">' +
+            '⭐' +
+          '</button>' +
+        '</div>' +
+        (dealer ? '<div class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">' + dealer + '</div>' : '') +
+        '<div class="text-sm font-semibold text-gray-900 mb-1 leading-snug">' + dealName + '</div>' +
+        (tag ? '<div class="text-xs text-gray-400 mb-3">' + tag + '</div>' : '<div class="mb-3"></div>') +
+        '<div class="flex items-center justify-between">' +
+          '<span class="text-xl font-bold text-gray-900">' + priceDisplay + arrowHtml + '</span>' +
+          '<a href="' + buyUrl + '" target="_blank" rel="noopener" ' +
+            'class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors">' +
+            'Buy →' +
+          '</a>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ─── Auth UI ─────────────────────────────────────────────────────────────────
+  function updateAuthUI(user) {
+    var loginBtn = document.getElementById('loginBtn');
+    var userDisp = document.getElementById('userDisplay');
+    var myStackNav = document.getElementById('myStackNavWatch');
+    var loginGate = document.getElementById('loginGate');
+    var mainContent = document.getElementById('mainContent');
+
+    if (user) {
+      loginBtn.classList.add('hidden');
+      if (myStackNav) myStackNav.classList.remove('hidden');
+      userDisp.classList.remove('hidden');
+      var name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+      userDisp.textContent = '👤 ' + name;
+      userDisp.onclick = function() { netlifyIdentity.open('account'); };
+      loginGate.classList.add('hidden');
+      mainContent.classList.remove('hidden');
+    } else {
+      loginBtn.classList.remove('hidden');
+      if (myStackNav) myStackNav.classList.add('hidden');
+      userDisp.classList.add('hidden');
+      loginGate.classList.remove('hidden');
+      mainContent.classList.add('hidden');
+    }
+  }
+
+  // ─── Netlify Identity ────────────────────────────────────────────────────────
+  if (window.netlifyIdentity) {
+    netlifyIdentity.on('init', function(user) {
+      currentUser = user;
+      updateAuthUI(user);
+      if (user) syncWatchlistFromServer(user);
+    });
+    netlifyIdentity.on('login', function(user) {
+      currentUser = user;
+      updateAuthUI(user);
+      netlifyIdentity.close();
+      syncWatchlistFromServer(user);
+    });
+    netlifyIdentity.on('logout', function() {
+      currentUser = null;
+      watchlist = [];
+      updateAuthUI(null);
+    });
+  }
+</script>
+
+</body>
+</html>
+ + priceVal.toFixed(2);
+      }
+      var arrowHtml = '';
+      var savedVal = (deal.savedPrice != null && !isNaN(parseFloat(deal.savedPrice))) ? parseFloat(deal.savedPrice) : null;
+      if (priceVal !== null && savedVal !== null && Math.abs(priceVal - savedVal) > 0.001) {
+        if (priceVal > savedVal) {
+          arrowHtml = '<span style="color:#e53e3e;font-size:0.8rem;margin-left:4px;">&#9650;<\/span>';
+        } else {
+          arrowHtml = '<span style="color:#38a169;font-size:0.8rem;margin-left:4px;">&#9660;<\/span>';
+        }
       }
 
       var dealName = deal.name || 'Unnamed Deal';
