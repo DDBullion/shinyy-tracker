@@ -2122,7 +2122,7 @@ function renderStackContent(entries, sold, metal) {
       html += '</div>';
       if (pl!==null) { var pc=pl>=0?'pl-up':'pl-down',ps=pl>=0?'+':''; html += '<div class="sec-pl '+pc+'">'+ps+fmtUSD(pl)+' ('+ps+plP.toFixed(1)+'%)</div>'; }
       html += '<div class="sec-actions">';
-      html += '<button class="sec-btn sec-sell" onclick="openSellModal('+e.id+'+parseFloat(e.price_paid)+')">Mark Sold</button>';
+      html += '<button class="sec-btn sec-sell" onclick="openSellModal('+e.id+','+parseFloat(e.price_paid)+')">Mark Sold</button>';
       html += '<button class="sec-btn sec-share" onclick="openShareModal('+JSON.stringify(e).split('').map(function(c){return c==='<'?'\u003c':c==='>'?'\u003e':c;}).join('')+')">Share</button>';
       html += '<button class="sec-btn sec-del" onclick="deleteStackEntry('+e.id+')✕</button>';
       html += '</div></div>';
