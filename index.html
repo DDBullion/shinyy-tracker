@@ -362,7 +362,7 @@
     .fc-signin{font-size:0.82rem;color:var(--mut);text-align:center;padding:8px;}
 
 /* ── My Stack Redesign ── */
-.ms-page-wrap{max-width:920px;margin:0 auto;padding:16px;}
+.ms-page-wrap{max-width:1400px;margin:0 auto;padding:16px;}
 .ms-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
 .ms-hdr-left h2{font-size:1.4rem;font-weight:700;color:#1e293b;margin:0;}
 .ms-hdr-left p{font-size:0.82rem;color:var(--mut);margin:4px 0 0;}
@@ -405,7 +405,7 @@
 .ms-row-btn{padding:3px 8px;border-radius:5px;border:none;font-size:0.72rem;font-weight:600;cursor:pointer;}
 .ms-row-btn-sell{background:#fef3c7;color:#92400e;}
 .ms-row-btn-share{background:#ede9fe;color:#5b21b6;}
-.ms-row-btn-del{background:#fee2e2;color:#991b1b;}
+.ms-row-btn-del{background:#fee2e2;color:#991b1b;}.ms-row-btn-edit{background:#ede9fe;color:#7c3aed;}
 .ms-empty{text-align:center;padding:40px;color:var(--mut);font-size:0.9rem;}
 </style>
   <!-- Structured Data -->
@@ -1988,6 +1988,20 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
   </div>
 </div>
 
+<div id="pageForum" class="page">
+  <div class="forum-wrap">
+    <div class="forum-filters">
+      <button class="ff-btn ff-active" id="ff_recent" onclick="setForumFilter('recent')">&#128338; Recent</button>
+      <button class="ff-btn" id="ff_hot" onclick="setForumFilter('hot')">&#128293; Hot</button>
+      <button class="ff-btn" id="ff_cold" onclick="setForumFilter('cold')">&#129398; Cold</button>
+      <input type="text" class="ff-search" placeholder="&#128269; Search..." oninput="forumSearchInput(this.value)">
+    </div>
+    <div id="forumFeed" class="forum-feed">
+      <div class="forum-loading">Loading posts...</div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ ADD TO STACK MODAL ══ -->
 <div id="addStackModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('addStackModal')">
   <div class="modal-box">
@@ -2145,7 +2159,7 @@ async function renderMyStack() {
       s.cost  += pp * qty;
       s.value += qty * (spots[e.metal] || 0);
     });
-    var mLabel = { silver: '🪙 Silver Stack', gold: '🪙 Gold Stack', platinum: '⚪ Platinum Stack', palladium: '🔷 Palladium Stack' };
+    var mLabel = { silver: '🪙 Silver Stack', gold: '🥇 Gold Stack', platinum: '⚪ Platinum Stack', palladium: '🔷 Palladium Stack' };
     var cardsHtml = '';
     metals.forEach(function(m) {
       var s = summary[m];
@@ -2206,9 +2220,9 @@ async function renderMyStack() {
         tbody += '<td>' + (spot>0?fmtUSD(sVal):'—') + '</td>';
         tbody += '<td class="ms-gl-cell ' + glCls + '">' + glStr + '</td>';
         tbody += '<td><div class="ms-row-btns">';
-        tbody += '<button class="ms-row-btn ms-row-btn-sell" onclick="openSellModal(' + eid + ',' + pp + ')">Sell</button>';
-        tbody += '<button class="ms-row-btn ms-row-btn-share" onclick="openShareModal(window._msEntMap[' + eid + '])">Share</button>';
-        tbody += '<button class="ms-row-btn ms-row-btn-del" onclick="deleteStackEntry(' + eid + ')">Del</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-sell" onclick="openSellModal(\'' + eid + '\',' + pp + ')">Sell</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-share" onclick="openShareModal(window._msEntMap[\'' + eid + '\'])">Share</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-del" onclick="deleteStackEntry(\'' + eid + '\')">Del</button><button class="ms-row-btn ms-row-btn-edit" onclick="openEditStackModal(\'' + eid + '\')">Edit</button>';
         tbody += '</div></td></tr>';
       });
     }
@@ -2319,16 +2333,53 @@ function openAddStackModal(metal) {
   var f = document.getElementById('addStackForm');
   if (f) f.reset();
   document.getElementById('addStackMetal').value = metal||currentStackMetal;
+  window._editingEid=null; var _eh=document.querySelector('#addStackModal .modal-header h3'); if(_eh) _eh.textContent='Add Entry'; var _es=document.querySelector('#addStackModal .form-share'); if(_es) _es.style.display='';
   showModal('addStackModal');
 }
 
 function submitAddStack() {
   var f = document.getElementById('addStackForm');
   var sr = document.querySelector('input[name="shareType"]:checked');
-  addStackEntry({ metal: document.getElementById('addStackMetal').value, item_name: f.item_name.value.trim(), quantity: f.quantity.value, price_paid: f.price_paid.value, dealer: f.dealer.value.trim(), date_purchased: f.date_purchased.value, notes: f.notes.value.trim(), shareType: sr?sr.value:'private' });
+  if(window._editingEid){updateStackEntry(window._editingEid,{metal:document.getElementById('addStackMetal').value,item_name:f.item_name.value.trim(),quantity:f.quantity.value,price_paid:f.price_paid.value,dealer:f.dealer.value.trim(),date_purchased:f.date_purchased.value,notes:f.notes.value.trim()});window._editingEid=null;}else{addStackEntry({ metal: document.getElementById('addStackMetal').value, item_name: f.item_name.value.trim(), quantity: f.quantity.value, price_paid: f.price_paid.value, dealer: f.dealer.value.trim(), date_purchased: f.date_purchased.value, notes: f.notes.value.trim(), shareType: sr?sr.value:'private' });}
 }
 
 // ── Forum ──
+function openEditStackModal(eid) {
+  var entry = window._msEntMap && window._msEntMap[eid];
+  if (!entry) return;
+  window._editingEid = eid;
+  var f = document.getElementById('addStackForm');
+  if (!f) return;
+  var metalSel = document.getElementById('addStackMetal');
+  if (metalSel) metalSel.value = entry.metal || 'silver';
+  var nm = f.querySelector('[name="item_name"]'); if (nm) nm.value = entry.item_name || '';
+  var qty = f.querySelector('[name="quantity"]'); if (qty) qty.value = entry.quantity || '';
+  var pp2 = f.querySelector('[name="price_paid"]'); if (pp2) pp2.value = entry.price_paid || '';
+  var dl = f.querySelector('[name="dealer"]'); if (dl) dl.value = entry.dealer || '';
+  var dt = f.querySelector('[name="date_purchased"]'); if (dt) dt.value = entry.date_purchased || '';
+  var nt = f.querySelector('[name="notes"]'); if (nt) nt.value = entry.notes || '';
+  var hdr = document.querySelector('#addStackModal .modal-header h3');
+  if (hdr) hdr.textContent = 'Edit Entry';
+  var shareOpts = document.querySelector('#addStackModal .form-share');
+  if (shareOpts) shareOpts.style.display = 'none';
+  showModal('addStackModal');
+}
+async function updateStackEntry(eid, data) {
+  initSupabase();
+  var user = getUser();
+  if (!user || !_sb) return;
+  var r = await _sb.from('stack_entries').update({
+    metal: data.metal,
+    item_name: data.item_name,
+    quantity: parseFloat(data.quantity),
+    price_paid: parseFloat(data.price_paid),
+    dealer: data.dealer || null,
+    date_purchased: data.date_purchased || null,
+    notes: data.notes || null
+  }).eq('id', eid).eq('user_id', user.id).select();
+  if (!r.error) { closeModal('addStackModal'); renderMyStack(); }
+  else { alert('Error: ' + (r.error && r.error.message)); }
+}
 var forumFilter = 'recent', forumSearch = '', _openComments = {};
 
 function loadForum() { initSupabase(); renderForum(); }
