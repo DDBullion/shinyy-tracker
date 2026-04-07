@@ -1895,6 +1895,27 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
       });
     }
   </script>
+<!-- Spot Watch nav link (shown when signed in) -->
+<script>
+(function() {
+  function injectSpotWatch() {
+    if (document.getElementById('spotWatchNav')) return;
+    var loginBtn = document.getElementById('loginBtn');
+    if (!loginBtn) return;
+    var sw = document.createElement('a');
+    sw.id = 'spotWatchNav';
+    sw.href = '/spot-watch.html';
+    sw.textContent = '⭐ Spot Watch';
+    sw.className = 'hidden';
+    loginBtn.parentNode.appendChild(sw);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectSpotWatch);
+  } else {
+    injectSpotWatch();
+  }
+})();
+</script>
 
 <!-- ══ MY STACK PAGE ══ -->
 <div id="pageMyStack" class="page">
