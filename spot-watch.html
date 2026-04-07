@@ -138,7 +138,47 @@
   }
 
   // ─── Load watchlist from server ──────────────────────────────────────────────
-  function syncWatchlistFromServer(user) {
+  var _cachedSpot = null;
+
+  function applyLivePrices() {
+    if (!_cachedSpot) return;
+    Object.keys(watchlist).forEach(function(url) {
+      var deal = watchlist[url];
+      var prem = parseFloat(deal.prem);
+      if (isNaN(prem)) return;
+      var metal = (deal.metal || 'silver').toLowerCase();
+      var spot = 0;
+      if (metal === 'gold') spot = _cachedSpot.gold || 0;
+      else if (metal === 'silver') spot = _cachedSpot.silver || 0;
+      else if (metal === 'platinum') spot = _cachedSpot.platinum || 0;
+      else if (metal === 'palladium') spot = _cachedSpot.palladium || 0;
+      else return;
+      if (spot > 0) deal.price = (spot + prem).toFixed(2);
+    });
+  }
+
+  function fetchSpotThenRender() {
+    if (_cachedSpot) { applyLivePrices(); renderWatchlist(); return; }
+    fetch('https://www.kitco.com/api/kitco-rest-proxy/precious-metals')
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(data) {
+        if (data && data.metals) {
+          _cachedSpot = {};
+          data.metals.forEach(function(m) {
+            var bid = parseFloat(m.bid);
+            if (m.symbol === 'AG') _cachedSpot.silver = bid;
+            else if (m.symbol === 'AU') _cachedSpot.gold = bid;
+            else if (m.symbol === 'PT') _cachedSpot.platinum = bid;
+            else if (m.symbol === 'PD') _cachedSpot.palladium = bid;
+          });
+        }
+        applyLivePrices();
+        renderWatchlist();
+      })
+      .catch(function() { renderWatchlist(); });
+  }
+
+    function syncWatchlistFromServer(user) {
     if (!user) return;
     document.getElementById('loadingState').classList.remove('hidden');
     document.getElementById('emptyState').classList.add('hidden');
@@ -162,13 +202,13 @@
 
         var seen = {}; watchlist = merged.filter(function(d) { if (!d.url || seen[d.url]) return false; seen[d.url] = true; return true; });
         if (key) localStorage.setItem(key, JSON.stringify(watchlist));
-        renderWatchlist();
+        fetchSpotThenRender();
       })
       .catch(function() {
         // Fallback to localStorage
         var key = watchKey();
       watchlist = toWatchArray(key ? JSON.parse(localStorage.getItem(key) || 'null') : null);
-        renderWatchlist();
+        fetchSpotThenRender();
       });
     });
   }
@@ -195,7 +235,7 @@
   function unstar(url) {
     watchlist = watchlist.filter(function(d) { return d.url !== url; });
     saveWatchlist();
-    renderWatchlist();
+    fetchSpotThenRender();
   }
 
   // ─── Render deal cards ───────────────────────────────────────────────────────
