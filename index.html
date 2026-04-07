@@ -63,6 +63,7 @@
     .metal-tab.active-gold{color:var(--gold);border-bottom-color:var(--gold);text-shadow:0 0 20px rgba(217,119,6,0.3);}
     .metal-tab.active-sold{color:#16a34a;border-bottom-color:#16a34a;text-shadow:0 0 20px rgba(22,163,74,0.3);}
     .metal-tab.active-ebay{color:#e53e0a;border-bottom-color:#e53e0a;text-shadow:0 0 20px rgba(229,62,10,0.3);}
+    .metal-tab.active-junk{color:#333;border-bottom-color:#333;text-shadow:none;}
 
     /* ── Last 3 Sold ── */
     .sold-wrap{padding:14px;}
@@ -138,7 +139,7 @@
     /* ── Status Bar ── */
     .sbar{display:flex;justify-content:space-between;padding:8px 16px 4px;font-size:0.7rem;color:var(--mut);}
     .sdot{width:8px;height:8px;border-radius:50%;background:var(--grn);display:inline-block;margin-right:5px;position:relative;}
-    .sdot::after{content:'';position:absolute;top:-3px;left:-3px;width:14px;height:14px;border-radius:50%;background:var(--grn);opacity:0.3;animation:ping 2s cubic-bezier(0,0,.2,1) infinite;}
+    .sdot::after{content:'';position:absolute;top:-3px;left:-3px;width:14px;height:14px;border-radius:50%;background:var(--grn);opacity:0.3;display:none;}
     .sdot.loading{background:var(--yel);}
     .sdot.loading::after{background:var(--yel);}
     .sdot.error{background:var(--red);}
@@ -1085,7 +1086,7 @@ function renderJunk() {
   function loadWatchlist() {
     var user = window.netlifyIdentity && netlifyIdentity.currentUser();
     var key = 'shinyy_watch_' + (user ? user.email : 'guest');
-    try { watchlist = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { watchlist = {}; }
+    try { var _raw = JSON.parse(localStorage.getItem(key) || '{}'); if (Array.isArray(_raw)) { watchlist = {}; _raw.forEach(function(item) { if (item && item.url) watchlist[item.url] = item; }); try { localStorage.setItem(key, JSON.stringify(watchlist)); } catch(_e) {} } else { watchlist = (_raw && typeof _raw === 'object') ? _raw : {}; } } catch(e) { watchlist = {}; }
   }
   function getAuthToken(user, cb) {
     if (!user) return;
@@ -1137,9 +1138,11 @@ function renderJunk() {
             headers: {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'},
             body: mergedData
           }).catch(function() {});
-          document.querySelectorAll('a.deal').forEach(function(a) {
-            if (watchlist[a.getAttribute('href')]) a.classList.add('starred');
-            else a.classList.remove('starred');
+          document.querySelectorAll('.star-btn').forEach(function(btn) {
+            var _a = btn.closest('a[href]');
+            var _url = _a ? _a.getAttribute('href') : null;
+            if (_url && watchlist[_url]) btn.classList.add('starred');
+            else btn.classList.remove('starred');
           });
         }).catch(function() {});
     });
@@ -1163,6 +1166,7 @@ function renderJunk() {
             tag:     btn.getAttribute('data-tag')     || '',
             metal:   btn.getAttribute('data-metal')   || 'silver',
             price:   btn.getAttribute('data-price')   || '',
+            savedPrice: btn.getAttribute('data-price') || '',
             prem:    btn.getAttribute('data-premium') || '',
             dealer:  btn.getAttribute('data-dealer')  || ''
           };
@@ -1528,7 +1532,8 @@ fetchSpot();
         html += '<a class="deal '+cls+best+'" href="'+d.url+'" target="_blank" rel="noopener noreferrer">';
         html += '<div class="dl"><div class="dn"><span class="stag">'+d.size+'</span> '+d.name+bestBadge+'</div>';
         html += '<div class="dm">'+d.dealer+verif+ship+'</div></div>';
-        html += '<div class="dr"><div class="dp o">'+d.price.toFixed(2)+'<span style="font-size:0.6rem;font-weight:500;color:var(--mut)">/fv</span></div>';
+        const junkWatched = watchlist[d.url] ? ' starred' : '';
+        html += '<div class="dr"><div style="display:flex;align-items:center;gap:5px;justify-content:flex-end">'+'<div class="dp o">'+d.price.toFixed(2)+'<span style="font-size:0.6rem;font-weight:500;color:var(--mut)">/fv</span></div>'+'<button class="star-btn'+junkWatched+'" data-name="'+(d.name||'')+'" data-tag="'+(d.size||'')+'" data-metal="junk" data-price="'+d.price+'" data-premium="'+(d.prem||'')+'" data-dealer="'+(d.dealer||'')+'" onclick="event.preventDefault();event.stopPropagation();toggleWatch(this)">&#9734;</button></div>';
         html += '<div class="dspot">'+spotLine+'</div></div>';
         html += '</a>';
     });
