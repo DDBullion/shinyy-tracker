@@ -2208,7 +2208,7 @@ async function renderMyStack() {
         var gl    = spot > 0 ? sVal - total : null;
         var glStr = gl!==null ? ((gl>=0?'+':'')+fmtUSD(gl)) : '—';
         var glCls = gl!==null ? (gl>=0?'ms-gl-pos':'ms-gl-neg') : '';
-        var eid   = JSON.stringify(String(e.id));
+        var eid   = String(e.id);
         tbody += '<tr>';
         tbody += '<td><span class="ms-metal-badge ' + (mBadge[e.metal]||'ms-badge-silver') + '">' + (mEm[e.metal]||'')+' '+escHtml(e.metal)+'</span></td>';
         tbody += '<td>' + escHtml(e.item_name) + '</td>';
@@ -2220,9 +2220,9 @@ async function renderMyStack() {
         tbody += '<td>' + (spot>0?fmtUSD(sVal):'—') + '</td>';
         tbody += '<td class="ms-gl-cell ' + glCls + '">' + glStr + '</td>';
         tbody += '<td><div class="ms-row-btns">';
-        tbody += '<button class="ms-row-btn ms-row-btn-sell" data-eid="' + eid + '" data-pp="' + pp + '" onclick="var b=this;openSellModal(b.dataset.eid,parseFloat(b.dataset.pp))">Sell</button>';
-        tbody += '<button class="ms-row-btn ms-row-btn-share" data-eid="' + eid + '" onclick="var b=this;openShareModal(window._msEntMap[b.dataset.eid])">Share</button>';
-        tbody += '<button class="ms-row-btn ms-row-btn-del" data-eid="' + eid + '" onclick="var b=this;deleteStackEntry(b.dataset.eid)">Del</button><button class="ms-row-btn ms-row-btn-edit" data-eid="' + eid + '" onclick="var b=this;openEditStackModal(b.dataset.eid)">Edit</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-sell" data-eid="' + eid + '" data-pp="' + pp + '" onclick="var b=this;openSellModal(b.dataset.eid,parseFloat(b.dataset.pp))"title="Sell">💰</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-share" data-eid="' + eid + '" onclick="var b=this;openShareModal(window._msEntMap[b.dataset.eid])"title="Share">📤</button>';
+        tbody += '<button class="ms-row-btn ms-row-btn-del" data-eid="' + eid + '" onclick="var b=this;deleteStackEntry(b.dataset.eid)"title="Delete">🗑️</button><button class="ms-row-btn ms-row-btn-edit" data-eid="' + eid + '" onclick="var b=this;openEditStackModal(b.dataset.eid)"title="Edit">✏️</button>';
         tbody += '</div></td></tr>';
       });
     }
