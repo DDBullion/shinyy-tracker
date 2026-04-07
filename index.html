@@ -9,7 +9,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-VW8NWT320V');
+    gtag('config', 'G-VW8NWT320V')
   </script>
   <meta charset="UTF-8">
   <meta name="fo-verify" content="f39e9caf-b6c2-4eb0-bd63-dfa43822a22b" />
@@ -407,6 +407,47 @@
 .ms-row-btn-share{background:#ede9fe;color:#5b21b6;}
 .ms-row-btn-del{background:#fee2e2;color:#991b1b;}.ms-row-btn-edit{background:#ede9fe;color:#7c3aed;}
 .ms-empty{text-align:center;padding:40px;color:var(--mut);font-size:0.9rem;}
+    /* ── Mobile Tab Tiles ── */
+    @media (max-width: 768px) {
+      .metal-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        gap: 8px;
+        padding: 8px 12px 12px;
+        scrollbar-width: none;
+        border-bottom: 1px solid rgba(0,0,0,0.08);
+      }
+      .metal-tabs::-webkit-scrollbar { display: none; }
+      .metal-tab {
+        flex: 0 0 auto;
+        width: 76px;
+        min-height: 70px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 6px 4px;
+        border-bottom: none !important;
+        background: rgba(255,255,255,0.85);
+        border: 1.5px solid rgba(0,0,0,0.1) !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        white-space: normal;
+        text-align: center;
+        line-height: 1.4;
+        color: var(--mut);
+      }
+      .metal-tab[class*="active"] {
+        background: rgba(26,26,48,0.13);
+        border-color: rgba(26,26,48,0.3) !important;
+        color: #1a1a30;
+      }
+    }
 </style>
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -469,7 +510,7 @@
       <div class="metal-tab" id="tabSold" onclick="setMetal('sold');loadPopularSold()">🔍 Last Sold</div>
       <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
        <div class="metal-tab" id="tabMyStack" onclick="setMetal('mystack')">📦 My Stack</div>
-       <div class="metal-tab" id="tabForum" onclick="setMetal('forum')">🏆 Forum</div>
+       <div class="metal-tab" id="tabForum" onclick="setMetal('forum')">✨ Shiny Feed</div>
     </div>
   </div>
 
@@ -2274,7 +2315,8 @@ async function confirmShare(type) {
 async function shareEntryToForum(entry, displayName, postType) {
   initSupabase();
   if (!_sb) return;
-  var post = { user_id: entry.user_id, display_name: displayName||null, metal: entry.metal, item_name: entry.item_name, quantity: parseFloat(entry.quantity), price_paid: parseFloat(entry.price_paid), total_paid: parseFloat(entry.price_paid)*parseFloat(entry.quantity), dealer: entry.dealer||null, date_purchased: entry.date_purchased||null, post_type: postType||'buy' };
+  if (entry.user_id === '5fa1ce9c-323e-4b0e-9f2c-b43c64441aa5') displayName = 'Owner';
+  var post = { user_id: entry.user_id, display_name: displayName||null, metal: entry.metal, item_name: entry.item_name, quantity: parseFloat(entry.quantity), price_paid: parseFloat(entry.price_paid), dealer: entry.dealer||null, date_purchased: entry.date_purchased||null, post_type: postType||'buy' };
   if (postType==='sell'&&entry.sold_price) { post.sold_price=parseFloat(entry.sold_price); post.profit_loss=(parseFloat(entry.sold_price)-parseFloat(entry.price_paid))*parseFloat(entry.quantity); }
   var r = await _sb.from('forum_posts').insert([post]).select().single();
   if (!r.error&&r.data) await _sb.from('stack_entries').update({forum_post_id:r.data.id}).eq('id',entry.id);
