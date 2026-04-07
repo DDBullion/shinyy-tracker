@@ -2122,9 +2122,9 @@ function renderStackContent(entries, sold, metal) {
       html += '</div>';
       if (pl!==null) { var pc=pl>=0?'pl-up':'pl-down',ps=pl>=0?'+':''; html += '<div class="sec-pl '+pc+'">'+ps+fmtUSD(pl)+' ('+ps+plP.toFixed(1)+'%)</div>'; }
       html += '<div class="sec-actions">';
-      html += '<button class="sec-btn sec-sell" onclick="openSellModal(''+e.id+'','+parseFloat(e.price_paid)+')">Mark Sold</button>';
+      html += '<button class="sec-btn sec-sell" onclick="openSellModal('+e.id+'+parseFloat(e.price_paid)+')">Mark Sold</button>';
       html += '<button class="sec-btn sec-share" onclick="openShareModal('+JSON.stringify(e).split('').map(function(c){return c==='<'?'\u003c':c==='>'?'\u003e':c;}).join('')+')">Share</button>';
-      html += '<button class="sec-btn sec-del" onclick="deleteStackEntry(''+e.id+'')">✕</button>';
+      html += '<button class="sec-btn sec-del" onclick="deleteStackEntry('+e.id+')✕</button>';
       html += '</div></div>';
     });
     html += '</div>';
@@ -2294,8 +2294,8 @@ function renderForumPost(p, likedIds, userId) {
   }
   html += '</div>';
   html += '<div class="fp-footer">';
-  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike(''+p.id+'')">'+(isLiked?'❤️':'🤍')+' '+(p.likes_count||0)+'</button>';
-  html += '<button class="forum-comment-btn" onclick="toggleComments(''+p.id+'')">💬 '+(p.comments_count||0)+'</button>';
+  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike('+p.id+')'+(isLiked?'❤️':'🤍')+' '+(p.likes_count||0)+'</button>';
+  html += '<button class="forum-comment-btn" onclick="toggleComments('+p.id+')">💬 '+(p.comments_count||0)+'</button>';
   html += '</div>';
   html += '<div class="fp-comments" id="fcomments_'+p.id+'" style="display:none"></div>';
   html += '</div>';
@@ -2345,10 +2345,10 @@ async function loadComments(pid) {
   else cr.data.forEach(function(c){
     html+='<div class="fc-item"><div class="fc-meta"><span class="fc-author">'+escHtml(c.display_name||'Anonymous')+'</span><span class="fc-time">'+getTimeAgo(c.created_at)+'</span></div>';
     html+='<div class="fc-text">'+escHtml(c.content)+'</div>';
-    html+='<button class="fc-like'+(likedC[c.id]?' liked':'')+'" onclick="toggleCommentLike(''+c.id+'',''+pid+'')">'+(likedC[c.id]?'❤️':'🤍')+' '+(c.likes_count||0)+'</button></div>';
+    html+='<button class="fc-like'+(likedC[c.id]?' liked':'')+'" onclick="toggleCommentLike('+c.id+','+pid+')(likedC[c.id]?'❤️':'🤍')+' '+(c.likes_count||0)+'</button></div>';
   });
   html+='</div>';
-  if (user) html+='<div class="fc-add"><input type="text" id="fc_'+pid+'" placeholder="Add a comment..." class="fc-input" onkeydown="if(event.key==='Enter')addComment(''+pid+'')"><button class="fc-submit" onclick="addComment(''+pid+'')">Post</button></div>';
+  if (user) html+='<div class="fc-add"><input type="text" id="fc_'+pid+'" placeholder="Add a comment..." class="fc-input" onkeydown="if(event.key==='Enter')addComment('+pid+')"><button class="fc-submit" onclick="addComment('+pid+')">Post</button></div>';
   else html+='<div class="fc-signin">Sign in to comment</div>';
   el.innerHTML=html;
 }
