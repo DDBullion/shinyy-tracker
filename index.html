@@ -2279,7 +2279,7 @@ function renderForumPost(p, likedIds, userId) {
   var isSell = p.post_type==='sell';
   var html = '<div class="forum-post" id="fpost_'+p.id+'">';
   html += '<div class="fp-header">';
-  html += '<span class="fp-metal" style="color:'+(mColor[p.metal]||'#64748b')+'">'+(mEmoji[p.metal]||'🪙')+' '+p.metal.charAt(0).toUpperCase()+p.metal.slice(1)+'</span>';
+  html += '<span class="fp-metal" style="color:'+(mColor[p.metal]||'#64748b')+'">'+(mEmoji[p.metal]||'\uD83E\uDE99')+' '+p.metal.charAt(0).toUpperCase()+p.metal.slice(1)+'</span>';
   html += '<span class="fp-author">'+escHtml(p.display_name||'Anonymous')+'</span>';
   html += '<span class="fp-time">'+getTimeAgo(p.created_at)+'</span>';
   if (isSell) html += '<span class="fp-type-badge fp-sell">SOLD</span>';
@@ -2294,8 +2294,8 @@ function renderForumPost(p, likedIds, userId) {
   }
   html += '</div>';
   html += '<div class="fp-footer">';
-  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike('+p.id+')'+(isLiked?'❤️':'🤍')+' '+(p.likes_count||0)+'</button>';
-  html += '<button class="forum-comment-btn" onclick="toggleComments('+p.id+')">💬 '+(p.comments_count||0)+'</button>';
+  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike('+p.id+')'+(isLiked?'❤️':'\uD83E\uDD0D')+' '+(p.likes_count||0)+'</button>';
+  html += '<button class="forum-comment-btn" onclick="toggleComments('+p.id+')">\uD83D\uDCAC '+(p.comments_count||0)+'</button>';
   html += '</div>';
   html += '<div class="fp-comments" id="fcomments_'+p.id+'" style="display:none"></div>';
   html += '</div>';
