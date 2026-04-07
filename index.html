@@ -111,7 +111,7 @@
     /* ── Spot Card ── */
     .spot-wrap{padding:14px 14px 0;}
     .spot-card{border-radius:18px;padding:18px 18px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;animation:fadeIn .4s ease both;}
-    .spot-card::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;opacity:0.07;}
+    
     .spot-card.silver-card{background:linear-gradient(135deg,#e8eaff 0%,#d8dbf5 50%,#cdd0f0 100%);border:1px solid #b8bcdf;box-shadow:0 4px 20px rgba(91,94,246,0.12);}
     .spot-card.silver-card::before{background:var(--acc);}
     .spot-card.gold-card{background:linear-gradient(135deg,#fff8e1 0%,#fdedb0 50%,#fce58a 100%);border:1px solid #e5c840;box-shadow:0 4px 20px rgba(217,119,6,0.15);}
@@ -2408,9 +2408,7 @@ async function renderForum() {
   try {
     var q = _sb.from('forum_posts').select('*');
     if (forumSearch) q = q.ilike('item_name','%'+forumSearch+'%');
-    if (forumFilter==='hot')    q = q.order('likes_count',{ascending:false}).order('created_at',{ascending:false});
-    else if (forumFilter==='cold') q = q.order('likes_count',{ascending:true}).order('created_at',{ascending:false});
-    else q = q.order('created_at',{ascending:false});
+    q = q.order('created_at',{ascending:false});
     q = q.limit(50);
     var r = await q;
     if (r.error) { feed.innerHTML='<div class="forum-error">Error loading forum</div>'; return; }
@@ -2421,14 +2419,22 @@ async function renderForum() {
       var lr = await _sb.from('forum_likes').select('post_id').eq('user_id',user.id).not('post_id','is',null);
       if (lr.data) lr.data.forEach(function(l){likedIds[l.post_id]=true;});
     }
-    feed.innerHTML = r.data.map(function(p){return renderForumPost(p,likedIds,user?user.id:null);}).join('');
+    var likeCounts={};
+    var allLr=await _sb.from('forum_likes').select('post_id');
+    if(allLr.data)allLr.data.forEach(function(l){likeCounts[l.post_id]=(likeCounts[l.post_id]||0)+1;});
+    var commentCounts={};
+    var allCr=await _sb.from('forum_comments').select('post_id');
+    if(allCr.data)allCr.data.forEach(function(c){commentCounts[c.post_id]=(commentCounts[c.post_id]||0)+1;});
+    if(forumFilter==='hot')r.data.sort(function(a,b){return(likeCounts[b.id]||0)-(likeCounts[a.id]||0);});
+    else if(forumFilter==='cold')r.data.sort(function(a,b){return(likeCounts[a.id]||0)-(likeCounts[b.id]||0);});
+    feed.innerHTML = r.data.map(function(p){return renderForumPost(p,likedIds,user?user.id:null,likeCounts,commentCounts);}).join('');
     Object.keys(_openComments).forEach(function(pid){if(_openComments[pid])loadComments(pid);});
   } catch(e) { feed.innerHTML='<div class="forum-error">'+escHtml(e.message)+'</div>'; }
 }
 
-function renderForumPost(p, likedIds, userId) {
+function renderForumPost(p, likedIds, userId, likeCounts, commentCounts) {
   var mColor = {silver:'#64748b',gold:'#d97706',platinum:'#6366f1',palladium:'#0891b2'};
-  var mEmoji = {silver:'📈',gold:'📈',platinum:'⬜',palladium:'🔷'};
+  var mEmoji = {silver:'🥈',gold:'🥇',platinum:'⬜',palladium:'🔷'};
   var isLiked = likedIds&&likedIds[p.id];
   var isSell = p.post_type==='sell';
   var html = '<div class="forum-post" id="fpost_'+p.id+'">';
@@ -2448,8 +2454,8 @@ function renderForumPost(p, likedIds, userId) {
   }
   html += '</div>';
   html += '<div class="fp-footer">';
-  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike(\''+p.id+'\')">'+(isLiked?'❤️':'\uD83E\uDD0D')+' '+(p.likes_count||0)+'</button>';
-  html += '<button class="forum-comment-btn" onclick="toggleComments(\''+p.id+'\')">\uD83D\uDCAC '+(p.comments_count||0)+'</button>';
+  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike(\''+p.id+'\')">'+(isLiked?'❤️':'\uD83E\uDD0D')+' '+((likeCounts&&likeCounts[p.id])||0)+'</button>';
+  html += '<button class="forum-comment-btn" onclick="toggleComments(\''+p.id+'\')">\uD83D\uDCAC '+((commentCounts&&commentCounts[p.id])||0)+'</button>';
   html += '</div>';
   html += '<div class="fp-comments" id="fcomments_'+p.id+'" style="display:none"></div>';
   html += '</div>';
@@ -2462,14 +2468,10 @@ async function toggleLike(pid) {
   if (!user){alert('Sign in to like posts');return;}
   if (!_sb) return;
   var r=await _sb.from('forum_likes').select('id').eq('user_id',user.id).eq('post_id',pid).maybeSingle();
-  var pr=await _sb.from('forum_posts').select('likes_count').eq('id',pid).single();
-  var cnt=pr.data?(pr.data.likes_count||0):0;
   if (r.data) {
     await _sb.from('forum_likes').delete().eq('id',r.data.id);
-    await _sb.from('forum_posts').update({likes_count:Math.max(0,cnt-1)}).eq('id',pid);
   } else {
     await _sb.from('forum_likes').insert([{user_id:user.id,post_id:pid}]);
-    await _sb.from('forum_posts').update({likes_count:cnt+1}).eq('id',pid);
   }
   renderForum();
 }
@@ -2516,9 +2518,8 @@ async function addComment(pid) {
   var txt=(inp.value||'').trim();
   if (!txt) return;
   await _sb.from('forum_comments').insert([{post_id:pid,user_id:user.id,display_name:user.firstName,content:txt}]);
-  var pr=await _sb.from('forum_posts').select('comments_count').eq('id',pid).single();
-  if (pr.data) await _sb.from('forum_posts').update({comments_count:(pr.data.comments_count||0)+1}).eq('id',pid);
   inp.value='';
+  renderForum();
   loadComments(pid);
 }
 
