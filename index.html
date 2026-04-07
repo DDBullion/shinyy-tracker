@@ -2348,7 +2348,7 @@ async function loadComments(pid) {
     html+='<button class="fc-like'+(likedC[c.id]?' liked':'')+'" onclick="toggleCommentLike('+c.id+','+pid+')'+(likedC[c.id]?'\u2764\uFE0F':'\uD83D\uDC4D')+' '+(c.likes_count||0)+'</button></div>';
   });
   html+='</div>';
-  if (user) html+='<div class="fc-add"><input type="text" id="fc_'+pid+'" placeholder="Add a comment..." class="fc-input" onkeydown="if(event.key==='Enter')addComment('+pid+')"><button class="fc-submit" onclick="addComment('+pid+')">Post</button></div>';
+  if (user) html+='<div class="fc-add"><input type="text" id="fc_'+pid+'" placeholder="Add a comment..." class="fc-input" onkeydown="if(event.key===\'Enter\')addComment('+pid+')"><button class="fc-submit" onclick="addComment('+pid+')">Post</button></div>';
   else html+='<div class="fc-signin">Sign in to comment</div>';
   el.innerHTML=html;
 }
