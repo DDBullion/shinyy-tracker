@@ -260,7 +260,7 @@
     #signOutBtn{display:block;width:100%;padding:9px 16px;background:none;border:none;cursor:pointer;font-size:.82rem;color:#1a1a30;text-align:left;font-weight:500;}
     #signOutBtn:hover{background:#f0f0ff;}
     @media(max-width:500px){#loginBtn{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
-@media(max-width:600px){.hlogo{width:160px;}.hspacer{width:100px;}#loginBtn{top:8px !important;left:8px !important;font-size:0.7rem !important;padding:4px 8px !important;max-width:85px !important;}#myStackNavLink{top:8px !important;left:auto !important;right:108px !important;font-size:0.7rem !important;padding:4px 8px !important;}#spotWatchNav{top:8px !important;left:auto !important;right:8px !important;font-size:0.7rem !important;padding:4px 8px !important;}}
+@media(max-width:600px){.hlogo{width:160px;}.hspacer{width:100px;}#loginBtn{top:8px !important;left:8px !important;font-size:0.7rem !important;padding:4px 8px !important;max-width:85px !important;}#spotWatchNav{top:8px !important;left:auto !important;right:8px !important;font-size:0.7rem !important;padding:4px 8px !important;}}
 #junkTabs,#junkDDWrap,#junkSearchWrap{display:none;}
     /* ── My Stack & Forum Tab Underlines ── */
     .metal-tab.active-mystack{color:#6366f1;border-bottom-color:#6366f1;text-shadow:none;}
@@ -1895,76 +1895,6 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
       });
     }
   </script>
-
-<!-- My Stack nav link (shown when signed in) -->
-<script>
-(function() {
-  function injectMyStackLink() {
-    if (document.getElementById('myStackNavLink')) return;
-    var loginBtn = document.getElementById('loginBtn');
-    if (!loginBtn) return;
-    var link = document.createElement('a');
-    link.id = 'myStackNavLink';
-    link.href = '/my-stack.html';
-    link.textContent = '\uD83D\uDCCA My Stack';
-    link.style.cssText = loginBtn.style.cssText;
-    // Position it below loginBtn
-    link.style.left = '10px';
-    link.style.top = (10 + loginBtn.offsetHeight + 4) + 'px';
-    link.style.display = 'none';
-    link.style.textDecoration = 'none';
-    link.style.fontSize = '13px';
-    loginBtn.parentNode.insertBefore(link, loginBtn.nextSibling);
-    if (!document.getElementById('spotWatchNav')) {
-      var sw = document.createElement('a');
-      sw.id = 'spotWatchNav';
-      sw.href = '/spot-watch.html';
-      sw.textContent = '⭐ Spot Watch';
-      sw.style.cssText = loginBtn.style.cssText;
-      sw.style.left = '10px';
-      sw.style.display = 'none';
-      sw.style.textDecoration = 'none';
-      sw.style.fontSize = '13px';
-      loginBtn.parentNode.insertBefore(sw, link.nextSibling);
-    }
-  }
-  function repositionMyStackLink() {
-    var link = document.getElementById('myStackNavLink');
-    var btn = document.getElementById('loginBtn');
-    if (link && btn) {
-      link.style.left = '10px';
-      link.style.top = (10 + btn.offsetHeight + 4) + 'px';
-    }
-  }
-  function repositionSpotWatch() {
-    var sw = document.getElementById('spotWatchNav');
-    var ms = document.getElementById('myStackNavLink');
-    if (sw && ms) {
-      sw.style.left = ms.style.left;
-      sw.style.top = (ms.offsetTop + ms.offsetHeight + 4) + 'px';
-    }
-  }
-  function showMyStack(user) {
-    var link = document.getElementById('myStackNavLink');
-    if (link) link.style.display = user ? 'inline-block' : 'none';
-    requestAnimationFrame(repositionMyStackLink);
-    var sw = document.getElementById('spotWatchNav');
-    if (sw) sw.style.display = user ? 'inline' : 'none';
-    if (user) requestAnimationFrame(repositionSpotWatch);
-  }
-  // Two-path auth check:
-  // 1. gotrue.currentUser() reads localStorage synchronously (works at page load)
-  // 2. on('init', ...) catches the case where NI hasn't fired init yet
-  injectMyStackLink();
-  if (window.netlifyIdentity) {
-    var _u = netlifyIdentity.gotrue && netlifyIdentity.gotrue.currentUser();
-    if (_u) { showMyStack(_u); }
-    netlifyIdentity.on('init', function(u) { showMyStack(u); if(u) syncWatchlistFromServer(u); });
-    netlifyIdentity.on('login', function(u) { injectMyStackLink(); showMyStack(u); syncWatchlistFromServer(u); });
-    netlifyIdentity.on('logout', function() { showMyStack(null); });
-  }
-})();
-</script>
 
 <!-- ══ MY STACK PAGE ══ -->
 <div id="pageMyStack" class="page">
