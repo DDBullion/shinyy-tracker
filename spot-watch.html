@@ -153,7 +153,7 @@
       else if (metal === 'platinum') spot = _cachedSpot.platinum || 0;
       else if (metal === 'palladium') spot = _cachedSpot.palladium || 0;
       else return;
-      if (spot > 0) deal.price = (spot + prem).toFixed(2);
+      if (spot > 0) deal.price = (spot * (parseFloat(deal.oz) || 1) + prem).toFixed(2);
     });
   }
 
