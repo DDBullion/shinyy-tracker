@@ -39,6 +39,7 @@ export default async (req) => {
     const data = JSON.parse(raw);
     if (data.silver) data.silver = data.silver.map(fixDeal);
     if (data.gold)   data.gold   = data.gold.map(fixDeal);
+    if (data.junk)   data.junk   = data.junk.map(fixDeal);
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
