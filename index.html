@@ -505,11 +505,11 @@
     <!-- Top-level metal tabs -->
     <div class="metal-tabs">
       <div class="metal-tab active-silver" id="tabSilver" onclick="setMetal('silver')">🥈 Silver</div>
-      <div class="metal-tab" id="tabJunk" onclick="setMetal('junk')">🪙 90% Silver</div>
+      <div class="metal-tab" id="tabJunk" onclick="setMetal('junk')">📈 90% Silver</div>
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
       <div class="metal-tab" id="tabSold" onclick="setMetal('sold');loadPopularSold()">🔍 Last Sold</div>
       <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
-       <div class="metal-tab" id="tabMyStack" onclick="setMetal('mystack')">🪙 My Stack</div>
+       <div class="metal-tab" id="tabMyStack" onclick="setMetal('mystack')">📈 My Stack</div>
        <div class="metal-tab" id="tabForum" onclick="setMetal('forum')">✨ Shiny Feed</div>
     </div>
   </div>
@@ -552,7 +552,7 @@
       <div class="tab" onclick="setFilter('kilo')">Kilo</div>
       <div class="coin-dd-wrap" id="silverDDWrap">
         <select class="coin-dropdown" id="silverCoinDD" onchange="setSilverCoinFilter(this.value)">
-          <option value="">🪙 Coin Type</option>
+          <option value="">📈 Coin Type</option>
           <option value="eagle">🇺🇸 Eagles</option>
           <option value="maple">🍁 Maples</option>
           <option value="buffalo">🦬 Buffalos</option>
@@ -625,7 +625,7 @@
       <div class="tab" onclick="setGoldFilter('kilo')">Kilo</div>
       <div class="coin-dd-wrap" id="goldDDWrap">
         <select class="coin-dropdown" id="goldCoinDD" onchange="setGoldCoinFilter(this.value)">
-          <option value="">🪙 Coin Type</option>
+          <option value="">📈 Coin Type</option>
           <option value="eagle">🇺🇸 Eagles</option>
           <option value="maple">🍁 Maples</option>
           <option value="buffalo">🦬 Buffalos</option>
@@ -751,7 +751,7 @@
       <div class="tab" onclick="setJunkFilter('kilo')">Kilo</div>
       <div class="coin-dd-wrap" id="junkDDWrap">
         <select class="coin-dropdown" id="junkCoinDD" onchange="setJunkCoinFilter(this.value)">
-          <option value="">🪙 Coin Type</option>
+          <option value="">📈 Coin Type</option>
           <option value="eagle">🇺🇸 Eagles</option>
           <option value="maple">🍁 Maples</option>
           <option value="buffalo">🦬 Buffalos</option>
@@ -808,7 +808,7 @@ function setMetal(m) {
   if (m === 'silver') document.getElementById('headerSub').textContent = '🥈 Silver · Live Every 5 Min';
   else if (m === 'gold') document.getElementById('headerSub').textContent = '🥇 Gold · Live Every 5 Min';
   else if (m === 'ebay') document.getElementById('headerSub').textContent = '🛒 eBay Live Listings';
-  else if (m === 'junk') document.getElementById('headerSub').textContent = '🪙 90% Silver · Daily Pricing';
+  else if (m === 'junk') document.getElementById('headerSub').textContent = '📈 90% Silver · Daily Pricing';
   else document.getElementById('headerSub').textContent = '🔍 Last 3 Sold on eBay';
   // New pages
   var _pms = document.getElementById('pageMyStack'); if (_pms) _pms.classList.toggle('active', m === 'mystack');
@@ -850,7 +850,7 @@ async function doSoldSearch() {
       const dateStr = d ? d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '';
       const img = item.image
         ? `<img class="sold-img" src="${item.image}" alt="" loading="lazy" onerror="this.remove()">`
-        : `<div class="sold-img-placeholder">🪙</div>`;
+        : `<div class="sold-img-placeholder">📈</div>`;
       return `<a class="sold-card" href="${item.url}" target="_blank" rel="noopener">
         ${img}
         <div class="sold-info">
@@ -898,7 +898,7 @@ async function doEbaySearch() {
         : '<span class="ebay-badge ebay-badge-auc">Auction</span>';
       const img = item.image
         ? '<img class="ebay-thumb" src="' + item.image + '" alt="" loading="lazy">'
-        : '<div class="ebay-thumb-ph">🪙</div>';
+        : '<div class="ebay-thumb-ph">📈</div>';
       return '<a class="ebay-card" href="' + item.url + '" target="_blank" rel="noopener noreferrer">'
         + img
         + '<div class="ebay-info">'
@@ -1827,7 +1827,7 @@ async function doSoldSearch(){
       +data.map(item=>{
         const d=item.soldDate?new Date(item.soldDate):null;
         const ds=d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
-        const img=item.image?'<img class="sold-sale-img" src="'+item.image+'" alt="" loading="lazy" onerror="this.remove()">':'<div class="sold-sale-img-placeholder">🪙</div>';
+        const img=item.image?'<img class="sold-sale-img" src="'+item.image+'" alt="" loading="lazy" onerror="this.remove()">':'<div class="sold-sale-img-placeholder">📈</div>';
         return '<div class="sold-sale-row">'+img
           +'<div class="sold-sale-info"><div class="sold-sale-title" title="'+item.title+'">'+item.title.substring(0,60)+(item.title.length>60?'…':'')+'</div>'
           +'<div class="sold-sale-date">'+ds+(item.condition?' · '+item.condition:'')+'</div></div>'
@@ -2021,7 +2021,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
   <div class="modal-box">
     <div class="modal-header"><h3>Add to My Stack</h3><button onclick="closeModal('addStackModal')" class="modal-close">✕</button></div>
     <form id="addStackForm" onsubmit="event.preventDefault();submitAddStack()">
-      <div class="form-field"><label>Metal</label><select id="addStackMetal" name="metal" class="form-input"><option value="silver">🪙 Silver</option><option value="gold">🪙 Gold</option><option value="platinum">⚪ Platinum</option><option value="palladium">🔷 Palladium</option></select></div>
+      <div class="form-field"><label>Metal</label><select id="addStackMetal" name="metal" class="form-input"><option value="silver">📈 Silver</option><option value="gold">📈 Gold</option><option value="platinum">⚪ Platinum</option><option value="palladium">🔷 Palladium</option></select></div>
       <div class="form-field"><label>Item Name</label><input name="item_name" required placeholder="e.g. 1 oz Silver Eagle" class="form-input"></div>
       <div class="form-row">
         <div class="form-field"><label>Quantity (oz)</label><input name="quantity" type="number" step="0.001" min="0.001" required placeholder="1.000" class="form-input"></div>
@@ -2173,7 +2173,7 @@ async function renderMyStack() {
       s.cost  += pp * qty;
       s.value += qty * (spots[e.metal] || 0);
     });
-    var mLabel = { silver: '🪙 Silver Stack', gold: '🥇 Gold Stack', platinum: '⚪ Platinum Stack', palladium: '🔷 Palladium Stack' };
+    var mLabel = { silver: '📈 Silver Stack', gold: '🥇 Gold Stack', platinum: '⚪ Platinum Stack', palladium: '🔷 Palladium Stack' };
     var cardsHtml = '';
     metals.forEach(function(m) {
       var s = summary[m];
@@ -2208,7 +2208,7 @@ async function renderMyStack() {
     cardsEl.innerHTML = cardsHtml;
     if (countEl) countEl.textContent = entries.length + (entries.length===1?' entry':' entries');
     var mBadge = { silver:'ms-badge-silver', gold:'ms-badge-gold', platinum:'ms-badge-platinum', palladium:'ms-badge-palladium' };
-    var mEm = { silver:'🪙', gold:'🪙', platinum:'⚪', palladium:'🔷' };
+    var mEm = { silver:'📈', gold:'📈', platinum:'⚪', palladium:'🔷' };
     var tbody = '';
     if (entries.length === 0) {
       tbody = '<tr><td colspan="10" class="ms-empty">No entries yet — click + Add Entry to start!</td></tr>';
@@ -2428,7 +2428,7 @@ async function renderForum() {
 
 function renderForumPost(p, likedIds, userId) {
   var mColor = {silver:'#64748b',gold:'#d97706',platinum:'#6366f1',palladium:'#0891b2'};
-  var mEmoji = {silver:'🪙',gold:'🪙',platinum:'⬜',palladium:'🔷'};
+  var mEmoji = {silver:'📈',gold:'📈',platinum:'⬜',palladium:'🔷'};
   var isLiked = likedIds&&likedIds[p.id];
   var isSell = p.post_type==='sell';
   var html = '<div class="forum-post" id="fpost_'+p.id+'">';
