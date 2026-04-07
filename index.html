@@ -1900,20 +1900,20 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
 (function() {
   function injectSpotWatch() {
     if (document.getElementById('spotWatchNav')) return;
-    var loginBtn = document.getElementById('loginBtn');
-    if (!loginBtn) return;
     var sw = document.createElement('a');
     sw.id = 'spotWatchNav';
     sw.href = '/spot-watch.html';
     sw.textContent = '⭐ Spot Watch';
-    sw.className = 'hidden';
-    loginBtn.parentNode.appendChild(sw);
+    sw.style.cssText = 'position:fixed;top:8px;right:8px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;font-weight:500;text-decoration:none;display:none;';
+    document.body.appendChild(sw);
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectSpotWatch);
-  } else {
-    injectSpotWatch();
+  function showSpotWatch(user) {
+    var sw = document.getElementById('spotWatchNav');
+    if (sw) sw.style.display = user ? 'inline-block' : 'none';
   }
+  netlifyIdentity.on('init', function(user) { injectSpotWatch(); showSpotWatch(user); });
+  netlifyIdentity.on('login', function(user) { injectSpotWatch(); showSpotWatch(user); });
+  netlifyIdentity.on('logout', function() { showSpotWatch(null); });
 })();
 </script>
 
