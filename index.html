@@ -261,7 +261,106 @@
     #signOutBtn:hover{background:#f0f0ff;}
     @media(max-width:500px){#loginBtn{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
 @media(max-width:600px){.hlogo{width:160px;}.hspacer{width:100px;}#loginBtn{top:8px !important;left:8px !important;font-size:0.7rem !important;padding:4px 8px !important;max-width:85px !important;}#myStackNavLink{top:8px !important;left:auto !important;right:108px !important;font-size:0.7rem !important;padding:4px 8px !important;}#spotWatchNav{top:8px !important;left:auto !important;right:8px !important;font-size:0.7rem !important;padding:4px 8px !important;}}
-#junkTabs,#junkDDWrap,#junkSearchWrap{display:none;}</style>
+#junkTabs,#junkDDWrap,#junkSearchWrap{display:none;}
+    /* ── My Stack & Forum Tab Underlines ── */
+    .metal-tab.active-mystack{color:#6366f1;border-bottom-color:#6366f1;text-shadow:none;}
+    .metal-tab.active-forum{color:#d97706;border-bottom-color:#d97706;text-shadow:none;}
+
+    /* ── Shared Modal ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;}
+    .modal-box{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+    .modal-header h3{margin:0;font-size:1.1rem;font-weight:700;}
+    .modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--mut);line-height:1;}
+    .form-field{margin-bottom:12px;}
+    .form-field label{display:block;font-size:0.75rem;font-weight:600;color:var(--mut);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+    .form-input{width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.9rem;box-sizing:border-box;}
+    .form-input:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.15);}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .form-share{background:#f8fafc;border-radius:10px;padding:12px;margin:12px 0;}
+    .share-label{font-size:0.78rem;font-weight:600;color:var(--mut);margin:0 0 8px;text-transform:uppercase;}
+    .share-opt{display:block;font-size:0.88rem;margin:6px 0;cursor:pointer;}
+    .share-opt input{margin-right:6px;}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
+    .share-actions{justify-content:center;}
+    .btn-primary{padding:9px 18px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;}
+    .btn-primary:hover{background:#4f46e5;}
+    .btn-secondary{padding:9px 18px;background:#f1f5f9;color:#334155;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;}
+    .btn-outline{padding:9px 18px;background:transparent;color:#6366f1;border:1px solid #6366f1;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;}
+    .sell-orig-price{font-size:1rem;font-weight:600;color:#334155;padding:6px 0;}
+
+    /* ── My Stack Page ── */
+    .stack-wrap{max-width:700px;margin:0 auto;padding:16px;}
+    .stack-metal-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;}
+    .s-tab{padding:7px 14px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--mut);white-space:nowrap;}
+    .s-tab-active{background:#6366f1;color:#fff;border-color:#6366f1;}
+    .stack-content{min-height:200px;}
+    .stack-loading,.stack-empty,.stack-login-msg,.stack-error{text-align:center;padding:40px 20px;color:var(--mut);font-size:0.9rem;}
+    .stack-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);border-radius:12px;padding:16px;margin-bottom:16px;}
+    .stack-stat{}
+    .ss-label{font-size:0.7rem;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;}
+    .ss-val{font-size:1.05rem;font-weight:700;color:#1e293b;margin-top:2px;}
+    .stack-section-header{display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;font-size:0.82rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;}
+    .sold-header{margin-top:24px;}
+    .add-stack-btn{padding:5px 12px;background:#6366f1;color:#fff;border:none;border-radius:16px;font-size:0.8rem;font-weight:600;cursor:pointer;}
+    .stack-entries{display:flex;flex-direction:column;gap:10px;}
+    .stack-entry-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .sold-card{opacity:.8;background:#f8fafc;}
+    .sec-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+    .sec-name{font-size:0.92rem;font-weight:600;color:#1e293b;flex:1;}
+    .sec-price{font-size:0.92rem;font-weight:700;color:#334155;white-space:nowrap;margin-left:8px;}
+    .sec-details{display:flex;flex-wrap:wrap;gap:8px;font-size:0.78rem;color:var(--mut);margin-bottom:8px;}
+    .sec-pl{font-size:0.82rem;font-weight:600;margin-bottom:8px;}
+    .pl-up{color:#16a34a;}
+    .pl-down{color:#dc2626;}
+    .sec-actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .sec-btn{padding:4px 10px;border-radius:6px;border:none;font-size:0.75rem;font-weight:600;cursor:pointer;}
+    .sec-sell{background:#fef3c7;color:#92400e;}
+    .sec-share{background:#ede9fe;color:#5b21b6;}
+    .sec-del{background:#fee2e2;color:#991b1b;}
+    .sold-badge{background:#6366f1;color:#fff;font-size:0.65rem;padding:1px 6px;border-radius:10px;font-weight:700;vertical-align:middle;margin-left:4px;}
+
+    /* ── Forum Page ── */
+    .forum-wrap{max-width:700px;margin:0 auto;padding:16px;}
+    .forum-filters{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
+    .ff-btn{padding:7px 14px;border-radius:20px;border:1px solid #e2e8f0;background:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--mut);}
+    .ff-active{background:#d97706;color:#fff;border-color:#d97706;}
+    .ff-search{flex:1;min-width:140px;padding:7px 12px;border:1px solid #e2e8f0;border-radius:20px;font-size:0.85rem;outline:none;}
+    .ff-search:focus{border-color:#d97706;}
+    .forum-feed{display:flex;flex-direction:column;gap:14px;}
+    .forum-loading,.forum-empty,.forum-error{text-align:center;padding:40px 20px;color:var(--mut);font-size:0.9rem;}
+    .forum-post{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .fp-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+    .fp-metal{font-size:0.82rem;font-weight:700;text-transform:capitalize;}
+    .fp-author{font-size:0.88rem;font-weight:600;color:#334155;}
+    .fp-time{font-size:0.75rem;color:var(--mut);margin-left:auto;}
+    .fp-type-badge{font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:10px;}
+    .fp-sell{background:#dcfce7;color:#15803d;}
+    .fp-item{font-size:1rem;font-weight:700;color:#1e293b;margin-bottom:6px;}
+    .fp-details{display:flex;flex-wrap:wrap;gap:10px;font-size:0.8rem;color:var(--mut);margin-bottom:8px;}
+    .fp-dealer{background:#f1f5f9;padding:2px 7px;border-radius:6px;}
+    .fp-sell-row{display:flex;gap:14px;align-items:center;font-size:0.85rem;font-weight:600;margin-bottom:8px;}
+    .fp-pl{font-size:0.95rem;}
+    .fp-footer{display:flex;gap:12px;padding-top:10px;border-top:1px solid #f1f5f9;}
+    .forum-like,.forum-comment-btn{background:none;border:1px solid #e2e8f0;border-radius:16px;padding:4px 12px;font-size:0.82rem;cursor:pointer;color:var(--mut);}
+    .forum-like.liked{border-color:#f87171;color:#dc2626;background:#fef2f2;}
+    .forum-like:hover,.forum-comment-btn:hover{background:#f8fafc;}
+    .fp-comments{padding-top:12px;border-top:1px solid #f1f5f9;margin-top:10px;}
+    .fc-list{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+    .fc-item{background:#f8fafc;border-radius:10px;padding:10px 12px;}
+    .fc-meta{display:flex;gap:8px;margin-bottom:4px;}
+    .fc-author{font-size:0.8rem;font-weight:600;color:#334155;}
+    .fc-time{font-size:0.75rem;color:var(--mut);}
+    .fc-text{font-size:0.87rem;color:#1e293b;margin-bottom:6px;}
+    .fc-like{background:none;border:none;font-size:0.78rem;cursor:pointer;color:var(--mut);padding:0;}
+    .fc-like.liked{color:#dc2626;}
+    .fc-empty{font-size:0.82rem;color:var(--mut);text-align:center;padding:8px;}
+    .fc-add{display:flex;gap:8px;margin-top:8px;}
+    .fc-input{flex:1;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.85rem;outline:none;}
+    .fc-input:focus{border-color:#6366f1;}
+    .fc-submit{padding:7px 14px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;}
+    .fc-signin{font-size:0.82rem;color:var(--mut);text-align:center;padding:8px;}
+</style>
   <!-- Structured Data -->
   <script type="application/ld+json">
   {
@@ -294,7 +393,8 @@
   }
   </script>
 
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <button id="loginBtn" style="position:fixed;top:10px;left:10px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:5px 14px;font-size:0.78rem;cursor:pointer;font-weight:500;">Sign In</button>
@@ -321,6 +421,8 @@
       <div class="metal-tab" id="tabGold" onclick="setMetal('gold')">🥇 Gold</div>
       <div class="metal-tab" id="tabSold" onclick="setMetal('sold');loadPopularSold()">🔍 Last Sold</div>
       <div class="metal-tab" id="tabEbay" onclick="setMetal('ebay')">🛒 eBay Live</div>
+       <div class="metal-tab" id="tabMyStack" onclick="setMetal('mystack')">📦 My Stack</div>
+       <div class="metal-tab" id="tabForum" onclick="setMetal('forum')">🏆 Forum</div>
     </div>
   </div>
 
@@ -620,6 +722,14 @@ function setMetal(m) {
   else if (m === 'ebay') document.getElementById('headerSub').textContent = '🛒 eBay Live Listings';
   else if (m === 'junk') document.getElementById('headerSub').textContent = '🪙 90% Silver · Daily Pricing';
   else document.getElementById('headerSub').textContent = '🔍 Last 3 Sold on eBay';
+  // New pages
+  var _pms = document.getElementById('pageMyStack'); if (_pms) _pms.classList.toggle('active', m === 'mystack');
+  var _pfm = document.getElementById('pageForum');   if (_pfm) _pfm.classList.toggle('active', m === 'forum');
+  // New tab active classes
+  var _tms = document.getElementById('tabMyStack'); if (_tms) _tms.className = 'metal-tab' + (m === 'mystack' ? ' active-mystack' : '');
+  var _tfo = document.getElementById('tabForum');   if (_tfo) _tfo.className = 'metal-tab' + (m === 'forum' ? ' active-forum' : '');
+  if (m === 'mystack') setTimeout(loadMyStack, 50);
+  if (m === 'forum')   setTimeout(loadForum, 50);
   if (m === 'silver' && silverSpot) renderSilver();
   if (m === 'gold' && goldSpot) renderGold();
   if (m === 'junk') renderJunk();
@@ -1807,6 +1917,480 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     netlifyIdentity.on('logout', function() { showMyStack(null); });
   }
 })();
+</script>
+
+<!-- ══ MY STACK PAGE ══ -->
+<div id="pageMyStack" class="page">
+  <div class="stack-wrap">
+    <div class="stack-metal-tabs">
+      <button class="s-tab s-tab-active" id="sTab_silver"    onclick="setStackMetal('silver')">🪙 Silver</button>
+      <button class="s-tab" id="sTab_gold"      onclick="setStackMetal('gold')">🪙 Gold</button>
+      <button class="s-tab" id="sTab_platinum"  onclick="setStackMetal('platinum')">⬜ Platinum</button>
+      <button class="s-tab" id="sTab_palladium" onclick="setStackMetal('palladium')">🔷 Palladium</button>
+    </div>
+    <div id="stackContent" class="stack-content">
+      <div class="stack-login-msg">Sign in to track your stack</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FORUM PAGE ══ -->
+<div id="pageForum" class="page">
+  <div class="forum-wrap">
+    <div class="forum-filters">
+      <button class="ff-btn ff-active" id="ff_recent" onclick="setForumFilter('recent')">🕒 Recent</button>
+      <button class="ff-btn" id="ff_hot"    onclick="setForumFilter('hot')">🔥 Hot</button>
+      <button class="ff-btn" id="ff_cold"   onclick="setForumFilter('cold')">🧊 Cold</button>
+      <input type="text" class="ff-search" placeholder="🔍 Search..." oninput="forumSearchInput(this.value)">
+    </div>
+    <div id="forumFeed" class="forum-feed">
+      <div class="forum-loading">Loading posts...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD TO STACK MODAL ══ -->
+<div id="addStackModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('addStackModal')">
+  <div class="modal-box">
+    <div class="modal-header"><h3>Add to My Stack</h3><button onclick="closeModal('addStackModal')" class="modal-close">✕</button></div>
+    <form id="addStackForm" onsubmit="event.preventDefault();submitAddStack()">
+      <input type="hidden" id="addStackMetal" name="metal">
+      <div class="form-field"><label>Item Name</label><input name="item_name" required placeholder="e.g. 1 oz Silver Eagle" class="form-input"></div>
+      <div class="form-row">
+        <div class="form-field"><label>Quantity (oz)</label><input name="quantity" type="number" step="0.001" min="0.001" required placeholder="1.000" class="form-input"></div>
+        <div class="form-field"><label>Price Paid / oz</label><input name="price_paid" type="number" step="0.01" min="0.01" required placeholder="32.50" class="form-input"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Dealer</label><input name="dealer" placeholder="e.g. BGASC" class="form-input"></div>
+        <div class="form-field"><label>Date</label><input name="date_purchased" type="date" class="form-input"></div>
+      </div>
+      <div class="form-field"><label>Notes (optional)</label><input name="notes" placeholder="Optional notes" class="form-input"></div>
+      <div class="form-share">
+        <p class="share-label">Share to Community Forum?</p>
+        <label class="share-opt"><input type="radio" name="shareType" value="private" checked> 🔒 Keep Private</label>
+        <label class="share-opt"><input type="radio" name="shareType" value="name"> 👤 Share with My Name</label>
+        <label class="share-opt"><input type="radio" name="shareType" value="anon"> 🕶️ Share Anonymously</label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="closeModal('addStackModal')" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-primary">Add to Stack</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ MARK AS SOLD MODAL ══ -->
+<div id="sellModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('sellModal')">
+  <div class="modal-box">
+    <div class="modal-header"><h3>Mark as Sold</h3><button onclick="closeModal('sellModal')" class="modal-close">✕</button></div>
+    <div class="form-field"><label>Original Price</label><div id="sellPricePaid" class="sell-orig-price"></div></div>
+    <div class="form-row">
+      <div class="form-field"><label>Sold Price / oz</label><input id="sellPrice" type="number" step="0.01" min="0.01" placeholder="0.00" class="form-input"></div>
+      <div class="form-field"><label>Sold Date</label><input id="sellDate" type="date" class="form-input"></div>
+    </div>
+    <div class="form-share">
+      <p class="share-label">Share to Forum?</p>
+      <label class="share-opt"><input type="checkbox" id="sellShareForum"> 👤 Share with My Name</label>
+      <label class="share-opt"><input type="checkbox" id="sellShareAnon"> 🕶️ Share Anonymously</label>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeModal('sellModal')" class="btn-secondary">Cancel</button>
+      <button onclick="confirmSell()" class="btn-primary">Confirm Sale</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHARE TO FORUM MODAL ══ -->
+<div id="shareModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('shareModal')">
+  <div class="modal-box">
+    <div class="modal-header"><h3>Share to Forum</h3><button onclick="closeModal('shareModal')" class="modal-close">✕</button></div>
+    <p style="color:#334155;margin:0 0 16px">Share <strong id="shareItemName"></strong> to the community forum?</p>
+    <div class="modal-actions share-actions">
+      <button onclick="closeModal('shareModal')" class="btn-secondary">Cancel</button>
+      <button onclick="confirmShare('name')" class="btn-primary">Share with My Name</button>
+      <button onclick="confirmShare('anon')" class="btn-outline">Share Anonymously</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// SUPABASE + MY STACK + FORUM
+// ══════════════════════════════════════════════
+var SUPA_URL = 'https://lqdzzmjnjlzbpbybzgjw.supabase.co';
+var SUPA_KEY = 'sb_publishable_-5XrhkvkxC5sCMupT1WTGg_iO6GmK84';
+var _sb = null;
+function initSupabase() {
+  if (window.supabase && !_sb) _sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+}
+
+function getUser() {
+  var u = window.netlifyIdentity && window.netlifyIdentity.currentUser();
+  if (!u) return null;
+  var name = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || '';
+  return { id: u.id, email: u.email, firstName: name.split(' ')[0] || 'Stacker' };
+}
+
+// ── Helpers ──
+function fmtUSD(n) { return '$' + parseFloat(n||0).toFixed(2).replace(/B(?=(d{3})+(?!d))/g,','); }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function getTimeAgo(ts) {
+  if (!ts) return '';
+  var diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+  if (diff < 60) return diff + 's ago';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+function showModal(id) { var el=document.getElementById(id); if(el) el.style.display='flex'; }
+function closeModal(id) { var el=document.getElementById(id); if(el) el.style.display='none'; }
+
+// ── My Stack ──
+var currentStackMetal = 'silver';
+
+function loadMyStack() {
+  initSupabase();
+  var user = getUser();
+  if (!user) {
+    var c = document.getElementById('stackContent');
+    if (c) c.innerHTML = '<div class="stack-login-msg"><p>Sign in to track your precious metals stack</p></div>';
+    return;
+  }
+  renderStackMetal(currentStackMetal);
+}
+
+function setStackMetal(m) {
+  currentStackMetal = m;
+  ['silver','gold','platinum','palladium'].forEach(function(x) {
+    var t = document.getElementById('sTab_' + x);
+    if (t) t.classList.toggle('s-tab-active', x === m);
+  });
+  renderStackMetal(m);
+}
+
+async function renderStackMetal(metal) {
+  initSupabase();
+  var user = getUser();
+  if (!user || !_sb) return;
+  var content = document.getElementById('stackContent');
+  if (!content) return;
+  content.innerHTML = '<div class="stack-loading">Loading...</div>';
+  try {
+    var q1 = await _sb.from('stack_entries').select('*').eq('user_id', user.id).eq('metal', metal).is('sold_price', null).order('created_at', {ascending: false});
+    var q2 = await _sb.from('stack_entries').select('*').eq('user_id', user.id).eq('metal', metal).not('sold_price', 'is', null).order('sold_date', {ascending: false});
+    renderStackContent(q1.data||[], q2.data||[], metal);
+  } catch(e) {
+    content.innerHTML = '<div class="stack-error">Error loading stack</div>';
+  }
+}
+
+function renderStackContent(entries, sold, metal) {
+  var spotPrice = metal==='silver' ? (parseFloat(localStorage.getItem('silver_spot'))||0) :
+                  metal==='gold'   ? (parseFloat(localStorage.getItem('gold_spot'))||0) : 0;
+  var html = '';
+  if (entries.length > 0) {
+    var tPaid = entries.reduce(function(s,e){return s+(parseFloat(e.price_paid)*parseFloat(e.quantity));},0);
+    var tQty  = entries.reduce(function(s,e){return s+parseFloat(e.quantity);},0);
+    var tVal  = spotPrice > 0 ? spotPrice * tQty : 0;
+    var tPL   = tVal - tPaid;
+    var tPct  = tPaid > 0 ? (tPL/tPaid*100) : 0;
+    html += '<div class="stack-summary">';
+    html += '<div class="stack-stat"><div class="ss-label">Invested</div><div class="ss-val">'+fmtUSD(tPaid)+'</div></div>';
+    if (spotPrice > 0) {
+      html += '<div class="stack-stat"><div class="ss-label">Value</div><div class="ss-val">'+fmtUSD(tVal)+'</div></div>';
+      var plCls = tPL>=0?'pl-up':'pl-down', plSign=tPL>=0?'+':'';
+      html += '<div class="stack-stat"><div class="ss-label">P&amp;L</div><div class="ss-val '+plCls+'">'+plSign+fmtUSD(tPL)+'<br><span style="font-size:.8em">'+plSign+tPct.toFixed(1)+'%</span></div></div>';
+    }
+    html += '<div class="stack-stat"><div class="ss-label">Total oz</div><div class="ss-val">'+tQty.toFixed(3)+'</div></div>';
+    html += '</div>';
+  }
+  html += '<div class="stack-section-header"><span>Holdings ('+entries.length+')</span><button class="add-stack-btn" onclick="openAddStackModal(''+metal+'')">+ Add</button></div>';
+  if (entries.length === 0) {
+    html += '<div class="stack-empty">No '+metal+' in your stack yet. <a onclick="openAddStackModal(''+metal+'')" style="cursor:pointer;color:#6366f1;text-decoration:underline">Add your first entry</a></div>';
+  } else {
+    html += '<div class="stack-entries">';
+    entries.forEach(function(e) {
+      var tot = parseFloat(e.price_paid)*parseFloat(e.quantity);
+      var cVal = spotPrice>0 ? spotPrice*parseFloat(e.quantity) : null;
+      var pl = cVal!==null ? cVal-tot : null;
+      var plP = (pl!==null&&tot>0) ? (pl/tot*100) : null;
+      html += '<div class="stack-entry-card">';
+      html += '<div class="sec-top"><div class="sec-name">'+escHtml(e.item_name)+'</div><div class="sec-price">'+fmtUSD(parseFloat(e.price_paid))+'/oz</div></div>';
+      html += '<div class="sec-details"><span>'+parseFloat(e.quantity).toFixed(3)+' oz</span><span>Total: '+fmtUSD(tot)+'</span>';
+      if (e.dealer) html += '<span>'+escHtml(e.dealer)+'</span>';
+      if (e.date_purchased) html += '<span>'+e.date_purchased+'</span>';
+      html += '</div>';
+      if (pl!==null) { var pc=pl>=0?'pl-up':'pl-down',ps=pl>=0?'+':''; html += '<div class="sec-pl '+pc+'">'+ps+fmtUSD(pl)+' ('+ps+plP.toFixed(1)+'%)</div>'; }
+      html += '<div class="sec-actions">';
+      html += '<button class="sec-btn sec-sell" onclick="openSellModal(''+e.id+'','+parseFloat(e.price_paid)+')">Mark Sold</button>';
+      html += '<button class="sec-btn sec-share" onclick="openShareModal('+JSON.stringify(e).split('').map(function(c){return c==='<'?'\u003c':c==='>'?'\u003e':c;}).join('')+')">Share</button>';
+      html += '<button class="sec-btn sec-del" onclick="deleteStackEntry(''+e.id+'')">✕</button>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+  }
+  if (sold.length > 0) {
+    var tProfit = sold.reduce(function(s,e){return s+((parseFloat(e.sold_price)-parseFloat(e.price_paid))*parseFloat(e.quantity));},0);
+    var pc2=tProfit>=0?'pl-up':'pl-down';
+    html += '<div class="stack-section-header sold-header"><span>Sold ('+sold.length+')</span><span class="'+pc2+'">'+(tProfit>=0?'+':'')+fmtUSD(tProfit)+' realized</span></div>';
+    html += '<div class="stack-entries sold-entries">';
+    sold.forEach(function(e) {
+      var pl2=(parseFloat(e.sold_price)-parseFloat(e.price_paid))*parseFloat(e.quantity);
+      var plP2=parseFloat(e.price_paid)>0?((parseFloat(e.sold_price)-parseFloat(e.price_paid))/parseFloat(e.price_paid)*100):0;
+      var pc3=pl2>=0?'pl-up':'pl-down',ps3=pl2>=0?'+':'';
+      html += '<div class="stack-entry-card sold-card">';
+      html += '<div class="sec-top"><div class="sec-name">'+escHtml(e.item_name)+' <span class="sold-badge">SOLD</span></div><div class="sec-price">'+fmtUSD(parseFloat(e.sold_price))+'/oz</div></div>';
+      html += '<div class="sec-details"><span>Paid: '+fmtUSD(parseFloat(e.price_paid))+'/oz</span><span>'+parseFloat(e.quantity).toFixed(3)+' oz</span>';
+      if (e.sold_date) html += '<span>Sold '+e.sold_date+'</span>';
+      html += '</div><div class="sec-pl '+pc3+'">'+ps3+fmtUSD(pl2)+' ('+ps3+plP2.toFixed(1)+'%)</div></div>';
+    });
+    html += '</div>';
+  }
+  document.getElementById('stackContent').innerHTML = html;
+}
+
+async function addStackEntry(data) {
+  initSupabase();
+  var user = getUser();
+  if (!user || !_sb) return;
+  var entry = { user_id: user.id, metal: data.metal, item_name: data.item_name, quantity: parseFloat(data.quantity), price_paid: parseFloat(data.price_paid), dealer: data.dealer||null, date_purchased: data.date_purchased||null, notes: data.notes||null };
+  if (data.shareType==='name'||data.shareType==='anon') { entry.posted_to_forum=true; entry.is_anonymous=(data.shareType==='anon'); }
+  var r = await _sb.from('stack_entries').insert([entry]).select().single();
+  if (!r.error && r.data) {
+    if (data.shareType==='name'||data.shareType==='anon') await shareEntryToForum(r.data, data.shareType==='anon'?null:user.firstName, 'buy');
+    closeModal('addStackModal');
+    renderStackMetal(data.metal);
+  } else { alert('Error: '+(r.error&&r.error.message)); }
+}
+
+async function deleteStackEntry(id) {
+  if (!confirm('Remove this entry?')) return;
+  initSupabase();
+  if (!_sb) return;
+  await _sb.from('stack_entries').delete().eq('id', id);
+  renderStackMetal(currentStackMetal);
+}
+
+var _sellId = null;
+function openSellModal(id, pp) {
+  _sellId = id;
+  document.getElementById('sellPricePaid').textContent = fmtUSD(pp)+'/oz';
+  document.getElementById('sellPrice').value = '';
+  document.getElementById('sellDate').value = new Date().toISOString().slice(0,10);
+  if(document.getElementById('sellShareForum')) document.getElementById('sellShareForum').checked=false;
+  if(document.getElementById('sellShareAnon'))  document.getElementById('sellShareAnon').checked=false;
+  showModal('sellModal');
+}
+
+async function confirmSell() {
+  var sp = parseFloat(document.getElementById('sellPrice').value);
+  var sd = document.getElementById('sellDate').value;
+  if (!sp||sp<=0) { alert('Enter a valid sell price'); return; }
+  if (!_sellId) return;
+  initSupabase();
+  var user = getUser();
+  if (!_sb||!user) return;
+  var r = await _sb.from('stack_entries').select('*').eq('id',_sellId).single();
+  await _sb.from('stack_entries').update({sold_price:sp,sold_date:sd||null}).eq('id',_sellId);
+  var shareForum = document.getElementById('sellShareForum')&&document.getElementById('sellShareForum').checked;
+  var shareAnon  = document.getElementById('sellShareAnon')&&document.getElementById('sellShareAnon').checked;
+  if (r.data && (shareForum||shareAnon)) await shareEntryToForum(Object.assign({},r.data,{sold_price:sp,sold_date:sd}), shareAnon?null:user.firstName, 'sell');
+  closeModal('sellModal');
+  renderStackMetal(currentStackMetal);
+}
+
+var _shareEntry = null;
+function openShareModal(entry) {
+  _shareEntry = entry;
+  var n = document.getElementById('shareItemName');
+  if (n) n.textContent = entry.item_name;
+  showModal('shareModal');
+}
+
+async function confirmShare(type) {
+  if (!_shareEntry) return;
+  initSupabase();
+  var user = getUser();
+  if (!_sb||!user) return;
+  await shareEntryToForum(_shareEntry, type==='anon'?null:user.firstName, 'buy');
+  await _sb.from('stack_entries').update({posted_to_forum:true,is_anonymous:type==='anon'}).eq('id',_shareEntry.id);
+  closeModal('shareModal');
+  renderStackMetal(currentStackMetal);
+}
+
+async function shareEntryToForum(entry, displayName, postType) {
+  initSupabase();
+  if (!_sb) return;
+  var post = { user_id: entry.user_id, display_name: displayName||null, metal: entry.metal, item_name: entry.item_name, quantity: parseFloat(entry.quantity), price_paid: parseFloat(entry.price_paid), total_paid: parseFloat(entry.price_paid)*parseFloat(entry.quantity), dealer: entry.dealer||null, date_purchased: entry.date_purchased||null, post_type: postType||'buy' };
+  if (postType==='sell'&&entry.sold_price) { post.sold_price=parseFloat(entry.sold_price); post.profit_loss=(parseFloat(entry.sold_price)-parseFloat(entry.price_paid))*parseFloat(entry.quantity); }
+  var r = await _sb.from('forum_posts').insert([post]).select().single();
+  if (!r.error&&r.data) await _sb.from('stack_entries').update({forum_post_id:r.data.id}).eq('id',entry.id);
+}
+
+function openAddStackModal(metal) {
+  var f = document.getElementById('addStackForm');
+  if (f) f.reset();
+  document.getElementById('addStackMetal').value = metal||currentStackMetal;
+  showModal('addStackModal');
+}
+
+function submitAddStack() {
+  var f = document.getElementById('addStackForm');
+  var sr = document.querySelector('input[name="shareType"]:checked');
+  addStackEntry({ metal: document.getElementById('addStackMetal').value, item_name: f.item_name.value.trim(), quantity: f.quantity.value, price_paid: f.price_paid.value, dealer: f.dealer.value.trim(), date_purchased: f.date_purchased.value, notes: f.notes.value.trim(), shareType: sr?sr.value:'private' });
+}
+
+// ── Forum ──
+var forumFilter = 'recent', forumSearch = '', _openComments = {};
+
+function loadForum() { initSupabase(); renderForum(); }
+
+async function renderForum() {
+  initSupabase();
+  if (!_sb) { setTimeout(renderForum, 600); return; }
+  var feed = document.getElementById('forumFeed');
+  if (!feed) return;
+  feed.innerHTML = '<div class="forum-loading">Loading posts...</div>';
+  try {
+    var q = _sb.from('forum_posts').select('*');
+    if (forumSearch) q = q.ilike('item_name','%'+forumSearch+'%');
+    if (forumFilter==='hot')    q = q.order('likes_count',{ascending:false}).order('created_at',{ascending:false});
+    else if (forumFilter==='cold') q = q.order('likes_count',{ascending:true}).order('created_at',{ascending:false});
+    else q = q.order('created_at',{ascending:false});
+    q = q.limit(50);
+    var r = await q;
+    if (r.error) { feed.innerHTML='<div class="forum-error">Error loading forum</div>'; return; }
+    if (!r.data||!r.data.length) { feed.innerHTML='<div class="forum-empty">No posts yet! Be the first to share from your stack.</div>'; return; }
+    var user = getUser();
+    var likedIds = {};
+    if (user) {
+      var lr = await _sb.from('forum_likes').select('post_id').eq('user_id',user.id).not('post_id','is',null);
+      if (lr.data) lr.data.forEach(function(l){likedIds[l.post_id]=true;});
+    }
+    feed.innerHTML = r.data.map(function(p){return renderForumPost(p,likedIds,user?user.id:null);}).join('');
+    Object.keys(_openComments).forEach(function(pid){if(_openComments[pid])loadComments(pid);});
+  } catch(e) { feed.innerHTML='<div class="forum-error">'+escHtml(e.message)+'</div>'; }
+}
+
+function renderForumPost(p, likedIds, userId) {
+  var mColor = {silver:'#64748b',gold:'#d97706',platinum:'#6366f1',palladium:'#0891b2'};
+  var mEmoji = {silver:'🪙',gold:'🪙',platinum:'⬜',palladium:'🔷'};
+  var isLiked = likedIds&&likedIds[p.id];
+  var isSell = p.post_type==='sell';
+  var html = '<div class="forum-post" id="fpost_'+p.id+'">';
+  html += '<div class="fp-header">';
+  html += '<span class="fp-metal" style="color:'+(mColor[p.metal]||'#64748b')+'">'+(mEmoji[p.metal]||'🪙')+' '+p.metal.charAt(0).toUpperCase()+p.metal.slice(1)+'</span>';
+  html += '<span class="fp-author">'+escHtml(p.display_name||'Anonymous')+'</span>';
+  html += '<span class="fp-time">'+getTimeAgo(p.created_at)+'</span>';
+  if (isSell) html += '<span class="fp-type-badge fp-sell">SOLD</span>';
+  html += '</div>';
+  html += '<div class="fp-body"><div class="fp-item">'+escHtml(p.item_name)+'</div>';
+  html += '<div class="fp-details"><span>'+parseFloat(p.quantity).toFixed(3)+' oz</span><span>@ '+fmtUSD(parseFloat(p.price_paid))+'/oz</span><span>Total: '+fmtUSD(parseFloat(p.total_paid||p.price_paid*p.quantity))+'</span>';
+  if (p.dealer) html += '<span class="fp-dealer">'+escHtml(p.dealer)+'</span>';
+  html += '</div>';
+  if (isSell&&p.sold_price!=null) {
+    var pl=p.profit_loss!=null?parseFloat(p.profit_loss):(parseFloat(p.sold_price)-parseFloat(p.price_paid))*parseFloat(p.quantity);
+    html += '<div class="fp-sell-row"><span>Sold @ '+fmtUSD(parseFloat(p.sold_price))+'/oz</span><span class="'+(pl>=0?'pl-up':'pl-down')+' fp-pl">'+(pl>=0?'+':'')+fmtUSD(pl)+' '+(pl>=0?'▲':'▼')+'</span></div>';
+  }
+  html += '</div>';
+  html += '<div class="fp-footer">';
+  html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike(''+p.id+'')">'+(isLiked?'❤️':'🤍')+' '+(p.likes_count||0)+'</button>';
+  html += '<button class="forum-comment-btn" onclick="toggleComments(''+p.id+'')">💬 '+(p.comments_count||0)+'</button>';
+  html += '</div>';
+  html += '<div class="fp-comments" id="fcomments_'+p.id+'" style="display:none"></div>';
+  html += '</div>';
+  return html;
+}
+
+async function toggleLike(pid) {
+  initSupabase();
+  var user=getUser();
+  if (!user){alert('Sign in to like posts');return;}
+  if (!_sb) return;
+  var r=await _sb.from('forum_likes').select('id').eq('user_id',user.id).eq('post_id',pid).maybeSingle();
+  var pr=await _sb.from('forum_posts').select('likes_count').eq('id',pid).single();
+  var cnt=pr.data?(pr.data.likes_count||0):0;
+  if (r.data) {
+    await _sb.from('forum_likes').delete().eq('id',r.data.id);
+    await _sb.from('forum_posts').update({likes_count:Math.max(0,cnt-1)}).eq('id',pid);
+  } else {
+    await _sb.from('forum_likes').insert([{user_id:user.id,post_id:pid}]);
+    await _sb.from('forum_posts').update({likes_count:cnt+1}).eq('id',pid);
+  }
+  renderForum();
+}
+
+function toggleComments(pid) {
+  _openComments[pid] = !_openComments[pid];
+  var el=document.getElementById('fcomments_'+pid);
+  if (!el) return;
+  el.style.display=_openComments[pid]?'block':'none';
+  if (_openComments[pid]) loadComments(pid);
+}
+
+async function loadComments(pid) {
+  initSupabase();
+  if (!_sb) return;
+  var el=document.getElementById('fcomments_'+pid);
+  if (!el) return;
+  var cr=await _sb.from('forum_comments').select('*').eq('post_id',pid).order('created_at',{ascending:true});
+  var user=getUser();
+  var likedC={};
+  if (user&&cr.data&&cr.data.length) {
+    var lr=await _sb.from('forum_likes').select('comment_id').eq('user_id',user.id).not('comment_id','is',null);
+    if (lr.data) lr.data.forEach(function(l){likedC[l.comment_id]=true;});
+  }
+  var html='<div class="fc-list">';
+  if (!cr.data||!cr.data.length) html+='<div class="fc-empty">No comments yet</div>';
+  else cr.data.forEach(function(c){
+    html+='<div class="fc-item"><div class="fc-meta"><span class="fc-author">'+escHtml(c.display_name||'Anonymous')+'</span><span class="fc-time">'+getTimeAgo(c.created_at)+'</span></div>';
+    html+='<div class="fc-text">'+escHtml(c.content)+'</div>';
+    html+='<button class="fc-like'+(likedC[c.id]?' liked':'')+'" onclick="toggleCommentLike(''+c.id+'',''+pid+'')">'+(likedC[c.id]?'❤️':'🤍')+' '+(c.likes_count||0)+'</button></div>';
+  });
+  html+='</div>';
+  if (user) html+='<div class="fc-add"><input type="text" id="fc_'+pid+'" placeholder="Add a comment..." class="fc-input" onkeydown="if(event.key==='Enter')addComment(''+pid+'')"><button class="fc-submit" onclick="addComment(''+pid+'')">Post</button></div>';
+  else html+='<div class="fc-signin">Sign in to comment</div>';
+  el.innerHTML=html;
+}
+
+async function addComment(pid) {
+  initSupabase();
+  var user=getUser();
+  if (!user||!_sb) return;
+  var inp=document.getElementById('fc_'+pid);
+  if (!inp) return;
+  var txt=(inp.value||'').trim();
+  if (!txt) return;
+  await _sb.from('forum_comments').insert([{post_id:pid,user_id:user.id,display_name:user.firstName,content:txt}]);
+  var pr=await _sb.from('forum_posts').select('comments_count').eq('id',pid).single();
+  if (pr.data) await _sb.from('forum_posts').update({comments_count:(pr.data.comments_count||0)+1}).eq('id',pid);
+  inp.value='';
+  loadComments(pid);
+}
+
+async function toggleCommentLike(cid, pid) {
+  initSupabase();
+  var user=getUser();
+  if (!user){alert('Sign in to like');return;}
+  if (!_sb) return;
+  var r=await _sb.from('forum_likes').select('id').eq('user_id',user.id).eq('comment_id',cid).maybeSingle();
+  var cr=await _sb.from('forum_comments').select('likes_count').eq('id',cid).single();
+  var cnt=cr.data?(cr.data.likes_count||0):0;
+  if (r.data) { await _sb.from('forum_likes').delete().eq('id',r.data.id); await _sb.from('forum_comments').update({likes_count:Math.max(0,cnt-1)}).eq('id',cid); }
+  else { await _sb.from('forum_likes').insert([{user_id:user.id,comment_id:cid}]); await _sb.from('forum_comments').update({likes_count:cnt+1}).eq('id',cid); }
+  loadComments(pid);
+}
+
+function setForumFilter(f) {
+  forumFilter=f;
+  ['recent','hot','cold'].forEach(function(x){var b=document.getElementById('ff_'+x);if(b)b.classList.toggle('ff-active',x===f);});
+  renderForum();
+}
+function forumSearchInput(v) {
+  forumSearch=v;
+  clearTimeout(window._fsTimer);
+  window._fsTimer=setTimeout(renderForum,400);
+}
 </script>
 </body>
 </html>
