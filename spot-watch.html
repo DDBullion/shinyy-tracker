@@ -36,7 +36,6 @@
           </button>
         </div>
         <span id="userDisplay" class="text-sm font-medium text-indigo-600 hidden"></span>
-        <a href="/my-stack.html" id="myStackNavWatch" class="text-xs text-indigo-500 hover:text-indigo-700 font-medium hidden">📚 My Stack</a>
       </div>
       <!-- Center: logo -->
       <a href="/" class="absolute left-1/2 -translate-x-1/2">
@@ -268,9 +267,7 @@
   // ─── Auth UI ─────────────────────────────────────────────────────────────────
   function updateAuthUI(user) {
     var loginBtn = document.getElementById('loginBtn');
-    var userDisp = document.getElementById('userDisplay');
-    var myStackNav = document.getElementById('myStackNavWatch');
-    var loginGate = document.getElementById('loginGate');
+    var userDisp = document.getElementById('userDisplay');    var loginGate = document.getElementById('loginGate');
     var mainContent = document.getElementById('mainContent');
 
     if (user) {
