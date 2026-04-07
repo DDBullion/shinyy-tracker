@@ -260,7 +260,7 @@
     #signOutBtn{display:block;width:100%;padding:9px 16px;background:none;border:none;cursor:pointer;font-size:.82rem;color:#1a1a30;text-align:left;font-weight:500;}
     #signOutBtn:hover{background:#f0f0ff;}
     @media(max-width:500px){#loginBtn{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
-@media(max-width:600px){.hlogo{width:160px;}.hspacer{width:100px;}#loginBtn{top:8px !important;left:8px !important;font-size:0.7rem !important;padding:4px 8px !important;max-width:85px !important;}#spotWatchNav{top:8px !important;left:auto !important;right:8px !important;font-size:0.7rem !important;padding:4px 8px !important;}}
+@media(max-width:600px){.hlogo{width:160px;}.hspacer{width:100px;}#loginBtn{top:8px !important;left:8px !important;font-size:0.7rem !important;padding:4px 8px !important;max-width:85px !important;}#spotWatchNav{top:44px !important;left:10px !important;right:auto !important;font-size:0.7rem !important;padding:4px 8px !important;}}
 #junkTabs,#junkDDWrap,#junkSearchWrap{display:none;}
     /* ── My Stack & Forum Tab Underlines ── */
     .metal-tab.active-mystack{color:#6366f1;border-bottom-color:#6366f1;text-shadow:none;}
@@ -1904,7 +1904,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     sw.id = 'spotWatchNav';
     sw.href = '/spot-watch.html';
     sw.textContent = '⭐ Spot Watch';
-    sw.style.cssText = 'position:fixed;top:8px;right:8px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;font-weight:500;text-decoration:none;display:none;';
+    sw.style.cssText = 'position:fixed;top:44px;left:10px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;font-weight:500;text-decoration:none;display:none;';
     document.body.appendChild(sw);
   }
   function showSpotWatch(user) {
