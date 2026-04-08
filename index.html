@@ -2456,10 +2456,23 @@ function renderForumPost(p, likedIds, userId, likeCounts, commentCounts) {
   html += '<div class="fp-footer">';
   html += '<button class="forum-like'+(isLiked?' liked':'')+'" onclick="toggleLike(\''+p.id+'\')">'+(isLiked?'❤️':'\uD83E\uDD0D')+' '+((likeCounts&&likeCounts[p.id])||0)+'</button>';
   html += '<button class="forum-comment-btn" onclick="toggleComments(\''+p.id+'\')">\uD83D\uDCAC '+((commentCounts&&commentCounts[p.id])||0)+'</button>';
+  html += (getUser && getUser() && getUser().id==='5fa1ce9c-323e-4b0e-9f2c-b43c64441aa5' ? '<button class="forum-delete-btn" onclick="deleteForumPost(\''+p.id+'\')" title="Delete post" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#c0392b;font-size:1.2em;padding:2px 8px;">\uD83D\uDDD1\uFE0F</button>' : '');
   html += '</div>';
   html += '<div class="fp-comments" id="fcomments_'+p.id+'" style="display:none"></div>';
   html += '</div>';
   return html;
+}
+
+async function deleteForumPost(pid) {
+  initSupabase();
+  var user = getUser();
+  if (!user || user.id !== '5fa1ce9c-323e-4b0e-9f2c-b43c64441aa5') return;
+  if (!confirm('Delete this post and all its comments?')) return;
+  if (_sb) {
+    await _sb.from('forum_comments').delete().eq('post_id', pid);
+    await _sb.from('forum_posts').delete().eq('id', pid);
+  }
+  renderForum();
 }
 
 async function toggleLike(pid) {
