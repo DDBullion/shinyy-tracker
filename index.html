@@ -2021,7 +2021,12 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
         <div class="ms-hdr-left"><h2>My Stack</h2><p>Track your precious metals portfolio</p></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><button class="ms-import-btn" onclick="openImportModal()">⬆ Import</button><button class="ms-add-btn" onclick="openAddStackModal(currentStackMetal)">+ Add Entry</button></div>
       </div>
-            <div class="ms-filter-bar">
+      </div>
+<div class="ms-cards-grid" id="msCardsGrid"></div><div id="msChartSection" style="display:none;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-weight:700;font-size:.95em;margin-bottom:12px;">&#128202; Portfolio Breakdown</div><div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;"><canvas id="msAllocChart" width="170" height="170" style="flex-shrink:0;"></canvas><div id="msChartLegend" style="flex:1;min-width:120px;"></div></div></div>
+      <div class="ms-actions-row">
+        <span class="ms-count" id="msEntryCount"></span>
+        <button class="ms-act-btn" onclick="exportStackCSV()">Export CSV</button>
+      <div class="ms-filter-bar">
         <div class="ms-filter-group">
           <span class="ms-filter-label">Metal:</span>
           <button class="ms-filter-btn active" data-metal="all" onclick="setStackMetal('all')">All</button>
@@ -2036,11 +2041,6 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
           <button class="ms-sort-btn" data-sort="price" onclick="setStackSort('price')">Price</button>
           <button class="ms-sort-btn" data-sort="name" onclick="setStackSort('name')">Name</button>
         </div>
-      </div>
-<div class="ms-cards-grid" id="msCardsGrid"></div><div id="msChartSection" style="display:none;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-weight:700;font-size:.95em;margin-bottom:12px;">&#128202; Portfolio Breakdown</div><div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;"><canvas id="msAllocChart" width="170" height="170" style="flex-shrink:0;"></canvas><div id="msChartLegend" style="flex:1;min-width:120px;"></div></div></div>
-      <div class="ms-actions-row">
-        <span class="ms-count" id="msEntryCount"></span>
-        <button class="ms-act-btn" onclick="exportStackCSV()">Export CSV</button>
       </div>
       <div class="ms-table-wrap"><table class="ms-table" id="msTable">
         <thead><tr><th style="width:36px"><input type="checkbox" id="msSelectAll" onchange="toggleSelectAll(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1"></th><th>Metal</th><th>Item</th><th>Dealer</th><th>Qty (oz)</th><th>$/oz Paid</th><th>Total Paid</th><th>Date</th><th>Spot Value</th><th>Gain / Loss</th><th>Actions</th></tr></thead>
