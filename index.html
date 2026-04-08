@@ -2280,14 +2280,14 @@ function toggleEntrySelect(id) {
 function toggleSelectAll(checked) {
   window._msSelected = {};
   if (checked) { document.querySelectorAll('tr[data-eid]').forEach(function(r){ var id=r.dataset.eid; if(id) window._msSelected[id]=true; }); }
-  document.querySelectorAll('.ms-cb').forEach(function(cb){ cb.checked = checked; });
+  document.querySelectorAll('.ms-cb-row').forEach(function(cb){ cb.checked = checked; });
   document.querySelectorAll('tr[data-eid]').forEach(function(r){ r.classList.toggle('ms-selected', checked); });
   updateBulkBar();
 }
 
 function clearBulkSelect() {
   window._msSelected = {};
-  document.querySelectorAll('.ms-cb').forEach(function(cb){ cb.checked = false; });
+  document.querySelectorAll('.ms-cb-row').forEach(function(cb){ cb.checked = false; });
   document.querySelectorAll('tr[data-eid]').forEach(function(r){ r.classList.remove('ms-selected'); });
   var sa = document.getElementById('msSelectAll'); if(sa){ sa.checked=false; sa.indeterminate=false; }
   updateBulkBar();
@@ -2458,7 +2458,7 @@ async function renderMyStack() {
         var glCls = gl!==null ? (gl>=0?'ms-gl-pos':'ms-gl-neg') : '';
         var eid   = String(e.id);
         tbody += '<tr data-eid="'+eid+'">';
-        tbody += '<td style="text-align:center;width:36px"><input type="checkbox" class="ms-cb" id="cb_'+eid+'" onclick="toggleEntrySelect(\''+eid+'\')"/></td>';
+        tbody += '<td style="text-align:center;width:36px"><input type="checkbox" class="ms-cb-row" id="cb_'+eid+'"/></td>';
         tbody += '<td><span class="ms-metal-badge ' + (mBadge[e.metal]||'ms-badge-silver') + '">' + (mEm[e.metal]||'')+' '+escHtml(e.metal)+'</span></td>';
         tbody += '<td>' + escHtml(e.item_name) + '</td>';
         tbody += '<td>' + escHtml(e.dealer||'—') + '</td>';
@@ -2476,6 +2476,7 @@ async function renderMyStack() {
       });
     }
     tbodyEl.innerHTML = tbody;
+    tbodyEl.onclick = function(e) { var cb = e.target; if (!cb.classList.contains('ms-cb-row')) return; var row = cb.closest('tr[data-eid]'); if (row) toggleEntrySelect(row.dataset.eid); };
     // Restore selection state
     if (window._msSelected) { Object.keys(window._msSelected).forEach(function(id){ var row=document.querySelector('tr[data-eid="'+id+'"]'); if(row){ row.classList.add('ms-selected'); var cb=document.getElementById('cb_'+id); if(cb) cb.checked=true; } }); }
     updateBulkBar();
