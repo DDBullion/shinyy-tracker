@@ -2458,7 +2458,7 @@ async function renderMyStack() {
         var glCls = gl!==null ? (gl>=0?'ms-gl-pos':'ms-gl-neg') : '';
         var eid   = String(e.id);
         tbody += '<tr data-eid="'+eid+'">';
-        tbody += '<td style="text-align:center;width:36px"><input type="checkbox" class="ms-cb" id="cb_'+eid+'" onclick="toggleEntrySelect(\'\'+eid+\'\')"/></td>';
+        tbody += '<td style="text-align:center;width:36px"><input type="checkbox" class="ms-cb" id="cb_'+eid+'" onclick="toggleEntrySelect(\''+eid+'\')"/></td>';
         tbody += '<td><span class="ms-metal-badge ' + (mBadge[e.metal]||'ms-badge-silver') + '">' + (mEm[e.metal]||'')+' '+escHtml(e.metal)+'</span></td>';
         tbody += '<td>' + escHtml(e.item_name) + '</td>';
         tbody += '<td>' + escHtml(e.dealer||'—') + '</td>';
