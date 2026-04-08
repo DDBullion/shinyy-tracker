@@ -370,6 +370,27 @@
 .ms-add-btn:hover{background:#4f46e5;}
 .ms-import-btn{padding:9px 18px;background:#f1f5f9;color:#1e293b;border:1px solid #cbd5e1;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;white-space:nowrap;}
 .ms-import-btn:hover{background:#e2e8f0;}
+.ms-filter-bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding:10px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;}
+.ms-filter-group,.ms-sort-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ms-filter-label{font-size:0.78rem;font-weight:600;color:#64748b;white-space:nowrap;margin-right:2px;}
+.ms-filter-btn,.ms-sort-btn{padding:5px 12px;border:1px solid #cbd5e1;border-radius:20px;background:#fff;cursor:pointer;font-size:0.78rem;font-weight:600;color:#475569;transition:all 0.15s;}
+.ms-filter-btn:hover,.ms-sort-btn:hover{background:#e2e8f0;}
+.ms-filter-btn.active{background:#6366f1;color:#fff;border-color:#6366f1;}
+.ms-sort-btn.active{background:#0f172a;color:#fff;border-color:#0f172a;}
+.ms-select-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.ms-sel-all{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:0.82rem;color:#475569;font-weight:600;user-select:none;}
+.ms-sel-all input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#6366f1;}
+.ms-bulk-bar{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:14px;padding:12px 22px;gap:10px;align-items:center;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:9999;min-width:300px;justify-content:center;}
+.ms-bulk-bar.visible{display:flex;}
+.ms-bulk-count{font-size:0.88rem;font-weight:700;margin-right:4px;}
+.ms-bulk-btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:0.82rem;transition:all 0.15s;}
+.ms-bulk-delete{background:#ef4444;color:#fff;}.ms-bulk-delete:hover{background:#dc2626;}
+.ms-bulk-share{background:#6366f1;color:#fff;}.ms-bulk-share:hover{background:#4f46e5;}
+.ms-bulk-cancel{background:transparent;color:#94a3b8;border:1px solid #475569;font-size:0.78rem;padding:6px 12px;}
+.ms-card.ms-selected{outline:2px solid #6366f1;background:#eef2ff;}
+tr.ms-selected td{background:#eef2ff;}
+.ms-cb{position:absolute;top:10px;left:10px;width:17px;height:17px;cursor:pointer;z-index:2;accent-color:#6366f1;}
+.ms-cb-row{width:16px;height:16px;cursor:pointer;accent-color:#6366f1;}
 .import-metal-btn{padding:10px 20px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;transition:all 0.15s;color:#1e293b;}
 .import-metal-btn.active{border-color:#6366f1;background:#eef2ff;color:#4f46e5;}
 .import-preview-wrap{max-height:220px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px;margin-top:8px;}
@@ -379,7 +400,7 @@
 .import-preview-table tr:last-child td{border-bottom:none;}
 .import-step{display:none;}.import-step.active{display:block;}
 .ms-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px;}
-.ms-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}.ms-card-silver{background:#F0F0F2;border-color:#A8A9AD;}.ms-card-gold{background:#FFFBF0;border-color:#D4AF37;}.ms-card-platinum{background:#FAFAFA;border-color:#D0D0D0;}.ms-card-palladium{background:#EEF6FB;border-color:#B0D4E8;}
+.ms-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative;}.ms-card-silver{background:#F0F0F2;border-color:#A8A9AD;}.ms-card-gold{background:#FFFBF0;border-color:#D4AF37;}.ms-card-platinum{background:#FAFAFA;border-color:#D0D0D0;}.ms-card-palladium{background:#EEF6FB;border-color:#B0D4E8;}
 .ms-card-total{grid-column:1/-1;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border:none;}
 .ms-card-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px;}
 .ms-card-total .ms-card-title{color:rgba(255,255,255,.75);}
@@ -2000,13 +2021,29 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
         <div class="ms-hdr-left"><h2>My Stack</h2><p>Track your precious metals portfolio</p></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><button class="ms-import-btn" onclick="openImportModal()">⬆ Import</button><button class="ms-add-btn" onclick="openAddStackModal(currentStackMetal)">+ Add Entry</button></div>
       </div>
-      <div class="ms-cards-grid" id="msCardsGrid"></div><div id="msChartSection" style="display:none;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-weight:700;font-size:.95em;margin-bottom:12px;">&#128202; Portfolio Breakdown</div><div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;"><canvas id="msAllocChart" width="170" height="170" style="flex-shrink:0;"></canvas><div id="msChartLegend" style="flex:1;min-width:120px;"></div></div></div>
+            <div class="ms-filter-bar">
+        <div class="ms-filter-group">
+          <span class="ms-filter-label">Metal:</span>
+          <button class="ms-filter-btn active" data-metal="all" onclick="setStackMetal('all')">All</button>
+          <button class="ms-filter-btn" data-metal="silver" onclick="setStackMetal('silver')">⚪ Silver</button>
+          <button class="ms-filter-btn" data-metal="gold" onclick="setStackMetal('gold')">🥇 Gold</button>
+          <button class="ms-filter-btn" data-metal="platinum" onclick="setStackMetal('platinum')">🏆 Platinum</button>
+        </div>
+        <div class="ms-sort-group">
+          <span class="ms-filter-label">Sort:</span>
+          <button class="ms-sort-btn active" data-sort="date" onclick="setStackSort('date')">Date</button>
+          <button class="ms-sort-btn" data-sort="weight" onclick="setStackSort('weight')">Weight</button>
+          <button class="ms-sort-btn" data-sort="price" onclick="setStackSort('price')">Price</button>
+          <button class="ms-sort-btn" data-sort="name" onclick="setStackSort('name')">Name</button>
+        </div>
+      </div>
+<div class="ms-cards-grid" id="msCardsGrid"></div><div id="msChartSection" style="display:none;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-weight:700;font-size:.95em;margin-bottom:12px;">&#128202; Portfolio Breakdown</div><div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;"><canvas id="msAllocChart" width="170" height="170" style="flex-shrink:0;"></canvas><div id="msChartLegend" style="flex:1;min-width:120px;"></div></div></div>
       <div class="ms-actions-row">
         <span class="ms-count" id="msEntryCount"></span>
         <button class="ms-act-btn" onclick="exportStackCSV()">Export CSV</button>
       </div>
       <div class="ms-table-wrap"><table class="ms-table" id="msTable">
-        <thead><tr><th>Metal</th><th>Item</th><th>Dealer</th><th>Qty (oz)</th><th>$/oz Paid</th><th>Total Paid</th><th>Date</th><th>Spot Value</th><th>Gain / Loss</th><th>Actions</th></tr></thead>
+        <thead><tr><th style="width:36px"><input type="checkbox" id="msSelectAll" onchange="toggleSelectAll(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1"></th><th>Metal</th><th>Item</th><th>Dealer</th><th>Qty (oz)</th><th>$/oz Paid</th><th>Total Paid</th><th>Date</th><th>Spot Value</th><th>Gain / Loss</th><th>Actions</th></tr></thead>
         <tbody id="msTableBody"></tbody>
       </table></div>
     </div>
@@ -2218,6 +2255,81 @@ function loadMyStack() {
 
 function setStackMetal(m) {
   currentStackMetal = m;
+  window._msSelected = {};
+  document.querySelectorAll('.ms-filter-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.metal===m); });
+  renderMyStack();
+}
+
+function setStackSort(s) {
+  window._msSortBy = s;
+  window._msSelected = {};
+  document.querySelectorAll('.ms-sort-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.sort===s); });
+  renderMyStack();
+}
+
+function toggleEntrySelect(id) {
+  if (!window._msSelected) window._msSelected = {};
+  if (window._msSelected[id]) { delete window._msSelected[id]; } else { window._msSelected[id] = true; }
+  var cb = document.getElementById('cb_'+id);
+  if (cb) cb.checked = !!window._msSelected[id];
+  var row = document.querySelector('tr[data-eid="'+id+'"]');
+  if (row) row.classList.toggle('ms-selected', !!window._msSelected[id]);
+  updateBulkBar();
+}
+
+function toggleSelectAll(checked) {
+  window._msSelected = {};
+  if (checked) { document.querySelectorAll('tr[data-eid]').forEach(function(r){ var id=r.dataset.eid; if(id) window._msSelected[id]=true; }); }
+  document.querySelectorAll('.ms-cb').forEach(function(cb){ cb.checked = checked; });
+  document.querySelectorAll('tr[data-eid]').forEach(function(r){ r.classList.toggle('ms-selected', checked); });
+  updateBulkBar();
+}
+
+function clearBulkSelect() {
+  window._msSelected = {};
+  document.querySelectorAll('.ms-cb').forEach(function(cb){ cb.checked = false; });
+  document.querySelectorAll('tr[data-eid]').forEach(function(r){ r.classList.remove('ms-selected'); });
+  var sa = document.getElementById('msSelectAll'); if(sa){ sa.checked=false; sa.indeterminate=false; }
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  var count = Object.keys(window._msSelected || {}).length;
+  var bar = document.getElementById('msBulkBar');
+  var countEl = document.getElementById('msBulkCount');
+  var selCountEl = document.getElementById('msSelCount');
+  if (countEl) countEl.textContent = count + ' selected';
+  if (selCountEl) selCountEl.textContent = count > 0 ? count + ' selected' : '';
+  if (bar) bar.classList.toggle('visible', count > 0);
+  var allCards = document.querySelectorAll('tr[data-eid]').length;
+  var sa = document.getElementById('msSelectAll');
+  if (sa) { sa.indeterminate = count > 0 && count < allCards; sa.checked = allCards > 0 && count >= allCards; }
+}
+
+async function bulkDeleteSelected() {
+  var ids = Object.keys(window._msSelected || {});
+  if (!ids.length) return;
+  if (!confirm('Delete ' + ids.length + ' selected item' + (ids.length > 1 ? 's' : '') + '? This cannot be undone.')) return;
+  initSupabase();
+  var res = await _sb.from('stack_entries').delete().in('id', ids);
+  if (!res.error) { window._msSelected = {}; renderMyStack(); }
+  else { alert('Delete failed: ' + res.error.message); }
+}
+
+async function bulkShareSelected() {
+  var ids = Object.keys(window._msSelected || {});
+  if (!ids.length) return;
+  var user = getUser();
+  if (!user) return;
+  var dn = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name.split(' ')[0] : user.email.split('@')[0];
+  if (user.id === '5fa1ce9c-323e-4b0e-9f2c-b43c64441aa5') dn = 'Owner';
+  var count = 0;
+  for (var i=0; i<ids.length; i++) {
+    var entry = window._msEntMap && window._msEntMap[ids[i]];
+    if (entry) { await shareEntryToForum(entry, dn, 'buy'); count++; }
+  }
+  clearBulkSelect();
+  alert(count + ' item' + (count>1?'s':'') + ' shared to Shiny Feed!');
 }
 
 async function renderMyStack() {
@@ -2322,11 +2434,20 @@ async function renderMyStack() {
     if (countEl) countEl.textContent = entries.length + (entries.length===1?' entry':' entries');
     var mBadge = { silver:'ms-badge-silver', gold:'ms-badge-gold', platinum:'ms-badge-platinum', palladium:'ms-badge-palladium' };
     var mEm = { silver:'📈', gold:'📈', platinum:'⚪', palladium:'🔷' };
+    var _curMetal = window.currentStackMetal || 'all';
+    var _sortBy = window._msSortBy || 'date';
+    var displayEntries = _curMetal === 'all' ? entries.slice() : entries.filter(function(e){ return e.metal === _curMetal; });
+    displayEntries.sort(function(a,b){
+      if (_sortBy === 'weight') return (b.quantity||0)-(a.quantity||0);
+      if (_sortBy === 'price') return (b.price_paid||0)-(a.price_paid||0);
+      if (_sortBy === 'name') { var nA=(a.item_name||'').toLowerCase(),nB=(b.item_name||'').toLowerCase(); return nA<nB?-1:nA>nB?1:0; }
+      return new Date(b.date_purchased||0)-new Date(a.date_purchased||0);
+    });
     var tbody = '';
-    if (entries.length === 0) {
-      tbody = '<tr><td colspan="10" class="ms-empty">No entries yet — click + Add Entry to start!</td></tr>';
+    if (displayEntries.length === 0) {
+      tbody = '<tr><td colspan="11" class="ms-empty">No entries yet — click + Add Entry to start!</td></tr>';
     } else {
-      entries.forEach(function(e) {
+      displayEntries.forEach(function(e) {
         var qty   = parseFloat(e.quantity)   || 0;
         var pp    = parseFloat(e.price_paid) || 0;
         var total = qty * pp;
@@ -2336,7 +2457,8 @@ async function renderMyStack() {
         var glStr = gl!==null ? ((gl>=0?'+':'')+fmtUSD(gl)) : '—';
         var glCls = gl!==null ? (gl>=0?'ms-gl-pos':'ms-gl-neg') : '';
         var eid   = String(e.id);
-        tbody += '<tr>';
+        tbody += '<tr data-eid="'+eid+'">';
+        tbody += '<td style="text-align:center;width:36px"><input type="checkbox" class="ms-cb" id="cb_'+eid+'" onclick="toggleEntrySelect(\'\'+eid+\'\')"/></td>';
         tbody += '<td><span class="ms-metal-badge ' + (mBadge[e.metal]||'ms-badge-silver') + '">' + (mEm[e.metal]||'')+' '+escHtml(e.metal)+'</span></td>';
         tbody += '<td>' + escHtml(e.item_name) + '</td>';
         tbody += '<td>' + escHtml(e.dealer||'—') + '</td>';
@@ -2354,6 +2476,9 @@ async function renderMyStack() {
       });
     }
     tbodyEl.innerHTML = tbody;
+    // Restore selection state
+    if (window._msSelected) { Object.keys(window._msSelected).forEach(function(id){ var row=document.querySelector('tr[data-eid="'+id+'"]'); if(row){ row.classList.add('ms-selected'); var cb=document.getElementById('cb_'+id); if(cb) cb.checked=true; } }); }
+    updateBulkBar();
   } catch(ex) {
     console.error('renderMyStack error:', ex);
     cardsEl.innerHTML = '<div class="ms-empty">Error loading stack — check console.</div>';
@@ -2904,5 +3029,12 @@ function forumSearchInput(v) {
   }
 
 </script>
+
+<div id="msBulkBar" class="ms-bulk-bar">
+  <span id="msBulkCount" class="ms-bulk-count"></span>
+  <button class="ms-bulk-btn ms-bulk-share" onclick="bulkShareSelected()">⬆ Share</button>
+  <button class="ms-bulk-btn ms-bulk-delete" onclick="bulkDeleteSelected()">🗑 Delete</button>
+  <button class="ms-bulk-btn ms-bulk-cancel" onclick="clearBulkSelect()">✕ Cancel</button>
+</div>
 </body>
 </html>
