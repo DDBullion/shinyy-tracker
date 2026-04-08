@@ -368,6 +368,16 @@
 .ms-hdr-left p{font-size:0.82rem;color:var(--mut);margin:4px 0 0;}
 .ms-add-btn{padding:9px 18px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;white-space:nowrap;}
 .ms-add-btn:hover{background:#4f46e5;}
+.ms-import-btn{padding:9px 18px;background:#f1f5f9;color:#1e293b;border:1px solid #cbd5e1;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;white-space:nowrap;}
+.ms-import-btn:hover{background:#e2e8f0;}
+.import-metal-btn{padding:10px 20px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;transition:all 0.15s;color:#1e293b;}
+.import-metal-btn.active{border-color:#6366f1;background:#eef2ff;color:#4f46e5;}
+.import-preview-wrap{max-height:220px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px;margin-top:8px;}
+.import-preview-table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+.import-preview-table th{background:#f8fafc;padding:6px 8px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:600;color:#475569;position:sticky;top:0;}
+.import-preview-table td{padding:6px 8px;border-bottom:1px solid #f1f5f9;color:#1e293b;}
+.import-preview-table tr:last-child td{border-bottom:none;}
+.import-step{display:none;}.import-step.active{display:block;}
 .ms-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px;}
 .ms-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}.ms-card-silver{background:#F0F0F2;border-color:#A8A9AD;}.ms-card-gold{background:#FFFBF0;border-color:#D4AF37;}.ms-card-platinum{background:#FAFAFA;border-color:#D0D0D0;}.ms-card-palladium{background:#EEF6FB;border-color:#B0D4E8;}
 .ms-card-total{grid-column:1/-1;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border:none;}
@@ -483,10 +493,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <button id="loginBtn" style="position:fixed;top:10px;left:10px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:5px 14px;font-size:0.78rem;cursor:pointer;font-weight:500;">Sign In</button>
-  <div id="signOutDropdown"><button id="signOutBtn" onclick="document.getElementById('signOutDropdown').style.display='none';netlifyIdentity.logout()">Sign Out</button></div>
+  <div id="signOutDropdown" style="display:none"><button id="signOutBtn" onclick="document.getElementById('signOutDropdown').style.display='none';netlifyIdentity.logout()">Sign Out</button></div>
 <script>document.body.firstChild&&document.body.firstChild.nodeType===3&&document.body.firstChild.textContent.trim()===">"&&document.body.removeChild(document.body.firstChild)</script>
 
 <!-- ── App Content ── -->
@@ -1987,7 +1998,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     <div id="msContent" style="display:none">
       <div class="ms-hdr">
         <div class="ms-hdr-left"><h2>My Stack</h2><p>Track your precious metals portfolio</p></div>
-        <button class="ms-add-btn" onclick="openAddStackModal(currentStackMetal)">+ Add Entry</button>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><button class="ms-import-btn" onclick="openImportModal()">⬆ Import</button><button class="ms-add-btn" onclick="openAddStackModal(currentStackMetal)">+ Add Entry</button></div>
       </div>
       <div class="ms-cards-grid" id="msCardsGrid"></div><div id="msChartSection" style="display:none;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-weight:700;font-size:.95em;margin-bottom:12px;">&#128202; Portfolio Breakdown</div><div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;"><canvas id="msAllocChart" width="170" height="170" style="flex-shrink:0;"></canvas><div id="msChartLegend" style="flex:1;min-width:120px;"></div></div></div>
       <div class="ms-actions-row">
@@ -2043,6 +2054,73 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
         <button type="submit" class="btn-primary">Add to Stack</button>
       </div>
     </form>
+  </div>
+</div>
+
+
+<!-- ══ IMPORT STACK MODAL ══ -->
+<div id="importStackModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('importStackModal')">
+  <div class="modal-box" style="max-width:560px">
+    <div class="modal-header">
+      <h3 id="importModalTitle">Import Stack</h3>
+      <button onclick="closeModal('importStackModal')" class="modal-close">✕</button>
+    </div>
+
+    <!-- Step 1: Upload -->
+    <div id="importStep1" class="import-step active" style="padding:4px 0">
+      <p style="color:#475569;font-size:0.9rem;margin:0 0 16px">Upload a CSV or Excel file to bulk-import your stack entries.</p>
+      <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:10px;padding:24px;text-align:center;margin-bottom:16px;">
+        <div style="font-size:2rem;margin-bottom:8px;">📂</div>
+        <p style="margin:0 0 12px;font-weight:600;color:#1e293b;">Drop your file here or click to browse</p>
+        <p style="margin:0 0 14px;font-size:0.8rem;color:#64748b;">Supports .csv and .xlsx files</p>
+        <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleImportFile(event)">
+        <button onclick="document.getElementById('importFileInput').click()" style="padding:8px 20px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-weight:600;cursor:pointer;">Choose File</button>
+      </div>
+      <div style="text-align:center;">
+        <button onclick="downloadImportTemplate()" style="background:none;border:none;color:#6366f1;font-size:0.85rem;cursor:pointer;text-decoration:underline;">⬇ Download CSV Template</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Select Metal -->
+    <div id="importStep2" class="import-step" style="padding:4px 0">
+      <p style="color:#475569;font-size:0.9rem;margin:0 0 6px">File: <strong id="importFileName"></strong></p>
+      <p style="color:#1e293b;font-weight:600;margin:0 0 14px">Which metal is in this file?</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+        <button class="import-metal-btn" onclick="selectImportMetal('silver')">🥈 Silver</button>
+        <button class="import-metal-btn" onclick="selectImportMetal('gold')">🥇 Gold</button>
+        <button class="import-metal-btn" onclick="selectImportMetal('platinum')">⬜ Platinum</button>
+        <button class="import-metal-btn" onclick="selectImportMetal('palladium')">🔷 Palladium</button>
+      </div>
+      <button onclick="importGoBack()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:0.85rem;">← Back</button>
+    </div>
+
+    <!-- Step 3: Preview + Share -->
+    <div id="importStep3" class="import-step" style="padding:4px 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <p style="margin:0;font-size:0.9rem;color:#475569;">Previewing <strong id="importRowCount"></strong> rows — Metal: <strong id="importMetalLabel"></strong></p>
+        <button onclick="importGoBack2()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:0.82rem;">← Change Metal</button>
+      </div>
+      <div class="import-preview-wrap">
+        <table class="import-preview-table">
+          <thead><tr>
+            <th>Item</th><th>Qty</th><th>Total Paid</th><th>Dealer</th><th>Date</th><th>Notes</th>
+          </tr></thead>
+          <tbody id="importPreviewBody"></tbody>
+        </table>
+      </div>
+      <div id="importWarning" style="display:none;background:#fef9c3;border:1px solid #fde047;border-radius:6px;padding:8px 12px;font-size:0.82rem;color:#854d0e;margin-top:8px;"></div>
+      <div style="margin-top:16px;border-top:1px solid #f1f5f9;padding-top:14px;">
+        <p class="share-label">Share to Community Forum?</p>
+        <label class="share-opt"><input type="radio" name="importShareType" value="private"> 🔒 Keep Private</label>
+        <label class="share-opt"><input type="radio" name="importShareType" value="name" checked> 👤 Share with My Name</label>
+        <label class="share-opt"><input type="radio" name="importShareType" value="anon"> 🕶️ Share Anonymously</label>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" onclick="closeModal('importStackModal')" class="btn-secondary">Cancel</button>
+        <button type="button" id="importConfirmBtn" onclick="confirmImport()" class="btn-primary">Import Entries</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2594,6 +2672,213 @@ function forumSearchInput(v) {
   clearTimeout(window._fsTimer);
   window._fsTimer=setTimeout(renderForum,400);
 }
+
+
+  // ══ IMPORT STACK FUNCTIONS ══
+  window._importRows = [];
+  window._importMetal = '';
+
+  function openImportModal() {
+    var user = getUser();
+    if (!user) { alert('Please sign in to import your stack.'); return; }
+    // Reset all steps
+    document.getElementById('importStep1').className = 'import-step active';
+    document.getElementById('importStep2').className = 'import-step';
+    document.getElementById('importStep3').className = 'import-step';
+    document.getElementById('importFileInput').value = '';
+    document.getElementById('importWarning').style.display = 'none';
+    window._importRows = [];
+    window._importMetal = '';
+    document.querySelectorAll('.import-metal-btn').forEach(function(b){ b.classList.remove('active'); });
+    var radios = document.querySelectorAll('input[name="importShareType"]');
+    radios.forEach(function(r){ r.checked = r.value === 'name'; });
+    showModal('importStackModal');
+  }
+
+  function downloadImportTemplate() {
+    var header = 'item_name,quantity,price_paid_total,dealer,date_purchased,notes
+';
+    var example = 'American Silver Eagle 1oz,10,350.00,APMEX,2024-03-15,Monster box deal
+';
+    var blob = new Blob([header + example], { type: 'text/csv' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'shinyy_stack_template.csv';
+    a.click();
+  }
+
+  function handleImportFile(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    window._importFileName = file.name;
+    document.getElementById('importFileName').textContent = file.name;
+    var ext = file.name.split('.').pop().toLowerCase();
+    var reader = new FileReader();
+    if (ext === 'csv') {
+      reader.onload = function(e) {
+        var rows = parseImportCSV(e.target.result);
+        window._importRows = rows;
+        showImportStep2();
+      };
+      reader.readAsText(file);
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      reader.onload = function(e) {
+        if (typeof XLSX === 'undefined') { alert('Excel parser not loaded. Please try a CSV file.'); return; }
+        var wb = XLSX.read(e.target.result, { type: 'array' });
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        var json = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        // Normalize column names
+        var rows = json.map(function(row) {
+          var normalized = {};
+          Object.keys(row).forEach(function(k) {
+            normalized[k.trim().toLowerCase().replace(/\s+/g,'_')] = row[k];
+          });
+          return normalized;
+        });
+        window._importRows = rows;
+        showImportStep2();
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      alert('Please upload a .csv, .xlsx, or .xls file.');
+    }
+  }
+
+  function parseImportCSV(text) {
+    var lines = text.split('\n').filter(function(l){ return l.trim(); });
+    if (lines.length < 2) return [];
+    var headers = lines[0].split(',').map(function(h){ return h.trim().toLowerCase().replace(/\s+/g,'_').replace(/"/g,''); });
+    var rows = [];
+    for (var i = 1; i < lines.length; i++) {
+      var vals = lines[i].match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || lines[i].split(',');
+      vals = vals.map(function(v){ return String(v).replace(/^"|"$/g,'').trim(); });
+      var obj = {};
+      headers.forEach(function(h, idx){ obj[h] = vals[idx] || ''; });
+      if (obj.item_name || obj.quantity) rows.push(obj);
+    }
+    return rows;
+  }
+
+  function showImportStep2() {
+    document.getElementById('importStep1').className = 'import-step';
+    document.getElementById('importStep2').className = 'import-step active';
+    document.getElementById('importStep3').className = 'import-step';
+  }
+
+  function importGoBack() {
+    document.getElementById('importStep1').className = 'import-step active';
+    document.getElementById('importStep2').className = 'import-step';
+    document.getElementById('importStep3').className = 'import-step';
+  }
+
+  function importGoBack2() {
+    document.getElementById('importStep2').className = 'import-step active';
+    document.getElementById('importStep3').className = 'import-step';
+    window._importMetal = '';
+    document.querySelectorAll('.import-metal-btn').forEach(function(b){ b.classList.remove('active'); });
+  }
+
+  function selectImportMetal(metal) {
+    window._importMetal = metal;
+    document.querySelectorAll('.import-metal-btn').forEach(function(b){ b.classList.remove('active'); });
+    event.target.classList.add('active');
+    // Short delay so button animation shows
+    setTimeout(function(){ renderImportPreview(metal); }, 120);
+  }
+
+  function renderImportPreview(metal) {
+    var rows = window._importRows;
+    var metalLabel = metal.charAt(0).toUpperCase() + metal.slice(1);
+    document.getElementById('importMetalLabel').textContent = metalLabel;
+    document.getElementById('importRowCount').textContent = rows.length;
+    document.getElementById('importConfirmBtn').textContent = 'Import ' + rows.length + ' ' + (rows.length === 1 ? 'Entry' : 'Entries');
+    var tbody = document.getElementById('importPreviewBody');
+    var html = '';
+    var warnings = [];
+    rows.forEach(function(row, i) {
+      var qty = parseFloat(row.quantity) || 0;
+      var total = parseFloat(row.price_paid_total) || 0;
+      var pricePerOz = qty > 0 ? (total / qty).toFixed(2) : '—';
+      if (!row.item_name) warnings.push('Row ' + (i+1) + ': missing item name');
+      if (qty <= 0) warnings.push('Row ' + (i+1) + ': invalid quantity');
+      html += '<tr>';
+      html += '<td>' + (row.item_name || '<em style="color:#f87171">missing</em>') + '</td>';
+      html += '<td>' + (qty || '<em style="color:#f87171">?</em>') + '</td>';
+      html += '<td>$' + (total ? total.toFixed(2) : '—') + '</td>';
+      html += '<td>' + (row.dealer || '—') + '</td>';
+      html += '<td>' + (row.date_purchased || '—') + '</td>';
+      html += '<td>' + (row.notes || '—') + '</td>';
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+    var warnEl = document.getElementById('importWarning');
+    if (warnings.length) {
+      warnEl.style.display = 'block';
+      warnEl.textContent = '⚠ ' + warnings.slice(0,3).join(' · ') + (warnings.length > 3 ? ' (+ more)' : '');
+    } else {
+      warnEl.style.display = 'none';
+    }
+    document.getElementById('importStep2').className = 'import-step';
+    document.getElementById('importStep3').className = 'import-step active';
+  }
+
+  async function confirmImport() {
+    initSupabase();
+    var user = getUser();
+    if (!user || !_sb) return;
+    var rows = window._importRows;
+    var metal = window._importMetal;
+    if (!rows.length || !metal) { alert('No rows to import.'); return; }
+    var shareType = 'name';
+    document.querySelectorAll('input[name="importShareType"]').forEach(function(r){ if (r.checked) shareType = r.value; });
+    var btn = document.getElementById('importConfirmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Importing...';
+    var entries = rows.map(function(row) {
+      var qty = parseFloat(row.quantity) || 1;
+      var total = parseFloat(row.price_paid_total) || 0;
+      return {
+        user_id: user.id,
+        metal: metal,
+        item_name: row.item_name || 'Unknown Item',
+        quantity: qty,
+        price_paid: qty > 0 ? total / qty : 0,
+        dealer: row.dealer || null,
+        date_purchased: row.date_purchased || null,
+        notes: row.notes || null
+      };
+    });
+    var { data: insertedData, error } = await _sb.from('stack_entries').insert(entries).select();
+    if (error) {
+      alert('Import failed: ' + error.message);
+      btn.disabled = false;
+      btn.textContent = 'Import ' + rows.length + ' Entries';
+      return;
+    }
+    // Create one Shiny Feed post if not private
+    if (shareType !== 'private' && insertedData && insertedData.length) {
+      var totalOz = entries.reduce(function(s,e){ return s + e.quantity; }, 0);
+      var totalCost = entries.reduce(function(s,e){ return s + (e.quantity * e.price_paid); }, 0);
+      var avgDCA = totalOz > 0 ? (totalCost / totalOz).toFixed(2) : '0.00';
+      var displayName = shareType === 'anon' ? 'Anonymous' : (user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : user.email);
+      var summary = 'Imported ' + entries.length + ' entries · ' + totalOz.toFixed(3) + ' oz · Avg $' + avgDCA + '/oz · Cost basis $' + totalCost.toFixed(2);
+      await _sb.from('forum_posts').insert({
+        user_id: user.id,
+        display_name: displayName,
+        metal: metal,
+        item_name: 'Imported Stack',
+        quantity: parseFloat(totalOz.toFixed(3)),
+        price_paid: parseFloat(avgDCA),
+        dealer: null,
+        date_purchased: null,
+        post_type: 'stack',
+        notes: summary
+      });
+    }
+    closeModal('importStackModal');
+    renderMyStack();
+  }
+
 </script>
 </body>
 </html>
