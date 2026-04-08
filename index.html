@@ -2890,13 +2890,12 @@ function forumSearchInput(v) {
         user_id: user.id,
         display_name: displayName,
         metal: metal,
-        item_name: 'Imported Stack',
+        item_name: summary,
         quantity: parseFloat(totalOz.toFixed(3)),
         price_paid: parseFloat(avgDCA),
         dealer: null,
         date_purchased: null,
-        post_type: 'buy',
-        notes: summary
+        post_type: 'buy'
       });
     }
     closeModal('importStackModal');
