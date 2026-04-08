@@ -2025,7 +2025,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
       <div class="form-field"><label>Item Name</label><input name="item_name" required placeholder="e.g. 1 oz Silver Eagle" class="form-input"></div>
       <div class="form-row">
         <div class="form-field"><label>Quantity (oz)</label><input name="quantity" type="number" step="0.001" min="0.001" required placeholder="1.000" class="form-input"></div>
-        <div class="form-field"><label>Price Paid / oz</label><input name="price_paid" type="number" step="0.01" min="0.01" required placeholder="32.50" class="form-input"></div>
+        <div class="form-field"><label>Price Paid (Total)</label><input name="price_paid" type="number" step="0.01" min="0.01" required placeholder="500.00" class="form-input"></div>
       </div>
       <div class="form-row">
         <div class="form-field"><label>Dealer</label><input name="dealer" placeholder="e.g. BGASC" class="form-input"></div>
@@ -2355,7 +2355,7 @@ function openAddStackModal(metal) {
 function submitAddStack() {
   var f = document.getElementById('addStackForm');
   var sr = document.querySelector('input[name="shareType"]:checked');
-  if(window._editingEid){updateStackEntry(window._editingEid,{metal:document.getElementById('addStackMetal').value,item_name:f.item_name.value.trim(),quantity:f.quantity.value,price_paid:f.price_paid.value,dealer:f.dealer.value.trim(),date_purchased:f.date_purchased.value,notes:f.notes.value.trim()});window._editingEid=null;}else{addStackEntry({ metal: document.getElementById('addStackMetal').value, item_name: f.item_name.value.trim(), quantity: f.quantity.value, price_paid: f.price_paid.value, dealer: f.dealer.value.trim(), date_purchased: f.date_purchased.value, notes: f.notes.value.trim(), shareType: sr?sr.value:'private' });}
+  if(window._editingEid){updateStackEntry(window._editingEid,{metal:document.getElementById('addStackMetal').value,item_name:f.item_name.value.trim(),quantity:f.quantity.value,price_paid:parseFloat(f.price_paid.value)/parseFloat(f.quantity.value),dealer:f.dealer.value.trim(),date_purchased:f.date_purchased.value,notes:f.notes.value.trim()});window._editingEid=null;}else{addStackEntry({ metal: document.getElementById('addStackMetal').value, item_name: f.item_name.value.trim(), quantity: f.quantity.value, price_paid: parseFloat(f.price_paid.value)/parseFloat(f.quantity.value), dealer: f.dealer.value.trim(), date_purchased: f.date_purchased.value, notes: f.notes.value.trim(), shareType: sr?sr.value:'private' });}
 }
 
 // ── Forum ──
@@ -2369,7 +2369,7 @@ function openEditStackModal(eid) {
   if (metalSel) metalSel.value = entry.metal || 'silver';
   var nm = f.querySelector('[name="item_name"]'); if (nm) nm.value = entry.item_name || '';
   var qty = f.querySelector('[name="quantity"]'); if (qty) qty.value = entry.quantity || '';
-  var pp2 = f.querySelector('[name="price_paid"]'); if (pp2) pp2.value = entry.price_paid || '';
+  var pp2 = f.querySelector('[name="price_paid"]'); if (pp2) pp2.value = (entry.price_paid && entry.quantity) ? (parseFloat(entry.price_paid)*parseFloat(entry.quantity)).toFixed(2) : '';
   var dl = f.querySelector('[name="dealer"]'); if (dl) dl.value = entry.dealer || '';
   var dt = f.querySelector('[name="date_purchased"]'); if (dt) dt.value = entry.date_purchased || '';
   var nt = f.querySelector('[name="notes"]'); if (nt) nt.value = entry.notes || '';
