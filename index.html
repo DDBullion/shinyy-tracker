@@ -2036,7 +2036,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
         </div>
         <div class="ms-sort-group">
           <span class="ms-filter-label">Sort:</span>
-          <button class="ms-sort-btn active" data-sort="date" onclick="setStackSort('date')">Date</button>
+          <button class="ms-sort-btn active" data-sort="date" onclick="setStackSort('date')">Date ↓</button>
           <button class="ms-sort-btn" data-sort="weight" onclick="setStackSort('weight')">Weight</button>
           <button class="ms-sort-btn" data-sort="price" onclick="setStackSort('price')">Price</button>
           <button class="ms-sort-btn" data-sort="name" onclick="setStackSort('name')">Name</button>
@@ -2261,9 +2261,19 @@ function setStackMetal(m) {
 }
 
 function setStackSort(s) {
-  window._msSortBy = s;
+  if (window._msSortBy === s) {
+    window._msSortDir = window._msSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    window._msSortBy = s;
+    window._msSortDir = s === 'name' ? 'asc' : 'desc';
+  }
   window._msSelected = {};
-  document.querySelectorAll('.ms-sort-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.sort===s); });
+  document.querySelectorAll('.ms-sort-btn').forEach(function(b) {
+    var active = b.dataset.sort === window._msSortBy;
+    b.classList.toggle('active', active);
+    var lbl = b.dataset.sort.charAt(0).toUpperCase() + b.dataset.sort.slice(1);
+    b.textContent = lbl + (active ? (window._msSortDir === 'asc' ? ' ↑' : ' ↓') : '');
+  });
   renderMyStack();
 }
 
@@ -2438,10 +2448,11 @@ async function renderMyStack() {
     var _sortBy = window._msSortBy || 'date';
     var displayEntries = _curMetal === 'all' ? entries.slice() : entries.filter(function(e){ return e.metal === _curMetal; });
     displayEntries.sort(function(a,b){
-      if (_sortBy === 'weight') return (b.quantity||0)-(a.quantity||0);
-      if (_sortBy === 'price') return (b.price_paid||0)-(a.price_paid||0);
-      if (_sortBy === 'name') { var nA=(a.item_name||'').toLowerCase(),nB=(b.item_name||'').toLowerCase(); return nA<nB?-1:nA>nB?1:0; }
-      return new Date(b.date_purchased||0)-new Date(a.date_purchased||0);
+      var _dir = window._msSortDir === 'asc' ? 1 : -1;
+      if (_sortBy === 'weight') return _dir*((a.quantity||0)-(b.quantity||0));
+      if (_sortBy === 'price') return _dir*((a.price_paid||0)-(b.price_paid||0));
+      if (_sortBy === 'name') { var nA=(a.item_name||'').toLowerCase(),nB=(b.item_name||'').toLowerCase(); return _dir*(nA<nB?-1:nA>nB?1:0); }
+      return _dir*(new Date(a.date_purchased||0)-new Date(b.date_purchased||0));
     });
     var tbody = '';
     if (displayEntries.length === 0) {
