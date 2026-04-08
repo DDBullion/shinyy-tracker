@@ -2884,7 +2884,8 @@ function forumSearchInput(v) {
       var totalOz = entries.reduce(function(s,e){ return s + e.quantity; }, 0);
       var totalCost = entries.reduce(function(s,e){ return s + (e.quantity * e.price_paid); }, 0);
       var avgDCA = totalOz > 0 ? (totalCost / totalOz).toFixed(2) : '0.00';
-      var displayName = shareType === 'anon' ? 'Anonymous' : (user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : user.email);
+      var displayName = shareType === 'anon' ? 'Anonymous' : (user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name.split(' ')[0] : user.email.split('@')[0]);
+      if (user.id === '5fa1ce9c-323e-4b0e-9f2c-b43c64441aa5') displayName = 'Owner';
       var summary = 'Imported ' + entries.length + ' entries · ' + totalOz.toFixed(3) + ' oz · Avg $' + avgDCA + '/oz · Cost basis $' + totalCost.toFixed(2);
       await _sb.from('forum_posts').insert({
         user_id: user.id,
