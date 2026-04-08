@@ -2696,10 +2696,8 @@ function forumSearchInput(v) {
   }
 
   function downloadImportTemplate() {
-    var header = 'item_name,quantity,price_paid_total,dealer,date_purchased,notes
-';
-    var example = 'American Silver Eagle 1oz,10,350.00,APMEX,2024-03-15,Monster box deal
-';
+    var header = 'item_name,quantity,price_paid_total,dealer,date_purchased,notes\n';
+    var example = 'American Silver Eagle 1oz,10,350.00,APMEX,2024-03-15,Monster box deal\n';
     var blob = new Blob([header + example], { type: 'text/csv' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
