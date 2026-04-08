@@ -2794,8 +2794,9 @@ function forumSearchInput(v) {
     var html = '';
     var warnings = [];
     rows.forEach(function(row, i) {
-      var qty = parseFloat(row.quantity) || 0;
-      var total = parseFloat(row.price_paid_total) || 0;
+      var qty = parseFloat(String(row.quantity||'').replace(/[$,\s]/g,'')) || 0;
+      var priceCols = ['price_paid_total','total_paid','total','price_paid','price','amount','cost','paid'];
+      var total = 0; for (var pi=0;pi<priceCols.length;pi++){if(row[priceCols[pi]]!==undefined&&row[priceCols[pi]]!==''){total=parseFloat(String(row[priceCols[pi]]).replace(/[$,\s]/g,''))||0;break;}}
       var pricePerOz = qty > 0 ? (total / qty).toFixed(2) : '—';
       if (!row.item_name) warnings.push('Row ' + (i+1) + ': missing item name');
       if (qty <= 0) warnings.push('Row ' + (i+1) + ': invalid quantity');
@@ -2848,18 +2849,27 @@ function forumSearchInput(v) {
     var btn = document.getElementById('importConfirmBtn');
     btn.disabled = true;
     btn.textContent = 'Importing...';
+    function parseMoney(v) {
+      if (!v && v !== 0) return 0;
+      return parseFloat(String(v).replace(/[$,\s]/g,'')) || 0;
+    }
+    function pickField(row) {
+      var keys = ['price_paid_total','total_paid','total','price_paid','price','amount','cost','paid'];
+      for (var i=0;i<keys.length;i++) { if (row[keys[i]] !== undefined && row[keys[i]] !== '') return parseMoney(row[keys[i]]); }
+      return 0;
+    }
     var entries = rows.map(function(row) {
-      var qty = parseFloat(row.quantity) || 1;
-      var total = parseFloat(row.price_paid_total) || 0;
+      var qty = parseFloat(String(row.quantity||'').replace(/[$,\s]/g,'')) || 1;
+      var total = pickField(row);
       return {
         user_id: user.id,
         metal: metal,
-        item_name: row.item_name || 'Unknown Item',
+        item_name: row.item_name || row.item || row.name || row.description || 'Unknown Item',
         quantity: qty,
         price_paid: qty > 0 ? total / qty : 0,
-        dealer: row.dealer || null,
-        date_purchased: normalizeDate(row.date_purchased) || null,
-        notes: row.notes || null
+        dealer: row.dealer || row.source || row.vendor || null,
+        date_purchased: normalizeDate(row.date_purchased || row.date || row.purchase_date || row.bought) || null,
+        notes: row.notes || row.note || row.comments || null
       };
     });
     var { data: insertedData, error } = await _sb.from('stack_entries').insert(entries).select();
@@ -2870,7 +2880,7 @@ function forumSearchInput(v) {
       return;
     }
     // Create one Shiny Feed post if not private
-    if (shareType !== 'private' && insertedData && insertedData.length) {
+    if (shareType !== 'private' && entries.length > 0 && !error) {
       var totalOz = entries.reduce(function(s,e){ return s + e.quantity; }, 0);
       var totalCost = entries.reduce(function(s,e){ return s + (e.quantity * e.price_paid); }, 0);
       var avgDCA = totalOz > 0 ? (totalCost / totalOz).toFixed(2) : '0.00';
