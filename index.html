@@ -369,7 +369,7 @@
 .ms-add-btn{padding:9px 18px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.88rem;white-space:nowrap;}
 .ms-add-btn:hover{background:#4f46e5;}
 .ms-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px;}
-.ms-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.ms-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);}.ms-card-silver{background:#F0F0F2;border-color:#A8A9AD;}.ms-card-gold{background:#FFFBF0;border-color:#D4AF37;}.ms-card-platinum{background:#FAFAFA;border-color:#D0D0D0;}.ms-card-palladium{background:#EEF6FB;border-color:#B0D4E8;}
 .ms-card-total{grid-column:1/-1;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);border:none;}
 .ms-card-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px;}
 .ms-card-total .ms-card-title{color:rgba(255,255,255,.75);}
@@ -1989,7 +1989,7 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
         <div class="ms-hdr-left"><h2>My Stack</h2><p>Track your precious metals portfolio</p></div>
         <button class="ms-add-btn" onclick="openAddStackModal(currentStackMetal)">+ Add Entry</button>
       </div>
-      <div class="ms-cards-grid" id="msCardsGrid"></div>
+      <div class="ms-cards-grid" id="msCardsGrid"></div><div id="msChartSection" style="display:none;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-weight:700;font-size:.95em;margin-bottom:12px;">&#128202; Portfolio Breakdown</div><div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;"><canvas id="msAllocChart" width="170" height="170" style="flex-shrink:0;"></canvas><div id="msChartLegend" style="flex:1;min-width:120px;"></div></div></div>
       <div class="ms-actions-row">
         <span class="ms-count" id="msEntryCount"></span>
         <button class="ms-act-btn" onclick="exportStackCSV()">Export CSV</button>
@@ -2180,7 +2180,7 @@ async function renderMyStack() {
       var dca = s.oz > 0 ? s.cost / s.oz : 0;
       var gl  = s.value - s.cost;
       var glCls = gl >= 0 ? 'ms-gl-pos' : 'ms-gl-neg';
-      cardsHtml += '<div class="ms-card">';
+      cardsHtml += '<div class="ms-card ms-card-'+m+'">';
       cardsHtml += '<div class="ms-card-title">' + mLabel[m] + '</div>';
       cardsHtml += '<div class="ms-card-big">' + s.oz.toFixed(3) + ' oz</div>';
       cardsHtml += '<div class="ms-card-rows">';
@@ -2206,6 +2206,41 @@ async function renderMyStack() {
     cardsHtml += '<div class="ms-card-row"><span class="label">Return</span><span class="val ' + tGlCls + '">' + (totalRet>=0?'+':'')+totalRet.toFixed(2) + '%</span></div>';
     cardsHtml += '</div></div>';
     cardsEl.innerHTML = cardsHtml;
+    (function(){
+      var sec=document.getElementById('msChartSection');
+      var canvas=document.getElementById('msAllocChart');
+      var legend=document.getElementById('msChartLegend');
+      if(!sec||!canvas||!legend)return;
+      var metalColors={silver:'#A8A9AD',gold:'#D4AF37',platinum:'#D0D0D0',palladium:'#B0D4E8'};
+      var metalLabels={silver:'Silver',gold:'Gold',platinum:'Platinum',palladium:'Palladium'};
+      var totalOz=0;
+      metals.forEach(function(m){totalOz+=summary[m].oz;});
+      if(totalOz===0){sec.style.display='none';return;}
+      sec.style.display='';
+      var ctx=canvas.getContext('2d');
+      var w=170,h=170,cx=w/2,cy=h/2,r=72,ri=44;
+      ctx.clearRect(0,0,w,h);
+      var startAngle=-Math.PI/2;
+      metals.forEach(function(m){
+        var pct=summary[m].oz/totalOz;
+        if(pct<=0)return;
+        var end=startAngle+pct*2*Math.PI;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,startAngle,end);ctx.closePath();
+        ctx.fillStyle=metalColors[m];ctx.fill();
+        startAngle=end;
+      });
+      ctx.beginPath();ctx.arc(cx,cy,ri,0,2*Math.PI);ctx.fillStyle='#fff';ctx.fill();
+      var agOz=summary.silver.oz,auOz=summary.gold.oz;
+      var ratioHtml='';
+      if(auOz>0){var ratio=(agOz/auOz).toFixed(1);ratioHtml='<div style="font-size:1.1em;font-weight:700;color:#D4AF37;margin-bottom:10px;">'+ratio+':1 Ag:Au</div>';}
+      var legHtml=ratioHtml;
+      metals.forEach(function(m){
+        var pct=summary[m].oz/totalOz*100;
+        if(pct<=0)return;
+        legHtml+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:'+metalColors[m]+';flex-shrink:0;"></span><span style="font-size:.88em;">'+metalLabels[m]+' &#8212; '+pct.toFixed(1)+'%</span></div>';
+      });
+      legend.innerHTML=legHtml;
+    })();
     if (countEl) countEl.textContent = entries.length + (entries.length===1?' entry':' entries');
     var mBadge = { silver:'ms-badge-silver', gold:'ms-badge-gold', platinum:'ms-badge-platinum', palladium:'ms-badge-palladium' };
     var mEm = { silver:'📈', gold:'📈', platinum:'⚪', palladium:'🔷' };
@@ -2392,7 +2427,7 @@ async function updateStackEntry(eid, data) {
     date_purchased: data.date_purchased || null,
     notes: data.notes || null
   }).eq('id', eid).eq('user_id', user.id).select();
-  if (!r.error) { closeModal('addStackModal'); renderMyStack(); }
+  if (!r.error) { var _fpid=window._msEntMap&&window._msEntMap[eid]&&window._msEntMap[eid].forum_post_id; if(_fpid&&_sb){await _sb.from('forum_posts').update({item_name:data.item_name,quantity:parseFloat(data.quantity),price_paid:parseFloat(data.price_paid),dealer:data.dealer||null,date_purchased:data.date_purchased||null}).eq('id',_fpid).eq('user_id',user.id);} closeModal('addStackModal'); renderMyStack(); }
   else { alert('Error: ' + (r.error && r.error.message)); }
 }
 var forumFilter = 'recent', forumSearch = '', _openComments = {};
