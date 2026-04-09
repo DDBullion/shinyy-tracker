@@ -517,9 +517,7 @@ tr.ms-selected td{background:#eef2ff;}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-  <button id="loginBtn" style="position:fixed;top:10px;left:10px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:5px 14px;font-size:0.78rem;cursor:pointer;font-weight:500;">Sign In</button>
-  <div id="signOutDropdown" style="display:none"><button id="signOutBtn" onclick="document.getElementById('signOutDropdown').style.display='none';netlifyIdentity.logout()">Sign Out</button></div>
-<script>document.body.firstChild&&document.body.firstChild.nodeType===3&&document.body.firstChild.textContent.trim()===">"&&document.body.removeChild(document.body.firstChild)</script>
+  <script>document.body.firstChild&&document.body.firstChild.nodeType===3&&document.body.firstChild.textContent.trim()===">"&&document.body.removeChild(document.body.firstChild)</script>
 
 <!-- ── App Content ── -->
 <div id="appContent" style="display:block">
@@ -533,6 +531,9 @@ tr.ms-selected td{background:#eef2ff;}
         <div class="hsub" id="headerSub">🥈 Silver · Live Every 5 Min</div>
       </div>
       <button class="rbtn" id="rbtn" onclick="doRefresh()">↻ Refresh</button>
+      <button id="loginBtn" style="background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:5px 14px;font-size:0.78rem;cursor:pointer;font-weight:500;">Sign In</button>
+      <div id="signOutDropdown" style="display:none"><button id="signOutBtn" onclick="document.getElementById('signOutDropdown').style.display='none';netlifyIdentity.logout()">Sign Out</button></div>
+
     </div>
     <!-- Top-level metal tabs -->
     <div class="metal-tabs">
@@ -820,6 +821,7 @@ tr.ms-selected td{background:#eef2ff;}
 // ── Metal toggle ──
 let currentMetal = 'silver';
 function setMetal(m) {
+  localStorage.setItem('shinyTab', m);
   currentMetal = m;
   updatePageSEO && updatePageSEO(m, silverFilter);
   document.getElementById('pageSilver').classList.toggle('active', m === 'silver');
@@ -1927,6 +1929,9 @@ function updatePageSEO(metal, filter) {
 }
 
 function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch();}
+
+// Restore last active tab
+(function(){var t=localStorage.getItem('shinyTab');if(t)setMetal(t);})();
 </script>
 
   <script>
