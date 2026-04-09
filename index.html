@@ -256,7 +256,7 @@
 .sold-popular-error{text-align:center;color:var(--orn);padding:16px;font-size:0.82rem;background:var(--sur);border-radius:10px;border:1px solid var(--bdr);margin-bottom:16px;}
 .sold-divider{border:none;border-top:1px solid var(--bdr);margin:20px 0;}
     /* Sign-out dropdown */
-    #signOutDropdown{position:fixed;top:38px;left:10px;z-index:10000;background:#fff;border:1px solid rgba(26,26,48,0.2);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:120px;overflow:hidden;}
+    #signOutDropdown{position:fixed;top:68px;right:10px;left:auto;z-index:10000;background:#fff;border:1px solid rgba(26,26,48,0.2);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:120px;overflow:hidden;}
     #signOutBtn{display:block;width:100%;padding:9px 16px;background:none;border:none;cursor:pointer;font-size:.82rem;color:#1a1a30;text-align:left;font-weight:500;}
     #signOutBtn:hover{background:#f0f0ff;}
     @media(max-width:500px){#loginBtn{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
@@ -1931,7 +1931,7 @@ function updatePageSEO(metal, filter) {
 function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch();}
 
 // Restore last active tab
-(function(){var t=localStorage.getItem('shinyTab');if(t)setMetal(t);})();
+window.addEventListener('load',function(){var t=localStorage.getItem('shinyTab');if(t)setTimeout(function(){setMetal(t);},100);});
 </script>
 
   <script>
@@ -2004,8 +2004,8 @@ function soldQuick(q){document.getElementById('soldInput').value=q;doSoldSearch(
     sw.id = 'spotWatchNav';
     sw.href = '/spot-watch.html';
     sw.textContent = '⭐ Spot Watch';
-    sw.style.cssText = 'position:fixed;top:44px;left:10px;z-index:9999;background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;font-weight:500;text-decoration:none;display:none;';
-    document.body.appendChild(sw);
+        sw.style.cssText = 'background:rgba(26,26,48,0.09);color:#1a1a30;border:1px solid rgba(26,26,48,0.25);border-radius:6px;padding:4px 8px;font-size:0.7rem;cursor:pointer;font-weight:500;text-decoration:none;display:none;';
+        var _hr=document.querySelector('.hrow');if(_hr)_hr.insertBefore(sw,_hr.firstChild);else document.body.appendChild(sw);
   }
   function showSpotWatch(user) {
     var sw = document.getElementById('spotWatchNav');
