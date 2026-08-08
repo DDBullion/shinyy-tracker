@@ -956,219 +956,22 @@ function ebayQuick(q) {
 }
 
 // ═══════════════════════════════════════════════
-// SILVER DEALERS
-// Premiums verified March 23, 2026 · Spot ~$68.92
-// ═══════════════════════════════════════════════
-let SILVER_DEALERS = [
-  // ── Core Verified ──
-  {size:'1oz',  name:'1oz Silver Rounds (Random Design)',    dealer:'SD Bullion',       prem:4.28,  oz:1,      ship:'Free @ $499', url:'https://sdbullion.com/1-oz-generic-silver-rounds', verified:true},
-  {size:'10oz', name:'10oz SilverTowne Buffalo Bar',         dealer:'JM Bullion',       prem:3.75,  oz:10,     ship:'Free @ $499', url:'https://www.jmbullion.com/10-oz-silvertowne-buffalo-silver-bar/', verified:true},
-  // ── Estimated ──
-  {size:'5oz',  name:'5oz SilverTowne Buffalo Silver Bar (New)', dealer:'JM Bullion',       prem:3.49,  oz:5,      ship:'Free @ $499', url:'https://www.jmbullion.com/5-oz-silvertowne-buffalo-silver-bar/', verified:true},
-  {size:'kilo', name:'1 Kilo Silver Bar (Design Varies)',   dealer:'Safe Haven Metal', prem:2.02,  oz:32.15,  ship:'Free @ $199', url:'https://safehavenmetal.com/product/1-kilo-silver-bar-design-varies/'},
-  {size:'kilo', name:'1 Kilo Silver Bars (Browse All)',     dealer:'Bullion Exchanges',prem:2.15,  oz:32.15,  ship:'Free @ $199', url:'https://bullionexchanges.com/buy-silver/bars/1-kilo-silver-bars'},
-  {size:'100oz',name:'100oz Nadir Refinery Silver Bar',     dealer:'Bullion Exchanges',prem:2.29,  oz:100,    ship:'Free @ $199', url:'https://bullionexchanges.com/100-oz-nadir-refinery-silver-bar-w-assay'},
-  {size:'1oz',  name:"Gov't Minted Silver Coins (Random)",  dealer:'Bullion Exchanges',prem:2.31,  oz:1,      ship:'Free @ $199', url:'https://bullionexchanges.com/buy-silver/coins/1-oz-silver-coins'},
-  {size:'100oz',name:'Engelhard 100oz Silver Bar (Poured)', dealer:'Safe Haven Metal', prem:2.47,  oz:100,    ship:'Free @ $199', url:'https://safehavenmetal.com/product/100-oz-silver-bar-engelhard-poured-extruded/', tag:'engelhard'},
-  {size:'1oz',  name:'Canada 1oz Silver Maple Leaf',        dealer:'Pacific Precious', prem:3.65,  oz:1,      ship:'Varies',      url:'https://www.pacificpreciousmetals.com/product/1295-any-year-1oz-canadian-silver-maple-leaf'},
-  {size:'10oz', name:'10oz Silver Bar (5+ qty)',            dealer:'Money Metals',     prem:6.59,  oz:10,     ship:'Free @ $199', url:'https://www.moneymetals.com/10-oz-generic-silver-bar/37', mm:true},
-  {size:'10oz', name:'10oz Silver Bar (1–4 qty)',           dealer:'Money Metals',     prem:7.59,  oz:10,     ship:'Free @ $199', url:'https://www.moneymetals.com/10-oz-generic-silver-bar/37', mm:true},
-  {size:'1oz',  name:'Bitcoin 1oz Silver Round',            dealer:'Money Metals',     prem:8.76,  oz:1,      ship:'Free @ $199', url:'https://www.moneymetals.com/bitcoin-silver-round-1-troy-ounce-999-pure/1685', mm:true},
-
-  // ── APMEX (verified Mar 24, 2026) ──
-  {size:'1oz',  name:'1oz Silver Round (Random Design)',   dealer:'APMEX',            prem:5.99,  oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/category/25260/1-oz-silver-rounds', verified:true},
-  {size:'1oz',  name:'1oz APMEX Silver Bar',               dealer:'APMEX',            prem:5.99,  oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/product/27086/1-oz-silver-bar-apmex', verified:true},
-  {size:'100oz',name:'100oz Silver Bar (Secondary Mkt)',   dealer:'APMEX',            prem:1.99,  oz:100,    ship:'Free @ $199', url:'https://www.apmex.com/product/69643/100-oz-silver-bar-secondary-market', verified:true},
-  {size:'100oz',name:'100oz APMEX Stackable Silver Bar',   dealer:'APMEX',            prem:2.29,  oz:100,    ship:'Free @ $199', url:'https://www.apmex.com/product/50645/100-oz-silver-bar-apmex-stackable', verified:true},
-  {size:'10oz', name:'10oz Silver Bar (APMEX)',            dealer:'APMEX',            prem:3.99,  oz:10,     ship:'Free @ $199', url:'https://www.apmex.com/category/25640/10-oz-silver-bars', verified:true},
-
-
-  // ── Scottsdale Mint Silver (verified Mar 23, 2026) ──
-  {size:'1oz',  name:'1oz The One Silver Bar',               dealer:'Scottsdale Mint',  prem:6.99,  oz:1,      ship:'Varies',      url:'https://www.scottsdalemint.com/product/1-oz-scottsdale-the-one-silver-bar/', tag:'scottsdale', verified:true},
-  {size:'1oz',  name:'1oz Vortex Silver Bar',                dealer:'Scottsdale Mint',  prem:8.99,  oz:1,      ship:'Varies',      url:'https://www.scottsdalemint.com/product/scottsdale-the-vortex-1-troy-oz-9999-silver-bar/', tag:'scottsdale', verified:true},
-  {size:'5oz',  name:'5oz Cast Silver Bar',                  dealer:'Scottsdale Mint',  prem:4.29,  oz:5,      ship:'Varies',      url:'https://www.scottsdalemint.com/shop/silver/silver-cast-bars/', tag:'scottsdale', verified:true},
-  {size:'10oz', name:'10oz Stacker Silver Bar',              dealer:'Scottsdale Mint',  prem:3.39,  oz:10,     ship:'Varies',      url:'https://www.scottsdalemint.com/product/10-oz-stacker-silver-bar/', tag:'scottsdale', verified:true},
-  {size:'10oz', name:'10oz Silver Bars (All)',               dealer:'Scottsdale Mint',  prem:8.79,  oz:10,     ship:'Varies',      url:'https://www.scottsdalemint.com/shop/silver/silver-bars/', tag:'scottsdale', verified:true},
-  {size:'100oz',name:'100oz King Stacker Silver Bar',        dealer:'Scottsdale Mint',  prem:7.49,  oz:100,    ship:'Varies',      url:'https://www.scottsdalemint.com/product/100-oz-scottsdale-king-stacker-silver-bar/', tag:'scottsdale', verified:true},
-  {size:'kilo', name:'1 Kilo Reserve Cast Silver Bar',       dealer:'Scottsdale Mint',  prem:8.49,  oz:32.15,  ship:'Varies',      url:'https://www.scottsdalemint.com/product/scottsdale-reserve-cast-kilo-silver-bar/', tag:'scottsdale', verified:true},
-  {size:'kilo', name:'1 Kilo Wall Street Silver Bar',        dealer:'Scottsdale Mint',  prem:2.78,  oz:32.15,  ship:'Varies',      url:'https://www.scottsdalemint.com/product/wall-street-mint-1-kilo-silver-bar/', tag:'scottsdale', verified:true},
-
-  // ── Zombucks World (1oz rounds) ──
-
-  // ── Silver Libertads (estimated premiums, Mar 24, 2026 · Spot ~$68.92) ──
-  {size:'1oz',  name:'1oz Mexican Silver Libertad (Random Yr)',dealer:'JM Bullion',      prem:10.00, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/mexican-silver-libertad/', tag:'libertad'},
-  {size:'1oz',  name:'1oz Mexican Silver Libertad (2025)',    dealer:'JM Bullion',       prem:12.00, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/2025-mexican-silver-libertads/', tag:'libertad'},
-  {size:'1oz',  name:'1oz Mexican Silver Libertad (BU/Proof)',dealer:'APMEX',            prem:11.00, oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/category/23976/1-oz-mexican-silver-libertad-coins-bu-proof', tag:'libertad'},
-  {size:'1oz',  name:'1oz Mexican Silver Libertad',           dealer:'SD Bullion',       prem:10.50, oz:1,      ship:'Free @ $499', url:'https://sdbullion.com/silver/mexican-silver-libertad-coins', tag:'libertad'},
-  {size:'2oz',  name:'2oz Mexican Silver Libertad (Random Yr)',dealer:'JM Bullion',      prem:12.00, oz:2,      ship:'Free @ $499', url:'https://www.jmbullion.com/silver/silver-coins/mexican-silver-libertads/', tag:'libertad'},
-  {size:'2oz',  name:'2oz Mexican Silver Libertad (All)',     dealer:'APMEX',            prem:13.00, oz:2,      ship:'Free @ $199', url:'https://www.apmex.com/category/23975/mexican-silver-libertad-coins-all', tag:'libertad'},
-  {size:'5oz',  name:'5oz Mexican Silver Libertad (2023 BU)', dealer:'JM Bullion',       prem:11.00, oz:5,      ship:'Free @ $499', url:'https://www.jmbullion.com/2023-5-oz-mexican-silver-libertad-coin/', tag:'libertad'},
-  {size:'5oz',  name:'5oz Mexican Silver Libertad (All)',     dealer:'APMEX',            prem:12.00, oz:5,      ship:'Free @ $199', url:'https://www.apmex.com/category/23975/mexican-silver-libertad-coins-all', tag:'libertad'},
-
-  // ── Silver Pandas (estimated premiums, Mar 24, 2026 · Spot ~$68.92) ──
-  {size:'30g',  name:'30g Chinese Silver Panda (2026)',        dealer:'JM Bullion',       prem:14.00, oz:0.9645, ship:'Free @ $499', url:'https://www.jmbullion.com/silver/silver-coins/chinese-silver-pandas/2026-silver-panda/', tag:'panda'},
-  {size:'30g',  name:'30g Chinese Silver Panda (2026)',        dealer:'APMEX',            prem:15.00, oz:0.9645, ship:'Free @ $199', url:'https://www.apmex.com/product/322487/2026-china-30-gram-silver-panda-bu-in-capsule', tag:'panda'},
-  {size:'30g',  name:'30g Chinese Silver Panda (Random Year)', dealer:'JM Bullion',       prem:10.00, oz:0.9645, ship:'Free @ $499', url:'https://www.jmbullion.com/30-gram-chinese-silver-panda-coin-ry/', tag:'panda'},
-  {size:'30g',  name:'30g Chinese Silver Panda (Random Year)', dealer:'APMEX',            prem:11.00, oz:0.9645, ship:'Free @ $199', url:'https://www.apmex.com/category/24355/chinese-silver-panda-coins', tag:'panda'},
-  {size:'1oz',  name:'1oz Chinese Silver Panda (Random Year)', dealer:'JM Bullion',       prem:8.00,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-chinese-silver-panda-coin-varied-year/', tag:'panda'},
-  {size:'1oz',  name:'1oz Chinese Silver Panda (Random Year)', dealer:'APMEX',            prem:9.00,  oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/category/24355/chinese-silver-panda-coins', tag:'panda'},
-
-
-  // ── American Silver Eagles (est. Mar 24, 2026) ──
-  {size:'1oz', name:'1oz American Silver Eagle (BU)',       dealer:'SD Bullion',       prem:4.99,  oz:1, ship:'Free @ $499', url:'https://sdbullion.com/silver/us-mint-american-silver-eagle-coins', tag:'eagle'},
-  {size:'1oz', name:'1oz American Silver Eagle (BU)',       dealer:'JM Bullion',       prem:5.29,  oz:1, ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-american-silver-eagle-coin/', tag:'eagle'},
-  {size:'1oz', name:'1oz American Silver Eagle (BU)',       dealer:'APMEX',            prem:5.99,  oz:1, ship:'Free @ $199', url:'https://www.apmex.com/category/23955/american-silver-eagle-coins', tag:'eagle'},
-  {size:'1oz', name:'1oz American Silver Eagle (BU)',       dealer:'Money Metals',     prem:14.80, oz:1, ship:'Free @ $199', url:'https://www.moneymetals.com/buy/silver/coins/american-silver-eagle', tag:'eagle', mm:true},
-
-  // ── Canadian Silver Maples (est. Mar 24, 2026) ──
-  {size:'1oz', name:'1oz Canadian Silver Maple Leaf',       dealer:'SD Bullion',       prem:3.49,  oz:1, ship:'Free @ $499', url:'https://sdbullion.com/silver/canadian-silver-coins/canadian-silver-maple-leaf-coins', tag:'maple'},
-  {size:'1oz', name:'1oz Canadian Silver Maple Leaf',       dealer:'JM Bullion',       prem:3.79,  oz:1, ship:'Free @ $499', url:'https://www.jmbullion.com/canadian-silver-maple-leaf-varied-year/', tag:'maple'},
-  {size:'1oz', name:'1oz Canadian Silver Maple Leaf',       dealer:'APMEX',            prem:4.29,  oz:1, ship:'Free @ $199', url:'https://www.apmex.com/category/24100/canadian-silver-maple-leaf-coins', tag:'maple'},
-  {size:'1oz', name:'1oz Canadian Silver Maple Leaf',       dealer:'Money Metals',     prem:9.10,  oz:1, ship:'Free @ $199', url:'https://www.moneymetals.com/buy/silver/coins/canadian-silver-maple-leaf', tag:'maple', mm:true},
-
-  // ── Silver Buffalo Rounds (est. Mar 24, 2026) ──
-  {size:'1oz', name:'1oz Silver Buffalo Round',             dealer:'SD Bullion',       prem:1.99,  oz:1, ship:'Free @ $499', url:'https://sdbullion.com/1-oz-silver-buffalo-round', tag:'buffalo'},
-  {size:'1oz', name:'1oz Silver Buffalo Round',             dealer:'JM Bullion',       prem:2.49,  oz:1, ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-silvertowne-buffalo-silver-round-new/', tag:'buffalo'},
-  {size:'1oz', name:'1oz Silver Buffalo Round',             dealer:'APMEX',            prem:2.99,  oz:1, ship:'Free @ $199', url:'https://www.apmex.com/category/25393/1-oz-silver-buffalo-rounds', tag:'buffalo'},
-  {size:'1oz', name:'1oz Silver Buffalo Round',             dealer:'Money Metals',     prem:8.32,  oz:1, ship:'Free @ $199', url:'https://www.moneymetals.com/buy/silver/rounds/buffalo-silver-rounds', tag:'buffalo', mm:true},
-
-  // ── Silver Britannias (est. Mar 24, 2026) ──
-  {size:'1oz', name:'1oz Silver Britannia (BU)',            dealer:'SD Bullion',       prem:4.49,  oz:1, ship:'Free @ $499', url:'https://sdbullion.com/silver/british-royal-mint-silver-coins/silver-britannia-coins', tag:'britannia'},
-  {size:'1oz', name:'1oz Silver Britannia (BU)',            dealer:'JM Bullion',       prem:4.99,  oz:1, ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-british-silver-britannia-coin-vy/', tag:'britannia'},
-  {size:'1oz', name:'1oz Silver Britannia (BU)',            dealer:'APMEX',            prem:5.49,  oz:1, ship:'Free @ $199', url:'https://www.apmex.com/category/23989/silver-britannia-coins', tag:'britannia'},
-
-  // ── Silver Krugerrands (est. Mar 24, 2026) ──
-  {size:'1oz', name:'1oz Silver Krugerrand (BU)',           dealer:'SD Bullion',       prem:3.99,  oz:1, ship:'Free @ $499', url:'https://sdbullion.com/silver/african-silver-coins/south-african-silver-krugerrand-coins', tag:'krugerrand'},
-  {size:'1oz', name:'1oz Silver Krugerrand (BU)',           dealer:'JM Bullion',       prem:4.29,  oz:1, ship:'Free @ $499', url:'https://www.jmbullion.com/silver/silver-coins/south-african-silver-krugerrand/', tag:'krugerrand'},
-  {size:'1oz', name:'1oz Silver Krugerrand (BU)',           dealer:'APMEX',            prem:4.79,  oz:1, ship:'Free @ $199', url:'https://www.apmex.com/category/24705/south-african-mint-silver-krugerrand-coins', tag:'krugerrand'},
-
-  // ── Silver Kangaroos (est. Mar 24, 2026) ──
-  {size:'1oz', name:'1oz Australian Silver Kangaroo (BU)', dealer:'SD Bullion',       prem:3.49,  oz:1, ship:'Free @ $499', url:'https://sdbullion.com/silver/perth-mint-silver-coins/australian-silver-kangaroo-coins', tag:'kangaroo'},
-  {size:'1oz', name:'1oz Australian Silver Kangaroo (BU)', dealer:'JM Bullion',       prem:3.99,  oz:1, ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-australian-silver-kangaroo-coin-vyc/', tag:'kangaroo'},
-  {size:'1oz', name:'1oz Australian Silver Kangaroo (BU)', dealer:'APMEX',            prem:4.49,  oz:1, ship:'Free @ $199', url:'https://www.apmex.com/category/24045/the-perth-mint-silver-kangaroo-coins', tag:'kangaroo'},
-
-  // ── Engelhard Silver Bars (est. Mar 24, 2026 · Spot ~$68.92) ──
-  {size:'1oz',  name:'1oz Engelhard Silver Bar (Vintage)',   dealer:'JM Bullion',       prem:18.00, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+silver+bar', tag:'engelhard'},
-  {size:'1oz',  name:'1oz Engelhard Silver Bar (Vintage)',   dealer:'APMEX',            prem:20.00, oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+1+oz+silver+bar', tag:'engelhard'},
-  {size:'5oz',  name:'5oz Engelhard Silver Bar (Vintage)',   dealer:'JM Bullion',       prem:10.00, oz:5,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+silver+bar', tag:'engelhard'},
-  {size:'5oz',  name:'5oz Engelhard Silver Bar (Vintage)',   dealer:'APMEX',            prem:11.00, oz:5,      ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+5+oz+silver+bar', tag:'engelhard'},
-  {size:'10oz', name:'10oz Engelhard Silver Bar (Vintage)',  dealer:'JM Bullion',       prem:7.00,  oz:10,     ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+silver+bar', tag:'engelhard'},
-  {size:'10oz', name:'10oz Engelhard Silver Bar (Vintage)',  dealer:'APMEX',            prem:8.00,  oz:10,     ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+10+oz+silver+bar', tag:'engelhard'},
-
-  // ── Engelhard Prospector Rounds (est. Mar 24, 2026 · Spot ~$68.92) ──
-  {size:'1oz',  name:'1oz Engelhard Prospector Silver Round',dealer:'JM Bullion',       prem:20.00, oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=engelhard+prospector', tag:'prospector'},
-  {size:'1oz',  name:'1oz Engelhard Prospector Silver Round',dealer:'APMEX',            prem:22.00, oz:1,      ship:'Free @ $199', url:'https://www.apmex.com/search?q=engelhard+prospector+silver+round', tag:'prospector'},
-  {size:'1oz',  name:'1oz Engelhard Prospector Silver Round',dealer:'SD Bullion',       prem:19.00, oz:1,      ship:'Free @ $499', url:'https://sdbullion.com/search?q=engelhard+prospector', tag:'prospector'},
-
-  // ── Geiger Silver Bars (all OOS as of Mar 23, 2026) ──
-  {size:'1oz',  name:'1oz Geiger Original Silver Bar',      dealer:'JM Bullion',       prem:5.99,  oz:1,      ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'misc', name:'100g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:5.49,  oz:3.215,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'misc', name:'250g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:6.49,  oz:8.038,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'misc', name:'500g Geiger Square Silver Bar',       dealer:'JM Bullion',       prem:6.49,  oz:16.075, ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
-  {size:'kilo', name:'1000g Geiger Square Silver Bar',      dealer:'JM Bullion',       prem:5.99,  oz:32.15,  ship:'Free @ $499', url:'https://www.jmbullion.com/search/?q=geiger+silver+bar', tag:'geiger', oos:true},
-];
-
-// ═══════════════════════════════════════════════
-// GOLD DEALERS
-// Premiums in $/oz equiv, verified March 23, 2026 · Spot ~$4,452/oz
-// For gram items: display price = (goldSpot + premPerOz) × ozWeight
-// ═══════════════════════════════════════════════
-let GOLD_DEALERS = [
-  // ── Gram items (ozWeight = grams × 0.032151) ──
-  {gsize:'gram', name:'1g Gold Bar',                       dealer:'JM Bullion',       premOz:1017, ozW:0.032151, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/1-gram-gold-bars/', verified:true, gramLabel:'1g'},
-  {gsize:'gram', name:'1.5g Gold Bar',                     dealer:'JM Bullion',       premOz:950,  ozW:0.048227, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/', verified:true, gramLabel:'1.5g'},
-  {gsize:'gram', name:'2g Gold Bar',                       dealer:'JM Bullion',       premOz:850,  ozW:0.064302, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/', verified:true, gramLabel:'2g'},
-  {gsize:'gram', name:'5g Gold Bar',                       dealer:'JM Bullion',       premOz:469,  ozW:0.160755, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/5-gram-gold-bars/', verified:true, gramLabel:'5g'},
-
-  // ── Fractional oz ──
-  {gsize:'tenth',  name:'1/10oz American Gold Eagle',      dealer:'JM Bullion',       premOz:414,  ozW:0.1,      ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/american-gold-eagles/', verified:true, tag:'eagle'},
-  {gsize:'tenth',  name:'1/10oz Canadian Gold Maple Leaf', dealer:'JM Bullion',       premOz:385,  ozW:0.1,      ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/canadian-gold-maple-leafs/', verified:true, tag:'maple'},
-  {gsize:'quarter',name:'1/4oz American Gold Eagle',       dealer:'JM Bullion',       premOz:92,   ozW:0.25,     ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/american-gold-eagles/', verified:true, tag:'eagle'},
-  {gsize:'quarter',name:'1/4oz Canadian Gold Maple Leaf',  dealer:'JM Bullion',       premOz:80,   ozW:0.25,     ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/canadian-gold-maple-leafs/', verified:true, tag:'maple'},
-  {gsize:'half',   name:'1/2oz American Gold Eagle',       dealer:'JM Bullion',       premOz:273,  ozW:0.5,      ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/american-gold-eagles/', verified:true, tag:'eagle'},
-  {gsize:'half',   name:'1/2oz Canadian Gold Maple Leaf',  dealer:'JM Bullion',       premOz:220,  ozW:0.5,      ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/canadian-gold-maple-leafs/', verified:true, tag:'maple'},
-
-  // ── 1oz ──
-  {gsize:'1oz',  name:'1oz American Gold Eagle',           dealer:'JM Bullion',       premOz:85,   ozW:1,        ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/american-gold-eagles/', verified:true, tag:'eagle'},
-  {gsize:'1oz',  name:'1oz Canadian Gold Maple Leaf',      dealer:'JM Bullion',       premOz:55,   ozW:1,        ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/canadian-gold-maple-leafs/', verified:true, tag:'maple'},
-  {gsize:'1oz',  name:'1oz Gold Buffalo',                  dealer:'JM Bullion',       premOz:95,   ozW:1,        ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/american-gold-buffalos/', verified:true, tag:'buffalo'},
-  {gsize:'1oz',  name:'1oz PAMP Suisse Gold Bar (Assay)',  dealer:'JM Bullion',       premOz:72,   ozW:1,        ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/1-oz-gold-bars/', verified:true},
-  {gsize:'1oz',  name:'1oz American Gold Eagle',           dealer:'Money Metals',     premOz:183,  ozW:1,        ship:'Free @ $199', url:'https://www.moneymetals.com/buy/gold/american-gold-eagle/1-oz-gold-eagle-coins', tag:'eagle', mm:true},
-  {gsize:'1oz',  name:'1oz Canadian Gold Maple Leaf',      dealer:'Money Metals',     premOz:112,  ozW:1,        ship:'Free @ $199', url:'https://www.moneymetals.com/buy/gold/canadian-gold-coins/canadian-gold-maple-leaf', tag:'maple', mm:true},
-  {gsize:'1oz',  name:'1oz Gold Buffalo',                  dealer:'Money Metals',     premOz:266,  ozW:1,        ship:'Free @ $199', url:'https://www.moneymetals.com/buy/gold/coins/gold-american-buffalo', tag:'buffalo', mm:true},
-
-  // ── Kilo ──
-  {gsize:'kilo', name:'1 Kilo PAMP Suisse Gold Bar',       dealer:'JM Bullion',       premOz:38,   ozW:32.151,   ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-bars/kilo-gold-bars/', verified:true},
-
-  // ── APMEX Gold (verified Mar 24, 2026) ──
-  {gsize:'1oz',  name:'1oz American Gold Eagle',          dealer:'APMEX',            premOz:85,   ozW:1,        ship:'Free @ $199', url:'https://www.apmex.com/category/24890/1-oz-american-gold-eagles', verified:true, tag:'eagle'},
-  {gsize:'1oz',  name:'1oz Canadian Gold Maple Leaf',     dealer:'APMEX',            premOz:55,   ozW:1,        ship:'Free @ $199', url:'https://www.apmex.com/category/24894/1-oz-canadian-gold-maple-leafs', verified:true, tag:'maple'},
-  {gsize:'1oz',  name:'1oz Gold Bar (Secondary Mkt)',     dealer:'APMEX',            premOz:32,   ozW:1,        ship:'Free @ $199', url:'https://www.apmex.com/category/25625/1-oz-gold-bars', verified:true},
-  {gsize:'tenth',name:'1/10oz American Gold Eagle',       dealer:'APMEX',            premOz:420,  ozW:0.1,      ship:'Free @ $199', url:'https://www.apmex.com/category/24891/1-10-oz-american-gold-eagles', verified:true, tag:'eagle'},
-  {gsize:'quarter',name:'1/4oz American Gold Eagle',      dealer:'APMEX',            premOz:95,   ozW:0.25,     ship:'Free @ $199', url:'https://www.apmex.com/category/24892/1-4-oz-american-gold-eagles', verified:true, tag:'eagle'},
-
-
-  // ── Gold Libertads (estimated premiums, Mar 24, 2026 · Spot ~$4,452) ──
-  {gsize:'tenth',  name:'1/10oz Mexican Gold Libertad (Random Yr)', dealer:'APMEX',           premOz:450, ozW:0.1,   ship:'Free @ $199', url:'https://www.apmex.com/category/13014/1-10-oz-mexican-gold-libertad-coins-bu-proof', tag:'libertad'},
-  {gsize:'tenth',  name:'1/10oz Mexican Gold Libertad',             dealer:'SD Bullion',      premOz:430, ozW:0.1,   ship:'Free @ $499', url:'https://sdbullion.com/gold/mexican-gold-libertad-coins', tag:'libertad'},
-  {gsize:'quarter',name:'1/4oz Mexican Gold Libertad (Random Yr)',  dealer:'APMEX',           premOz:200, ozW:0.25,  ship:'Free @ $199', url:'https://www.apmex.com/category/13011/1-4-oz-mexican-gold-libertad-coins-bu-proof', tag:'libertad'},
-  {gsize:'quarter',name:'1/4oz Mexican Gold Libertad',              dealer:'SD Bullion',      premOz:185, ozW:0.25,  ship:'Free @ $499', url:'https://sdbullion.com/gold/mexican-gold-libertad-coins', tag:'libertad'},
-  {gsize:'half',   name:'1/2oz Mexican Gold Libertad (Random Yr)',  dealer:'APMEX',           premOz:165, ozW:0.5,   ship:'Free @ $199', url:'https://www.apmex.com/category/13012/1-2-oz-mexican-gold-libertad-coins-bu-proof', tag:'libertad'},
-  {gsize:'half',   name:'1/2oz Mexican Gold Libertad',              dealer:'SD Bullion',      premOz:150, ozW:0.5,   ship:'Free @ $499', url:'https://sdbullion.com/gold/mexican-gold-libertad-coins', tag:'libertad'},
-  {gsize:'1oz',    name:'1oz Mexican Gold Libertad (Random Yr)',    dealer:'APMEX',           premOz:130, ozW:1,     ship:'Free @ $199', url:'https://www.apmex.com/category/13010/mexican-gold-libertad-coins-all', tag:'libertad'},
-  {gsize:'1oz',    name:'1oz Mexican Gold Libertad',                dealer:'SD Bullion',      premOz:120, ozW:1,     ship:'Free @ $499', url:'https://sdbullion.com/gold/mexican-gold-libertad-coins', tag:'libertad'},
-  {gsize:'1oz',    name:'Mexican Gold Libertads (Pacific PM)',      dealer:'Pacific Precious',premOz:135, ozW:1,     ship:'Varies',      url:'https://www.pacificpreciousmetals.com/mexican-gold-coins', tag:'libertad'},
-
-  // ── Gold Pandas (estimated premiums, Mar 24, 2026 · Spot ~$4,452) ──
-  {gsize:'tenth',  name:'1/10oz Chinese Gold Panda (Random Yr)',    dealer:'JM Bullion',      premOz:500, ozW:0.1,   ship:'Free @ $499', url:'https://www.jmbullion.com/1-10-chinese-gold-panda-varied/', tag:'panda'},
-  {gsize:'tenth',  name:'1/10oz Chinese Gold Panda (Random Yr)',    dealer:'APMEX',           premOz:520, ozW:0.1,   ship:'Free @ $199', url:'https://www.apmex.com/category/24356/1-10-oz-chinese-gold-panda-coins', tag:'panda'},
-  {gsize:'quarter',name:'1/4oz Chinese Gold Panda (Random Yr)',     dealer:'JM Bullion',      premOz:210, ozW:0.25,  ship:'Free @ $499', url:'https://www.jmbullion.com/1-4-chinese-gold-panda-varied/', tag:'panda'},
-  {gsize:'quarter',name:'1/4oz Chinese Gold Panda (Random Yr)',     dealer:'APMEX',           premOz:225, ozW:0.25,  ship:'Free @ $199', url:'https://www.apmex.com/category/24357/1-4-oz-chinese-gold-panda-coins', tag:'panda'},
-  {gsize:'half',   name:'1/2oz Chinese Gold Panda (Random Yr)',     dealer:'JM Bullion',      premOz:160, ozW:0.5,   ship:'Free @ $499', url:'https://www.jmbullion.com/1-2-chinese-gold-panda-varied/', tag:'panda'},
-  {gsize:'half',   name:'1/2oz Chinese Gold Panda (Random Yr)',     dealer:'APMEX',           premOz:170, ozW:0.5,   ship:'Free @ $199', url:'https://www.apmex.com/category/24358/1-2-oz-chinese-gold-panda-coins', tag:'panda'},
-  {gsize:'1oz',    name:'1oz Chinese Gold Panda (Random Yr)',       dealer:'JM Bullion',      premOz:125, ozW:1,     ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-chinese-gold-panda-coin-varied/', tag:'panda'},
-  {gsize:'1oz',    name:'1oz Chinese Gold Panda (Random Yr)',       dealer:'APMEX',           premOz:135, ozW:1,     ship:'Free @ $199', url:'https://www.apmex.com/category/24359/1-oz-chinese-gold-panda-coins', tag:'panda'},
-  {gsize:'gram',   name:'30g Chinese Gold Panda (Random Yr)',       dealer:'JM Bullion',      premOz:130, ozW:0.9645,ship:'Free @ $499', url:'https://www.jmbullion.com/30-g-chinese-gold-panda-varied/', tag:'panda', gramLabel:'30g'},
-
-
-  // ── Gold Britannias (est. Mar 24, 2026) ──
-  {gsize:'tenth',  name:'1/10oz Gold Britannia (BU)',    dealer:'JM Bullion',      premOz:450, ozW:0.1,  ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/british-gold-coins/gold-britannias/', tag:'britannia'},
-  {gsize:'tenth',  name:'1/10oz Gold Britannia (BU)',    dealer:'APMEX',           premOz:470, ozW:0.1,  ship:'Free @ $199', url:'https://www.apmex.com/category/24895/gold-britannia-coins', tag:'britannia'},
-  {gsize:'quarter',name:'1/4oz Gold Britannia (BU)',     dealer:'JM Bullion',      premOz:110, ozW:0.25, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/british-gold-coins/gold-britannias/', tag:'britannia'},
-  {gsize:'quarter',name:'1/4oz Gold Britannia (BU)',     dealer:'APMEX',           premOz:120, ozW:0.25, ship:'Free @ $199', url:'https://www.apmex.com/category/24895/gold-britannia-coins', tag:'britannia'},
-  {gsize:'1oz',    name:'1oz Gold Britannia (BU)',       dealer:'JM Bullion',      premOz:80,  ozW:1,    ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/british-gold-coins/gold-britannias/', tag:'britannia'},
-  {gsize:'1oz',    name:'1oz Gold Britannia (BU)',       dealer:'APMEX',           premOz:90,  ozW:1,    ship:'Free @ $199', url:'https://www.apmex.com/category/24895/gold-britannia-coins', tag:'britannia'},
-  {gsize:'1oz',    name:'1oz Gold Britannia (BU)',       dealer:'SD Bullion',      premOz:75,  ozW:1,    ship:'Free @ $499', url:'https://sdbullion.com/gold/british-royal-mint-gold-coins/gold-britannia-coins', tag:'britannia'},
-
-  // ── Gold Krugerrands (est. Mar 24, 2026) ──
-  {gsize:'tenth',  name:'1/10oz Gold Krugerrand (BU)',   dealer:'JM Bullion',      premOz:430, ozW:0.1,  ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/south-african-gold-krugerrands/', tag:'krugerrand'},
-  {gsize:'tenth',  name:'1/10oz Gold Krugerrand (BU)',   dealer:'APMEX',           premOz:445, ozW:0.1,  ship:'Free @ $199', url:'https://www.apmex.com/category/16109/south-african-mint-gold-krugerrand-coins', tag:'krugerrand'},
-  {gsize:'quarter',name:'1/4oz Gold Krugerrand (BU)',    dealer:'JM Bullion',      premOz:85,  ozW:0.25, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/south-african-gold-krugerrands/', tag:'krugerrand'},
-  {gsize:'quarter',name:'1/4oz Gold Krugerrand (BU)',    dealer:'APMEX',           premOz:92,  ozW:0.25, ship:'Free @ $199', url:'https://www.apmex.com/category/16109/south-african-mint-gold-krugerrand-coins', tag:'krugerrand'},
-  {gsize:'1oz',    name:'1oz Gold Krugerrand (BU)',      dealer:'JM Bullion',      premOz:45,  ozW:1,    ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/south-african-gold-krugerrands/', tag:'krugerrand'},
-  {gsize:'1oz',    name:'1oz Gold Krugerrand (BU)',      dealer:'APMEX',           premOz:50,  ozW:1,    ship:'Free @ $199', url:'https://www.apmex.com/category/16109/south-african-mint-gold-krugerrand-coins', tag:'krugerrand'},
-  {gsize:'1oz',    name:'1oz Gold Krugerrand (BU)',      dealer:'SD Bullion',      premOz:42,  ozW:1,    ship:'Free @ $499', url:'https://sdbullion.com/gold/african-gold-coins/south-african-gold-krugerrand-coins', tag:'krugerrand'},
-
-  // ── Gold Kangaroos (est. Mar 24, 2026) ──
-  {gsize:'tenth',  name:'1/10oz Australian Gold Kangaroo (BU)', dealer:'JM Bullion', premOz:400, ozW:0.1,  ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/australian-gold-coins/perth-gold-kangaroos/', tag:'kangaroo'},
-  {gsize:'tenth',  name:'1/10oz Australian Gold Kangaroo (BU)', dealer:'APMEX',     premOz:415, ozW:0.1,  ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
-  {gsize:'quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'JM Bullion', premOz:90,  ozW:0.25, ship:'Free @ $499', url:'https://www.jmbullion.com/gold/gold-coins/australian-gold-coins/perth-gold-kangaroos/', tag:'kangaroo'},
-  {gsize:'quarter',name:'1/4oz Australian Gold Kangaroo (BU)',  dealer:'APMEX',     premOz:98,  ozW:0.25, ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
-  {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'JM Bullion', premOz:60,  ozW:1,    ship:'Free @ $499', url:'https://www.jmbullion.com/1-oz-australian-gold-kangaroo/', tag:'kangaroo'},
-  {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'APMEX',     premOz:65,  ozW:1,    ship:'Free @ $199', url:'https://www.apmex.com/category/14010/the-perth-mint-gold-kangaroo-coins', tag:'kangaroo'},
-  {gsize:'1oz',    name:'1oz Australian Gold Kangaroo (BU)',    dealer:'SD Bullion', premOz:58,  ozW:1,    ship:'Free @ $499', url:'https://sdbullion.com/gold/perth-mint-gold-coins/australian-gold-kangaroo-coins', tag:'kangaroo'},
-
-  // ── Scottsdale Mint Gold (verified Mar 23, 2026) ──
-  {gsize:'1oz',  name:'1oz Gold Lion Cast Bar',             dealer:'Scottsdale Mint',  premOz:70.22, ozW:1,       ship:'Varies',      url:'https://www.scottsdalemint.com/product/scottsdale-gold-lion-1-oz-9999-gold-cast-bar/', tag:'scottsdale', verified:true},
-  {gsize:'1oz',  name:'1oz Gold Bar (All 1oz)',             dealer:'Scottsdale Mint',  premOz:100.22,ozW:1,       ship:'Varies',      url:'https://www.scottsdalemint.com/shop/gold/gold-bars/', tag:'scottsdale', verified:true},
-  {gsize:'1oz',  name:'1oz Gold Cast Bars (Browse All)',   dealer:'Scottsdale Mint',  premOz:225.22,ozW:1,       ship:'Varies',      url:'https://www.scottsdalemint.com/shop/gold/gold-cast-bars/', tag:'scottsdale', verified:true},
-  {gsize:'kilo', name:'1 Kilo 9999 Fine Gold Cast Bar',    dealer:'Scottsdale Mint',  premOz:30.78, ozW:32.151,  ship:'Varies',      url:'https://www.scottsdalemint.com/product/scottsdale-mint-1-kilo-9999-fine-gold-cast-bar/', tag:'scottsdale', verified:true},
-  {gsize:'kilo', name:'1 Kilo Gold Bar (All Kilo)',         dealer:'Scottsdale Mint',  premOz:38,    ozW:32.151,  ship:'Varies',      url:'https://www.scottsdalemint.com/product/scottsdale-gold-1-kilo-gold-bar/', tag:'scottsdale', verified:true},
-];
-let JUNK_DEALERS = [];
-
-// ── State ──
-let silverSpot = null, prevSilverSpot = null;
+    // SILVER + GOLD DEALERS
+    // Populated entirely live from /.netlify/functions/get-prices — see
+    // loadLivePrices() below. No hardcoded fallback data: if live data is
+    // ever unavailable the UI shows a clear loading/error state instead of
+    // stale prices. This also means items that go out of stock at every
+    // dealer simply disappear from the list, and reappear automatically
+    // once back in stock — fully autonomous, no manual editing required.
+    // ═══════════════════════════════════════════════
+    let SILVER_DEALERS = [];
+    let GOLD_DEALERS = [];
+    let livePricesLoaded = false; // true once real dealer data has loaded at least once
+    let livePricesFailed = false; // true if the most recent fetch attempt failed
+        let JUNK_DEALERS = [];
+    
+        // ── State ──
+        let silverSpot = null, prevSilverSpot = null;
 let goldSpot = null, prevGoldSpot = null;
 let platinumSpot = null, palladiumSpot = null;
 let spotSource = '';
@@ -1180,7 +983,7 @@ function timedFetch(url, ms) {
   return Promise.race([
     fetch(url, {cache:'no-store'}),
     new Promise((_,r) => setTimeout(() => r(new Error('timeout')), ms))
-  ]);
+]);
 }
 
 // ── Fetch both silver AND gold from Kitco in one call ──
