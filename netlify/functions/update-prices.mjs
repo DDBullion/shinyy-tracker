@@ -314,4 +314,3 @@ export default async (req) => {
   }
   return new Response('OK: ' + totalFetched + ' deals');
 };
-// update-prices.mjs — Netlify Scheduled Function v2
