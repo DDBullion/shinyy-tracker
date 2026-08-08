@@ -1678,34 +1678,41 @@ async function doSoldSearch(){
 }
 
 
-// ── Live prices from Netlify Blobs (refreshed daily by update-prices) ──
-async function loadLivePrices() {
-  try {
-    const res = await fetch('/.netlify/functions/get-prices', { cache: 'no-store' });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (!data || !data.silver || !data.gold) return;
-    if (data.silver.length >= 5) SILVER_DEALERS = data.silver;
-    if (data.gold.length >= 3) {
-      GOLD_DEALERS = data.gold.map(function(d) {
-        return { gsize: d.size, name: d.name, dealer: d.dealer,
-          premOz: d.prem, ozW: d.oz, ship: d.ship, url: d.url,
-          tag: d.tag, verified: d.verified };
-      });
+// ── Live prices from Netlify Blobs (refreshed automatically by update-prices) ──
+    async function loadLivePrices() {
+        try {
+              const res = await fetch('/.netlify/functions/get-prices', { cache: 'no-store' });
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              const data = await res.json();
+              if (!data || !data.silver || !data.gold) throw new Error('bad payload');
+              if (data.silver.length >= 5) SILVER_DEALERS = data.silver;
+              if (data.gold.length >= 3) {
+                      GOLD_DEALERS = data.gold.map(function(d) {
+                                return { gsize: d.size, name: d.name, dealer: d.dealer,
+                                                  premOz: d.prem, ozW: d.oz, ship: d.ship, url: d.url,
+                                                  tag: d.tag, verified: d.verified };
+                      });
+              }
+              if (data.junk && data.junk.length >= 1) JUNK_DEALERS = data.junk;
+              if (data.updated) {
+                      const mins = Math.round((Date.now() - new Date(data.updated)) / 60000);
+                      const ago = mins < 2 ? 'just now' : mins < 60 ? mins + 'm ago' : Math.round(mins/60) + 'h ago';
+                      const el = document.getElementById('prices-updated');
+                      if (el) el.textContent = 'Prices updated ' + ago;
+              }
+              livePricesLoaded = true;
+              livePricesFailed = false;
+              if (silverSpot) renderSilverDeals();
+              if (goldSpot) renderGoldDeals();
+              renderJunkDeals();
+        } catch(e) {
+              livePricesFailed = true;
+              if (silverSpot) renderSilverDeals();
+              if (goldSpot) renderGoldDeals();
+        }
     }
-    if (data.junk && data.junk.length >= 1) JUNK_DEALERS = data.junk;
-    if (data.updated) {
-      const mins = Math.round((Date.now() - new Date(data.updated)) / 60000);
-      const ago = mins < 2 ? 'just now' : mins < 60 ? mins + 'm ago' : Math.round(mins/60) + 'h ago';
-      const el = document.getElementById('prices-updated');
-      if (el) el.textContent = 'Prices updated ' + ago;
-    }
-    if (silverSpot) renderSilverDeals();
-    if (goldSpot) renderGoldDeals();
-    renderJunkDeals();
-  } catch(e) { /* silently use hardcoded fallback */ }
-}
-loadLivePrices();
+    loadLivePrices();
+    setInterval(loadLivePrices, 15 * 60 * 1000);
 
 
 // ── Dynamic SEO title per tab ──
