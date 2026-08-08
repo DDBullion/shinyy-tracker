@@ -1,9 +1,9 @@
 // update-prices.mjs — Netlify Scheduled Function v2
-// Runs every 3 hours, scrapes FindBullionPrices.com,
+// Runs daily at 6am UTC, scrapes FindBullionPrices.com,
 // caches results + enriched product URLs to Netlify Blobs.
 import { getStore } from '@netlify/blobs';
 
-export const config = { schedule: '0 */3 * * *' };
+export const config = { schedule: '0 6 * * *' };
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36',
