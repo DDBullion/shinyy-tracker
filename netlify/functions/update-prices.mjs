@@ -9,6 +9,30 @@ const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36',
   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 };
+// FindBullionPrices.com blocks Netlify's shared function IP range (confirmed:
+// direct fetches from a real browser / other networks succeed fine, only
+// Netlify's outbound IP gets HTTP 403 — this is an IP-reputation block, not
+// something about our request pattern). We route through r.jina.ai, a
+// read-only proxy/reader service, which fetches the page from its own
+// network and returns the raw HTML. This sidesteps the IP block entirely.
+// Falls back to a direct fetch if the proxy ever fails, in case the direct
+// block is later lifted.
+async function fetchViaProxy(url, timeoutMs, attempt = 1) {
+    try {
+          const r = await fetch('https://r.jina.ai/' + url, {
+                  headers: { ...HEADERS, 'X-Return-Format': 'html' },
+                  signal: AbortSignal.timeout(timeoutMs),
+          });
+          if (!r.ok) throw new Error('proxy HTTP ' + r.status);
+          return r;
+    } catch (e) {
+          if (attempt < 2) {
+                  await new Promise(res => setTimeout(res, 800));
+                  return fetchViaProxy(url, timeoutMs, attempt + 1);
+          }
+          return fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(timeoutMs) });
+    }
+}
 
 const DEALER_URLS = {
   'SD Bullion':           'https://sdbullion.com',
@@ -199,21 +223,18 @@ async function enrichProductUrls(allDeals, store) {
   // and keeps new listings enriched with real product links same-day.
   const toFetch = newPaths.slice(0, 90);
 
-  const BATCH = 6; // 6 concurrent fetches × 4s timeout = ~4s per batch
-  for (let i = 0; i < toFetch.length; i += BATCH) {
-    await Promise.all(toFetch.slice(i, i + BATCH).map(async (fp) => {
-      try {
-        const r = await fetch('https://www.findbullionprices.com' + fp, {
-          headers: HEADERS,
-          signal: AbortSignal.timeout(4000),
-        });
-        if (!r.ok) return;
+  const BATCH = 4; // lower concurrency — proxy hop is slower than direct
+    for (let i = 0; i < toFetch.length; i += BATCH) {
+          await Promise.all(toFetch.slice(i, i + BATCH).map(async (fp) => {
+                  try {
+                            const r = await fetchViaProxy('https://www.findbullionprices.com' + fp, 9000);
+                            if (!r.ok) return;
         const html = await r.text();
 
         // <tr id="vendor_N"> rows contain direct dealer product hrefs:
         // <a href="https://dealer.com/product" ... class="dealer-link"
         //    title="Shop for X from DealerName">
-        const vendorRows = html.match(/<tr id="vendor_\d+"[\s\S]*?<\/tr>/gi) || [];
+        const vendorRows = html.match(/<tr\s+id="vendor_\d+"[\s\S]*?<\/tr>/gi) || [];
         const map = {};
         for (const row of vendorRows) {
           const anchorM = row.match(/<a\b([^>]*)class="[^"]*dealer-link[^"]*"([^>]*)>/i);
@@ -260,10 +281,7 @@ export default async (req) => {
   // Fetch all 11 FBP pages in parallel — ~3s total instead of ~9s sequential
   const results = await Promise.allSettled(
     FBP_PAGES.map(async (page) => {
-      const resp = await fetch(page.url, {
-        headers: HEADERS,
-        signal: AbortSignal.timeout(12000),
-      });
+      const resp = await fetchViaProxy(page.url, 15000);
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       const html  = await resp.text();
       const deals = page.metal === 'junk' ? parseJunkProductPage(html, page) : parseDeals(html, page);
