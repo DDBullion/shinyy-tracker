@@ -278,18 +278,26 @@ export default async (req) => {
   const store = getStore('prices');
   const allDeals = { silver: [], gold: [], junk: [], updated: new Date().toISOString() };
 
-  // Fetch all 11 FBP pages in parallel — ~3s total instead of ~9s sequential
-  const results = await Promise.allSettled(
-    FBP_PAGES.map(async (page) => {
-      const resp = await fetchViaProxy(page.url, 15000);
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      const html  = await resp.text();
-      const deals = page.metal === 'junk' ? parseJunkProductPage(html, page) : parseDeals(html, page);
-      console.log('  ' + page.metal + ' ' + page.size + ': ' + deals.length + ' deals');
-      return { page, deals };
-    })
-  );
-
+  // Fetch FBP pages in small batches via the proxy — batching avoids
+    // overwhelming the proxy service's rate limit when all 16 requests
+    // fire at once (same pattern as enrichProductUrls below).
+    const results = [];
+    const PAGE_BATCH = 5;
+    for (let i = 0; i < FBP_PAGES.length; i += PAGE_BATCH) {
+          const batch = await Promise.allSettled(
+                  FBP_PAGES.slice(i, i + PAGE_BATCH).map(async (page) => {
+                            const resp = await fetchViaProxy(page.url, 15000);
+                            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                            const html  = await resp.text();
+                            const deals = page.metal === 'junk' ? parseJunkProductPage(html, page) : parseDeals(html, page);
+                            console.log('  ' + page.metal + ' ' + page.size + ': ' + deals.length + ' deals');
+                            return { page, deals };
+                  })
+                );
+          results.push(...batch);
+          if (i + PAGE_BATCH < FBP_PAGES.length) await new Promise(r => setTimeout(r, 500));
+    }
+  
   let totalFetched = 0;
   for (const r of results) {
     if (r.status === 'fulfilled') {
