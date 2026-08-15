@@ -282,21 +282,67 @@ export default async (req) => {
     // overwhelming the proxy service's rate limit when all 16 requests
     // fire at once (same pattern as enrichProductUrls below).
     const results = [];
-    const PAGE_BATCH = 5;
+async function fetchOnePage(page) {
+      const resp = await fetchViaProxy(page.url, 15000);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const html = await resp.text();
+      const deals = page.metal === 'junk' ? parseJunkProductPage(html, page) : parseDeals(html, page);
+      console.log('  ' + page.metal + ' ' + page.size + ': ' + deals.length + ' deals');
+      return { page, deals };
+}
+    const PAGE_BATCH = 3;
     for (let i = 0; i < FBP_PAGES.length; i += PAGE_BATCH) {
           const batch = await Promise.allSettled(
-                  FBP_PAGES.slice(i, i + PAGE_BATCH).map(async (page) => {
-                            const resp = await fetchViaProxy(page.url, 15000);
-                            if (!resp.ok) throw new Error('HTTP ' + resp.status);
-                            const html  = await resp.text();
-                            const deals = page.metal === 'junk' ? parseJunkProductPage(html, page) : parseDeals(html, page);
-                            console.log('  ' + page.metal + ' ' + page.size + ': ' + deals.length + ' deals');
-                            return { page, deals };
-                  })
+                  FBP_PAGES.slice(i, i + PAGE_BATCH).map(fetchOnePage)
                 );
           results.push(...batch);
-          if (i + PAGE_BATCH < FBP_PAGES.length) await new Promise(r => setTimeout(r, 500));
+          if (i + PAGE_BATCH < FBP_PAGES.length) await new Promise(r => setTimeout(r, 1200));
     }
+    // Final sequential retry for any pages that still failed — sequential
+    // (one at a time) fetches have proven far more reliable against
+    // rate limits than any concurrency, even small batches.
+    for (let j = 0; j < results.length; j++) {
+        a s yinfc  (fruenscutlitosn[ jf]e.tscthaOtnuesP a=g=e=( p'argeej)e c{t
+          e d ' )  c{o
+          n s t   r e scpo n=s ta wpaaigte  f=e tFcBhPV_iPaAPGrEoSx[yj(]p;a
+      g e . u r l ,t r1y5 0{0
+                            0 ) ; 
+                                     icfo n(s!tr evsapl.uoek )=  tahwraoiwt  nfeewt cEhrOrnoerP(a'gHeT(TpPa g'e )+; 
+                            r e s p . s t a truess)u;l
+                            t s [ j ]c o=n s{t  shttamtlu s=:  a'wfauiltf irlelsepd.'t,e xvta(l)u;e
+                                            } ; 
+                              c o n s t   d ecaolnss o=l ep.algoeg.(m'e t arle t=r=y=  s'ujcucneke'd e?d :p a'r s+e JpuangkeP.rmoedtuaclt P+a g'e ('h t+m lp,a gpea.gsei)z e:) ;p
+                            a r s e D e a}l sc(ahttcmhl ,( ep)a g{e
+                                                                  ) ; 
+                                                                           c ocnosnosloel.el.owga(r'n ( ''   +r eptargye .fmaeitlaeld :+  ''  +'  p+a gpea.gmee.tsailz e+  +'  '':  +'  p+a gdee.aslisz.el e+n g't:h  '+  +'  ed.emaelsss'a)g;e
+                                                                  ) ; 
+                                                                      r e t u r}n
+      {   p a}g
+      e ,  }deals };
+}
+  const PAGE_BATCH = 3;
+  for (let i = 0; i < FBP_PAGES.length; i += PAGE_BATCH) {
+        const batch = await Promise.allSettled(
+                FBP_PAGES.slice(i, i + PAGE_BATCH).map(fetchOnePage)
+              );
+        results.push(...batch);
+        if (i + PAGE_BATCH < FBP_PAGES.length) await new Promise(r => setTimeout(r, 1200));
+  }
+  // Final sequential retry for any pages that still failed — sequential
+  // (one at a time) fetches have proven far more reliable against
+  // rate limits than any concurrency, even small batches.
+  for (let j = 0; j < results.length; j++) {
+        if (results[j].status === 'rejected') {
+                const page = FBP_PAGES[j];
+                try {
+                          const value = await fetchOnePage(page);
+                          results[j] = { status: 'fulfilled', value };
+                          console.log('  retry succeeded: ' + page.metal + ' ' + page.size);
+                } catch (e) {
+                          console.warn('  retry failed: ' + page.metal + ' ' + page.size + ': ' + e.message);
+                }
+        }
+  }
   
   let totalFetched = 0;
   for (const r of results) {
