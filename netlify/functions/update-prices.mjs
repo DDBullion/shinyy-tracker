@@ -299,21 +299,6 @@ async function fetchOnePage(page) {
         results.push(...batch);
         if (i + PAGE_BATCH < FBP_PAGES.length) await new Promise(r => setTimeout(r, 1200));
   }
-  // Final sequential retry for any pages that still failed — sequential
-  // (one at a time) fetches have proven far more reliable against
-  // rate limits than any concurrency, even small batches.
-  for (let j = 0; j < results.length; j++) {
-        if (results[j].status === 'rejected') {
-                const page = FBP_PAGES[j];
-                try {
-                          const value = await fetchOnePage(page);
-                          results[j] = { status: 'fulfilled', value };
-                          console.log('  retry succeeded: ' + page.metal + ' ' + page.size);
-                } catch (e) {
-                          console.warn('  retry failed: ' + page.metal + ' ' + page.size + ': ' + e.message);
-                }
-        }
-  }
   
   let totalFetched = 0;
   for (const r of results) {
