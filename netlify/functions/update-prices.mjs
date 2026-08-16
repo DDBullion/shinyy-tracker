@@ -293,6 +293,16 @@ async function fetchOnePage(page) {
     
 const batchResults = await Promise.allSettled(FBP_PAGES.map(fetchOnePage));
     results.push(...batchResults);
+
+    // Retry any failed pages once, concurrently, after a brief cooldown —
+    // Netlify's scheduled functions get a 30s budget, and the main fetch
+    // above only uses ~10s, leaving plenty of room for one retry pass.
+    const failedIdx = results.map((r, i) => r.status === 'rejected' ? i : -1).filter(i => i >= 0);
+    if (failedIdx.length) {
+          await new Promise(r => setTimeout(r, 1500));
+          const retryResults = await Promise.allSettled(failedIdx.map(i => fetchOnePage(FBP_PAGES[i])));
+          retryResults.forEach((r, k) => { results[failedIdx[k]] = r; });
+    }
   
   let totalFetched = 0;
   for (const r of results) {
