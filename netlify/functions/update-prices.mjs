@@ -291,14 +291,8 @@ async function fetchOnePage(page) {
       return { page, deals };
 }
     
-  const PAGE_BATCH = 3;
-  for (let i = 0; i < FBP_PAGES.length; i += PAGE_BATCH) {
-        const batch = await Promise.allSettled(
-                FBP_PAGES.slice(i, i + PAGE_BATCH).map(fetchOnePage)
-              );
-        results.push(...batch);
-        if (i + PAGE_BATCH < FBP_PAGES.length) await new Promise(r => setTimeout(r, 1200));
-  }
+const batchResults = await Promise.allSettled(FBP_PAGES.map(fetchOnePage));
+    results.push(...batchResults);
   
   let totalFetched = 0;
   for (const r of results) {
